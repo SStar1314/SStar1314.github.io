@@ -40,7 +40,7 @@
 	<header id="header" class="inner">
 		<a href="/" class="profilepic">
 			
-			<img src="null" class="js-avatar">
+			<img src="/favicon.ico" class="js-avatar">
 			
 		</a>
 
@@ -55,6 +55,8 @@
 			
 				<li><a href="/">主页</a></li>
 	        
+				<li><a href="/archives">所有文章</a></li>
+	        
 				<li><a href="/tags/随笔">随笔</a></li>
 	        
 			</ul>
@@ -63,22 +65,17 @@
 	        
     		
     			
-    			<a class="js-smart-menu" data-idx="0" href="javascript:void(0)">所有文章</a>
+    			<a class="js-smart-menu" data-idx="0" href="javascript:void(0)">标签</a>
     			
     			
             
     			
-    			<a class="js-smart-menu" data-idx="1" href="javascript:void(0)">标签</a>
+    			<a class="js-smart-menu" data-idx="1" href="javascript:void(0)">友链</a>
     			
     			
             
     			
-    			<a class="js-smart-menu" data-idx="2" href="javascript:void(0)">友链</a>
-    			
-    			
-            
-    			
-    			<a class="js-smart-menu" data-idx="3" href="javascript:void(0)">关于我</a>
+    			<a class="js-smart-menu" data-idx="2" href="javascript:void(0)">关于我</a>
     			
     			
             
@@ -86,13 +83,13 @@
 		<nav class="header-nav">
 			<div class="social">
 				
-					<a class="github" target="_blank" href="#" title="github">github</a>
+					<a class="github" target="_blank" href="https://github.com/SStar1314/" title="github">github</a>
 		        
 					<a class="weibo" target="_blank" href="#" title="weibo">weibo</a>
 		        
 					<a class="rss" target="_blank" href="#" title="rss">rss</a>
 		        
-					<a class="zhihu" target="_blank" href="#" title="zhihu">zhihu</a>
+					<a class="mail" target="_blank" href="/xaxiamx@gmail.com" title="mail">mail</a>
 		        
 			</div>
 		</nav>
@@ -110,7 +107,7 @@
 		<header id="header" class="inner">
 			<div class="profilepic">
 				
-					<img src="null" class="js-avatar">
+					<img src="/favicon.ico" class="js-avatar">
 				
 			</div>
 			<hgroup>
@@ -122,6 +119,8 @@
 				
 					<li><a href="/">主页</a></li>
 		        
+					<li><a href="/archives">所有文章</a></li>
+		        
 					<li><a href="/tags/随笔">随笔</a></li>
 		        
 				</ul>
@@ -129,13 +128,13 @@
 			<nav class="header-nav">
 				<div class="social">
 					
-						<a class="github" target="_blank" href="#" title="github">github</a>
+						<a class="github" target="_blank" href="https://github.com/SStar1314/" title="github">github</a>
 			        
 						<a class="weibo" target="_blank" href="#" title="weibo">weibo</a>
 			        
 						<a class="rss" target="_blank" href="#" title="rss">rss</a>
 			        
-						<a class="zhihu" target="_blank" href="#" title="zhihu">zhihu</a>
+						<a class="mail" target="_blank" href="/xaxiamx@gmail.com" title="mail">mail</a>
 			        
 				</div>
 			</nav>
@@ -192,7 +191,7 @@
       <i class="icon-circle-left"></i>
       <div class="article-nav-title">
         
-          Hello World
+          Hello World1
         
       </div>
     </a>
@@ -251,7 +250,7 @@
     <script>
 	var yiliaConfig = {
 		fancybox: true,
-		mathjax: false,
+		mathjax: true,
 		animate: true,
 		isHome: false,
 		isPost: true,
@@ -260,18 +259,37 @@
 		isCategory: false,
 		open_in_new: false,
 		root: "/",
-		innerArchive: true
+		innerArchive: false
 	}
 </script>
 
 <script src="/./main.js"></script>
 
 
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+        processEscapes: true,
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    }
+});
+
+MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';                 
+    }       
+});
+</script>
+
+<script src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
     
 <div class="tools-col">
   <ul class="btn-wrap">
-    
-      <li class="chose" data-hook="tools-section-all"><span class="text">全部</span><i class="icon-book"></i></li>
     
     
       <li data-hook="tools-section-tag"><span class="text">标签</span><i class="icon-price-tags"></i></li>
@@ -285,14 +303,11 @@
   </ul>
   <div class="tools-wrap">
     
-    	<section class="tools-section tools-section-all chose">
-    	</section>
-    
 
     
     	<section class="tools-section tools-section-tag">
     			<div class="widget tagcloud" id="js-tagcloud">
-    				
+    				<a href="/tags/随笔/" style="font-size: 10px;">随笔</a>
     			</div>
     	</section>
     
