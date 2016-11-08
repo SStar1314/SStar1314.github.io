@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" >
+  <link rel="dns-prefetch" href="http://yoursite.com">
+  <title>Hadoop HDFS介绍及安装 | SStar1314</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="Hadoop HDFS 1.x vs 2.xHadoop HDFS有2个版本，1.x和2.x，两者之间还有比较大的差距：
+
+1.x只支持MapReduce运算. 2.x除了MapReduce之外，还支持Spark，MPI，Hama，Giraph等多种类型运算。
+1.x中的MR组件既分发任务还需要进行资源调度。 2.x由另一个组件YARN来进行资源调度，MR至进行任务分发。
+1.x无法实现HA，只有">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Hadoop HDFS介绍及安装">
+<meta property="og:url" content="http://yoursite.com/Hadoop HDFS介绍及安装/index.html">
+<meta property="og:site_name" content="SStar1314">
+<meta property="og:description" content="Hadoop HDFS 1.x vs 2.xHadoop HDFS有2个版本，1.x和2.x，两者之间还有比较大的差距：
+
+1.x只支持MapReduce运算. 2.x除了MapReduce之外，还支持Spark，MPI，Hama，Giraph等多种类型运算。
+1.x中的MR组件既分发任务还需要进行资源调度。 2.x由另一个组件YARN来进行资源调度，MR至进行任务分发。
+1.x无法实现HA，只有">
+<meta property="og:image" content="http://yoursite.com/images/Hadoop_1_x_vs_2_x.png">
+<meta property="og:image" content="http://yoursite.com/images/Hadoop_HDFS_2_x.png">
+<meta property="og:updated_time" content="2016-11-08T05:38:53.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Hadoop HDFS介绍及安装">
+<meta name="twitter:description" content="Hadoop HDFS 1.x vs 2.xHadoop HDFS有2个版本，1.x和2.x，两者之间还有比较大的差距：
+
+1.x只支持MapReduce运算. 2.x除了MapReduce之外，还支持Spark，MPI，Hama，Giraph等多种类型运算。
+1.x中的MR组件既分发任务还需要进行资源调度。 2.x由另一个组件YARN来进行资源调度，MR至进行任务分发。
+1.x无法实现HA，只有">
+<meta name="twitter:image" content="http://yoursite.com/images/Hadoop_1_x_vs_2_x.png">
+  
+    <link rel="alternative" href="/atom.xml" title="SStar1314" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  <link rel="stylesheet" href="/main.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div class="left-col">
+      <div class="overlay"></div>
+<div class="intrude-less">
+	<header id="header" class="inner">
+		<a href="/" class="profilepic">
+			
+			<img src="/favicon.ico" class="js-avatar">
+			
+		</a>
+
+		<hgroup>
+		  <h1 class="header-author"><a href="/">Xia,MingXing</a></h1>
+		</hgroup>
+
+		
+
+		<nav class="header-menu">
+			<ul>
+			
+				<li><a href="/">主页</a></li>
+	        
+				<li><a href="/archives">所有文章</a></li>
+	        
+				<li><a href="/tags/随笔">随笔</a></li>
+	        
+			</ul>
+		</nav>
+		<nav class="header-smart-menu">
+	        
+    		
+    			
+    			<a class="js-smart-menu" data-idx="0" href="javascript:void(0)">标签</a>
+    			
+    			
+            
+    			
+    			<a class="js-smart-menu" data-idx="1" href="javascript:void(0)">友链</a>
+    			
+    			
+            
+    			
+    			<a class="js-smart-menu" data-idx="2" href="javascript:void(0)">关于我</a>
+    			
+    			
+            
+		</nav>
+		<nav class="header-nav">
+			<div class="social">
+				
+					<a class="github" target="_blank" href="https://github.com/SStar1314/" title="github">github</a>
+		        
+					<a class="weibo" target="_blank" href="#" title="weibo">weibo</a>
+		        
+					<a class="rss" target="_blank" href="#" title="rss">rss</a>
+		        
+					<a class="mail" target="_blank" href="/xaxiamx@gmail.com" title="mail">mail</a>
+		        
+			</div>
+		</nav>
+	</header>		
+</div>
+
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+  	<div class="overlay">
+  		<div class="slider-trigger"><i class="icon-list"></i></div>
+  		<h1 class="header-author js-mobile-header hide">Xia,MingXing</h1>
+  	</div>
+	<div class="intrude-less">
+		<header id="header" class="inner">
+			<div class="profilepic">
+				
+					<img src="/favicon.ico" class="js-avatar">
+				
+			</div>
+			<hgroup>
+			  <h1 class="header-author">Xia,MingXing</h1>
+			</hgroup>
+			
+			<nav class="header-menu">
+				<ul>
+				
+					<li><a href="/">主页</a></li>
+		        
+					<li><a href="/archives">所有文章</a></li>
+		        
+					<li><a href="/tags/随笔">随笔</a></li>
+		        
+				</ul>
+			</nav>
+			<nav class="header-nav">
+				<div class="social">
+					
+						<a class="github" target="_blank" href="https://github.com/SStar1314/" title="github">github</a>
+			        
+						<a class="weibo" target="_blank" href="#" title="weibo">weibo</a>
+			        
+						<a class="rss" target="_blank" href="#" title="rss">rss</a>
+			        
+						<a class="mail" target="_blank" href="/xaxiamx@gmail.com" title="mail">mail</a>
+			        
+				</div>
+			</nav>
+		</header>				
+	</div>
+</nav>
+
+      <div class="body-wrap">
+        <article id="post-Hadoop HDFS介绍及安装" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Hadoop HDFS介绍及安装
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="Hadoop-HDFS-1-x-vs-2-x"><a href="#Hadoop-HDFS-1-x-vs-2-x" class="headerlink" title="Hadoop HDFS 1.x vs 2.x"></a>Hadoop HDFS 1.x vs 2.x</h2><p><img src="/images/Hadoop_1_x_vs_2_x.png" alt=""><br>Hadoop HDFS有2个版本，1.x和2.x，两者之间还有比较大的差距：</p>
+<ol>
+<li>1.x只支持MapReduce运算. 2.x除了MapReduce之外，还支持Spark，MPI，Hama，Giraph等多种类型运算。</li>
+<li>1.x中的MR组件既分发任务还需要进行资源调度。 2.x由另一个组件YARN来进行资源调度，MR至进行任务分发。</li>
+<li>1.x无法实现HA，只有一个NameNode管理所有节点。 2.x支持HA，有SecondNameNode，但也只支持冷迁移。2.x还支持了Federation联邦，通过文件系统挂载点，将一个NameNode的负载分发下去。注意：HA和Federation可以结合使用。</li>
+</ol>
+<p>网上资料中包含了10点差异，但是从技术／架构角度上来说，这3点变化是核心的。</p>
+<h2 id="Hadoop-HDFS-2-x-架构图"><a href="#Hadoop-HDFS-2-x-架构图" class="headerlink" title="Hadoop HDFS 2.x 架构图"></a>Hadoop HDFS 2.x 架构图</h2><p><img src="/images/Hadoop_HDFS_2_x.png" alt=""></p>
+<h4 id="NameNode"><a href="#NameNode" class="headerlink" title="NameNode"></a>NameNode</h4><p>HDFS分布式文件系统中的管理者，负责管理文件系统的命名空间，集群配置信息，存储的复制。</p>
+<h4 id="Secondary-NameNode"><a href="#Secondary-NameNode" class="headerlink" title="Secondary NameNode"></a>Secondary NameNode</h4><p>并非NameNode的热备份，辅助NameNode，定期合并FSimage和EditLog。在NameNode失效的情况下，可以依据Secondary NameNode本地存储的FSimage和EditLog，恢复自身作为NameNode，但可能会有部分文件丢失，原因在于Secondary NameNode上的FSimage和EditLog并不是实时更新的。</p>
+<h4 id="DataNode"><a href="#DataNode" class="headerlink" title="DataNode"></a>DataNode</h4><p>DataNode是文件存储的节点，用于存放文件的Block，并且周期性的将Block信息发送给NameNode。值得提一句的是：HDFS中的Block大小设置很有讲究，通常为64M／128M，过小的Block会给NameNode带来巨大的管理压力，过大的Block可能会导致磁盘空间的浪费。</p>
+<h4 id="Client"><a href="#Client" class="headerlink" title="Client"></a>Client</h4><p>于NameNode交互，获取文件存放位置；再与DataNode交互，读取或写入数据；并且可以管理整个HDFS文件系统。</p>
+<h4 id="文件写入过程"><a href="#文件写入过程" class="headerlink" title="文件写入过程"></a>文件写入过程</h4><ol>
+<li>Client向NameNode发起文件写入请求。</li>
+<li>NameNode根据文件大小和文件块配置情况，返回给Client它所管理的DataNode信息。</li>
+<li>Client将文件划分为多个Block，更具DataNode的地址信息，按顺序写入到每一个DataNode块中。<h4 id="文件读取过程"><a href="#文件读取过程" class="headerlink" title="文件读取过程"></a>文件读取过程</h4></li>
+<li>Client向NameNode发起文件读取请求。</li>
+<li>NameNode返回文件存储的DataNode信息。</li>
+<li>Client读取文件信息。</li>
+</ol>
+<h2 id="Hadoop-优缺点"><a href="#Hadoop-优缺点" class="headerlink" title="Hadoop 优缺点"></a>Hadoop 优缺点</h2><h4 id="优点"><a href="#优点" class="headerlink" title="优点"></a>优点</h4><ol>
+<li>处理超大文件</li>
+<li>流式访问数据，一次写入，多次访问</li>
+<li>运行于廉价的商用机器上</li>
+</ol>
+<h4 id="缺点"><a href="#缺点" class="headerlink" title="缺点"></a>缺点</h4><ol>
+<li>不适合低延迟的数据访问</li>
+<li>无法高效存储大量的小文件</li>
+<li>不支持多用户写入及任意修改文件</li>
+</ol>
+<h2 id="Hadoop-HDFS-2-x-安装"><a href="#Hadoop-HDFS-2-x-安装" class="headerlink" title="Hadoop HDFS 2.x 安装"></a>Hadoop HDFS 2.x 安装</h2><p>Hadoop HDFS 2.x 包含了3种安装模式：</p>
+<ol>
+<li>Standalone. 独立模式</li>
+<li>Pseudo-Distributed Operation. 伪分布式</li>
+<li>Cluster. 集群</li>
+</ol>
+<h3 id="Standalone"><a href="#Standalone" class="headerlink" title="Standalone"></a>Standalone</h3><p>默认情况下，Hadoop被配置成以非分布式模式运行的一个独立Java进程。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">export</span> JAVA_HOME=/usr/java/latest</div><div class="line"><span class="built_in">cd</span>  hadoop_home/</div><div class="line">mkdir input</div><div class="line">cp etc/hadoop/*.xml input</div><div class="line">bin/hadoop jar share/hadoop/mapreduce/hadoop-mapreduce-examples-2.7.2.jar grep input output <span class="string">'dfs[a-z.]+'</span></div><div class="line">cat output/*</div></pre></td></tr></table></figure></p>
+<h3 id="Pseudo-Distributed-Operation"><a href="#Pseudo-Distributed-Operation" class="headerlink" title="Pseudo-Distributed Operation"></a>Pseudo-Distributed Operation</h3><p>Hadoop可以在单节点上以所谓的伪分布式模式运行，此时每一个Hadoop守护进程都作为一个独立的Java进程运行。</p>
+<h4 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h4><p><strong>不配置Yarn</strong><br><strong>etc/hadoop/core-site.xml:</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">&lt;configuration&gt;</div><div class="line">    &lt;property&gt;</div><div class="line">        &lt;name&gt;fs.defaultFS&lt;/name&gt;</div><div class="line">        &lt;value&gt;hdfs://localhost:9000&lt;/value&gt;</div><div class="line">    &lt;/property&gt;</div><div class="line">&lt;/configuration&gt;</div></pre></td></tr></table></figure></p>
+<p><strong>etc/hadoop/hdfs-site.xml:</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">&lt;configuration&gt;</div><div class="line">    &lt;property&gt;</div><div class="line">        &lt;name&gt;dfs.replication&lt;/name&gt;</div><div class="line">        &lt;value&gt;3&lt;/value&gt;</div><div class="line">    &lt;/property&gt;</div><div class="line">&lt;/configuration&gt;</div></pre></td></tr></table></figure></p>
+<p><strong>Setup passphraseless ssh:</strong><br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">ssh localhost</div><div class="line">ssh-keygen -t dsa -P <span class="string">''</span> <span class="_">-f</span> ~/.ssh/id_dsa</div><div class="line">cat ~/.ssh/id_dsa.pub &gt;&gt; ~/.ssh/authorized_keys</div><div class="line">chmod 0600 ~/.ssh/authorized_keys</div></pre></td></tr></table></figure></p>
+<hr>
+<h4 id="HDFS使用命令"><a href="#HDFS使用命令" class="headerlink" title="HDFS使用命令"></a>HDFS使用命令</h4><p>The following instructions are to run a MapReduce job locally.</p>
+<ol>
+<li><p>Format the filesystem:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">bin/hdfs namenode -format</div></pre></td></tr></table></figure>
+</li>
+<li><p>Start NameNode daemon and DataNode daemon:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">sbin/start-dfs.sh</div></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>The hadoop daemon log output is written to the $(HADOOP_LOG_DIR) directory (defaults to $(HADOOP_HOME)/logs).</p>
+<ol>
+<li>Browse the web interface for the NameNode; by default it is available at:<br> NameNode - <a href="http://localhost:50070/" target="_blank" rel="external">http://localhost:50070/</a></li>
+<li><p>Make the HDFS directories required to execute MapReduce jobs:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">bin/hdfs dfs -mkdir /user</div><div class="line">bin/hdfs dfs -mkdir /user/&lt;username&gt;</div></pre></td></tr></table></figure>
+</li>
+<li><p>Copy the input files into the distributed filesystem:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">bin/hdfs dfs -put etc/hadoop input</div></pre></td></tr></table></figure>
+</li>
+<li><p>Run some of the examples provided:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">bin/hadoop jar share/hadoop/mapreduce/hadoop-mapreduce-examples-2.7.2.jar grep input output <span class="string">'dfs[a-z.]+'</span></div></pre></td></tr></table></figure>
+</li>
+<li><p>Examine the output files: Copy the output files from the distributed filesystem to the local filesystem and examine them:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">bin/hdfs dfs -get output output</div><div class="line">cat output/*</div></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>or<br>View the output files on the distributed filesystem:<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">bin/hdfs dfs -cat output/*</div></pre></td></tr></table></figure></p>
+<ol>
+<li>When you’re done, stop the daemons with:<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">sbin/stop-dfs.sh</div></pre></td></tr></table></figure>
+</li>
+</ol>
+<h4 id="配置Yarn"><a href="#配置Yarn" class="headerlink" title="配置Yarn"></a>配置Yarn</h4><p><strong>配置Yarn on a Single Node</strong><br><strong>etc/hadoop/mapred-site.xml</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">&lt;configuration&gt;</div><div class="line">    &lt;property&gt;</div><div class="line">        &lt;name&gt;mapreduce.framework.name&lt;/name&gt;</div><div class="line">        &lt;value&gt;yarn&lt;/value&gt;</div><div class="line">    &lt;/property&gt;</div><div class="line">&lt;/configuration&gt;</div></pre></td></tr></table></figure></p>
+<p><strong>etc/hadoop/yarn-site.xml:</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">&lt;configuration&gt;</div><div class="line">    &lt;property&gt;</div><div class="line">        &lt;name&gt;yarn.nodemanager.aux-services&lt;/name&gt;</div><div class="line">        &lt;value&gt;mapreduce_shuffle&lt;/value&gt;</div><div class="line">    &lt;/property&gt;</div><div class="line">&lt;/configuration&gt;</div></pre></td></tr></table></figure></p>
+<ol>
+<li><p>Start ResourceManager daemon and NodeManager daemon:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">sbin/start-yarn.sh</div></pre></td></tr></table></figure>
+</li>
+<li><p>Browse the web interface for the ResourceManager; by default it is available at:<br>ResourceManager - <a href="http://localhost:8088/" target="_blank" rel="external">http://localhost:8088/</a></p>
+</li>
+<li>Run a MapReduce job.<br>与不配置Yarn的HDFS使用命令类似，可参考上面的例子。</li>
+<li>When you’re done, stop the daemons with:<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">sbin/stop-yarn.sh</div></pre></td></tr></table></figure>
+</li>
+</ol>
+<h3 id="Cluster-Setup"><a href="#Cluster-Setup" class="headerlink" title="Cluster Setup"></a>Cluster Setup</h3><p>参考：<a href="http://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-common/ClusterSetup.html" target="_blank" rel="external">http://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-common/ClusterSetup.html</a><br>目前没有试过Hadoop Cluster的安装，网上资料很多，哪一天可以试试。<br>Hadoop’s Java configuration is driven by two types of important configuration files:</p>
+<ul>
+<li><p>Read-only default configuration - core-default.xml, hdfs-default.xml, yarn-default.xml and mapred-default.xml.</p>
+</li>
+<li><p>Site-specific configuration - etc/hadoop/core-site.xml, etc/hadoop/hdfs-site.xml, etc/hadoop/yarn-site.xml and etc/hadoop/mapred-site.xml.</p>
+</li>
+</ul>
+<p>Additionally, you can control the Hadoop scripts found in the bin/ directory of the distribution, by setting site-specific values via the etc/hadoop/hadoop-env.sh and etc/hadoop/yarn-env.sh.<br>HDFS daemons are NameNode, SecondaryNameNode, and DataNode. YARN damones are ResourceManager, NodeManager, and WebAppProxy.</p>
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      <a href="/Hadoop HDFS介绍及安装/" class="archive-article-date">
+  	<time datetime="2016-11-07T12:45:12.000Z" itemprop="datePublished"><i class="icon-clock"></i>2016-11-07</time>
+</a>
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags"></i>
+		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/大数据/">大数据</a></li></ul>
+	</div>
+
+      
+	<div class="article-category tagcloud">
+	<i class="icon-price-tags"></i>
+	<a class="article-category-link" href="/categories/bigdata/">bigdata</a>
+	</div>
+
+
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+  
+<nav id="article-nav">
+  
+    <a href="/Hadoop HDFS command/" id="article-nav-newer" class="article-nav-link-wrap">
+      <i class="icon-circle-left"></i>
+      <div class="article-nav-title">
+        
+          Hadoop HDFS 文件系统命令
+        
+      </div>
+    </a>
+  
+  
+    <a href="/hello-world_161107141345/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title"></div>
+      <i class="icon-circle-right"></i>
+    </a>
+  
+</nav>
+
+
+
+
+<div class="share_jia">
+	<!-- JiaThis Button BEGIN -->
+	<div class="jiathis_style">
+		<span class="jiathis_txt">Share to: &nbsp; </span>
+		<a class="jiathis_button_facebook"></a> 
+	    <a class="jiathis_button_twitter"></a>
+	    <a class="jiathis_button_plus"></a> 
+	    <a class="jiathis_button_tsina"></a>
+		<a class="jiathis_button_cqq"></a>
+		<a class="jiathis_button_douban"></a>
+		<a class="jiathis_button_weixin"></a>
+		<a class="jiathis_button_tumblr"></a>
+    <a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jtico jtico_jiathis" target="_blank"></a>
+	</div>
+	<script type="text/javascript" src="//v3.jiathis.com/code/jia.js?uid=1405949716054953" charset="utf-8"></script>
+	<!-- JiaThis Button END -->
+</div>
+
+
+
+
+
+
+
+
+
+      </div>
+      <footer id="footer">
+  <div class="outer">
+    <div id="footer-info">
+    	<div class="footer-left">
+    		&copy; 2016 Xia,MingXing
+    	</div>
+      	<div class="footer-right">
+      		<a href="http://hexo.io/" target="_blank">Hexo</a>  Theme <a href="https://github.com/litten/hexo-theme-yilia" target="_blank">Yilia</a> by Litten
+      	</div>
+    </div>
+  </div>
+</footer>
+    </div>
+    <script>
+	var yiliaConfig = {
+		fancybox: true,
+		mathjax: true,
+		animate: true,
+		isHome: false,
+		isPost: true,
+		isArchive: false,
+		isTag: false,
+		isCategory: false,
+		open_in_new: false,
+		root: "/",
+		innerArchive: false
+	}
+</script>
+
+<script src="/./main.js"></script>
+
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+        processEscapes: true,
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    }
+});
+
+MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';                 
+    }       
+});
+</script>
+
+<script src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+    
+<div class="tools-col">
+  <ul class="btn-wrap">
+    
+    
+      <li data-hook="tools-section-tag"><span class="text">标签</span><i class="icon-price-tags"></i></li>
+    
+    
+      <li data-hook="tools-section-friends"><span class="text">友链</span><i class="icon-link"></i></li>
+    
+    
+      <li data-hook="tools-section-me"><span class="text">我</span><i class="icon-smile"></i></li>
+    
+  </ul>
+  <div class="tools-wrap">
+    
+
+    
+    	<section class="tools-section tools-section-tag">
+    			<div class="widget tagcloud" id="js-tagcloud">
+    				<a href="/tags/大数据/" style="font-size: 20px;">大数据</a> <a href="/tags/大数据-Hadoop/" style="font-size: 10px;">大数据, Hadoop</a> <a href="/tags/简介/" style="font-size: 10px;">简介</a> <a href="/tags/随笔/" style="font-size: 10px;">随笔</a>
+    			</div>
+    	</section>
+    
+
+    
+    	<section class="tools-section tools-section-friends">
+  		
+  			<div class="friends-wrap" id="js-friends">
+  			
+  	          <a target="_blank" class="main-nav-link switch-friends-link" href="http://localhost:4000/">友情链接1</a>
+  	        
+  	          <a target="_blank" class="main-nav-link switch-friends-link" href="http://localhost:4000/">友情链接2</a>
+  	        
+  	          <a target="_blank" class="main-nav-link switch-friends-link" href="http://localhost:4000/">友情链接3</a>
+  	        
+  	          <a target="_blank" class="main-nav-link switch-friends-link" href="http://localhost:4000/">友情链接4</a>
+  	        
+  	          <a target="_blank" class="main-nav-link switch-friends-link" href="http://localhost:4000/">友情链接5</a>
+  	        
+  	          <a target="_blank" class="main-nav-link switch-friends-link" href="http://localhost:4000/">友情链接6</a>
+  	        
+  	        </div>
+  		
+    	</section>
+    
+
+    
+    	<section class="tools-section tools-section-me">
+  	  	
+  	  		<div class="aboutme-wrap" id="js-aboutme">很惭愧&lt;br&gt;&lt;br&gt;只做了一点微小的工作&lt;br&gt;谢谢大家</div>
+  	  	
+    	</section>
+    
+  </div>
+  
+</div>
+    <!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    <!-- Background of PhotoSwipe. 
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+
+        <!-- Container that holds slides. 
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                <!--  Controls are self-explanatory. Order can be changed. -->
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" style="display:none" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                      <div class="pswp__preloader__cut">
+                        <div class="pswp__preloader__donut"></div>
+                      </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div> 
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+  </div>
+</body>
+</html>
