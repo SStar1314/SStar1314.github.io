@@ -6,19 +6,19 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://yoursite.com">
-  <title>Hadoop HDFS 文件系统命令 | SStar1314</title>
+  <title>Hadoop HDFS FS Command | SStar1314</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   <meta name="description" content="Hadoop FS Command可以参考： http://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-common/FileSystemShell.html
 The File System (FS) shell includes various shell-like commands that directly intera">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Hadoop HDFS 文件系统命令">
+<meta property="og:title" content="Hadoop HDFS FS Command">
 <meta property="og:url" content="http://yoursite.com/Hadoop HDFS command/index.html">
 <meta property="og:site_name" content="SStar1314">
 <meta property="og:description" content="Hadoop FS Command可以参考： http://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-common/FileSystemShell.html
 The File System (FS) shell includes various shell-like commands that directly intera">
-<meta property="og:updated_time" content="2016-11-08T05:50:05.000Z">
+<meta property="og:updated_time" content="2016-11-08T08:05:20.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Hadoop HDFS 文件系统命令">
+<meta name="twitter:title" content="Hadoop HDFS FS Command">
 <meta name="twitter:description" content="Hadoop FS Command可以参考： http://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-common/FileSystemShell.html
 The File System (FS) shell includes various shell-like commands that directly intera">
   
@@ -153,7 +153,7 @@ The File System (FS) shell includes various shell-like commands that directly in
         
   
     <h1 class="article-title" itemprop="name">
-      Hadoop HDFS 文件系统命令
+      Hadoop HDFS FS Command
     </h1>
   
 
@@ -165,7 +165,7 @@ The File System (FS) shell includes various shell-like commands that directly in
 <p>The File System (FS) shell includes various shell-like commands that directly interact with the Hadoop Distributed File System (HDFS) as well as other file systems that Hadoop supports, such as Local FS, HFTP FS, S3 FS, and others. The FS shell is invoked by:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">bin/hadoop fs &lt;args&gt;</div></pre></td></tr></table></figure></p>
 <p>All FS shell commands take path URIs as arguments. The URI format is<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">scheme://authority/path</div></pre></td></tr></table></figure></p>
 <p>For <strong>HDFS</strong> the scheme is <strong>hdfs</strong> , and for the <strong>Local FS</strong> the scheme is <strong>file</strong>. The scheme and authority are optional. If not specified, the default scheme specified in the configuration is used. An HDFS file or directory such as /parent/child can be specified as <strong>hdfs://namenodehost/parent/child</strong> or simply as <strong>/parent/child</strong> (given that your configuration is set to point to <strong>hdfs://namenodehost</strong> ).</p>
-<p><args>可以为：</args></p>
+<p>args 可以为：</p>
 <ul>
 <li>appendToFile</li>
 <li>cat</li>
@@ -211,7 +211,11 @@ The File System (FS) shell includes various shell-like commands that directly in
 <li>truncate</li>
 <li>usage</li>
 </ul>
-<p>appendToFile</p>
+<hr>
+<h3 id="Hadoop-FS-命令："><a href="#Hadoop-FS-命令：" class="headerlink" title="Hadoop FS 命令："></a>Hadoop FS 命令：</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line">hadoop fs :</div><div class="line">          [-ls &lt;path&gt;]</div><div class="line">          [-lsr &lt;path&gt;]</div><div class="line">           [-du &lt;path&gt;]</div><div class="line">           [-dus &lt;path&gt;]</div><div class="line">           [-count[-q] &lt;path&gt;]</div><div class="line">           [-mv &lt;src&gt; &lt;dst&gt;]</div><div class="line">           [-cp &lt;src&gt; &lt;dst&gt;]</div><div class="line">           [-rm [-skipTrash] &lt;path&gt;]</div><div class="line">           [-rmr [-skipTrash] &lt;path&gt;]</div><div class="line">           [-put &lt;localsrc&gt; ... &lt;dst&gt;]</div><div class="line">           [-copyFromLocal &lt;localsrc&gt; ... &lt;dst&gt;]</div><div class="line">           [-moveFromLocal &lt;localsrc&gt; ... &lt;dst&gt;]</div><div class="line"></div><div class="line">           [-getmerge &lt;src&gt; &lt;localdst&gt; [addnl]]</div><div class="line">           [-cat &lt;src&gt;]</div><div class="line">           [-text &lt;src&gt;]</div><div class="line">           [-copyToLocal [-ignoreCrc] [-crc] &lt;src&gt; &lt;localdst&gt;]</div><div class="line">           [-moveToLocal [-crc] &lt;src&gt; &lt;localdst&gt;]</div><div class="line">           [-mkdir &lt;path&gt;]</div><div class="line">           [-tail [-f] &lt;file&gt;]</div><div class="line">           [-chmod [-R] &lt;MODE[,MODE]... | OCTALMODE&gt; PATH...]</div><div class="line">           [-chown [-R] [OWNER][:[GROUP]] PATH...]</div><div class="line">           [-chgrp [-R] GROUP PATH...]</div><div class="line">           [-help [cmd]]</div></pre></td></tr></table></figure>
+<h3 id="Hadoop-DFS-Admin-命令："><a href="#Hadoop-DFS-Admin-命令：" class="headerlink" title="Hadoop DFS Admin 命令："></a>Hadoop DFS Admin 命令：</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line">hadoop dfsadmin :</div><div class="line">           [-report]</div><div class="line">             报告文件系统的基本信息</div><div class="line">           [-safemode enter | leave | get | wait]</div><div class="line">           安全模式维护命令</div><div class="line">           [-saveNamespace]</div><div class="line">             保存当前的命名空间</div><div class="line">           [-refreshNodes]</div><div class="line">              重新读取 Hosts 和 eclude 文件，使新的节点或需要退出集群的节点能够重新被 NameNode 识别。</div><div class="line">           [-finalizeUpgrade]</div><div class="line">            终结 HDFS 的升级操作</div><div class="line">           [-upgradeProgress status | details | force]</div><div class="line">          [-metasave filename]</div><div class="line">           保存 Namenode 的主要数据结构到 Hadoop.log.dir 属性指定目录下的 filename 上</div><div class="line">           [-setQuota &lt;quota&gt; &lt;dirname&gt;...&lt;dirname&gt;]</div><div class="line">           为每个目录设定配额，强制限定目录树下的名字个数。</div><div class="line">           [-clrQuota &lt;dirname&gt;...&lt;dirname&gt;]</div><div class="line">          为每个目录清除配额设定。</div><div class="line">           [-setBalancerBandwidth &lt;bandwidth in bytes per second&gt;]</div><div class="line">           设定负载均衡时使用的带宽</div></pre></td></tr></table></figure>
+<hr>
+<p><strong>appendToFile</strong></p>
 <p>Usage: hadoop fs -appendToFile <localsrc> … <dst></dst></localsrc></p>
 <p>Append single src, or multiple srcs from local file system to the destination file system. Also reads input from stdin and appends to destination file system.</p>
 <ul>
@@ -222,7 +226,7 @@ The File System (FS) shell includes various shell-like commands that directly in
 </ul>
 <p>Exit Code:</p>
 <p>Returns 0 on success and 1 on error.</p>
-<p>cat</p>
+<p><strong>cat</strong></p>
 <p>Usage: hadoop fs -cat URI [URI …]</p>
 <p>Copies source paths to stdout.</p>
 <p>Example:</p>
@@ -232,7 +236,7 @@ The File System (FS) shell includes various shell-like commands that directly in
 </ul>
 <p>Exit Code:</p>
 <p>Returns 0 on success and -1 on error.</p>
-<p>checksum</p>
+<p><strong>checksum</strong></p>
 <p>Usage: hadoop fs -checksum URI</p>
 <p>Returns the checksum information of a file.</p>
 <p>Example:</p>
@@ -240,38 +244,38 @@ The File System (FS) shell includes various shell-like commands that directly in
 <li>hadoop fs -checksum hdfs://nn1.example.com/file1</li>
 <li>hadoop fs -checksum file:///etc/hosts</li>
 </ul>
-<p>chgrp</p>
+<p><strong>chgrp</strong></p>
 <p>Usage: hadoop fs -chgrp [-R] GROUP URI [URI …]</p>
 <p>Change group association of files. The user must be the owner of files, or else a super-user. Additional information is in the Permissions Guide.</p>
 <p>Options</p>
 <ul>
 <li>The -R option will make the change recursively through the directory structure.</li>
 </ul>
-<p>chmod</p>
+<p><strong>chmod</strong></p>
 <p>Usage: hadoop fs -chmod [-R] <mode[,mode]... |="" octalmode=""> URI [URI …]</mode[,mode]...></p>
 <p>Change the permissions of files. With -R, make the change recursively through the directory structure. The user must be the owner of the file, or else a super-user. Additional information is in the Permissions Guide.</p>
 <p>Options</p>
 <ul>
 <li>The -R option will make the change recursively through the directory structure.</li>
 </ul>
-<p>chown</p>
+<p><strong>chown</strong></p>
 <p>Usage: hadoop fs -chown [-R] [OWNER][:[GROUP]] URI [URI ]</p>
 <p>Change the owner of files. The user must be a super-user. Additional information is in the Permissions Guide.</p>
 <p>Options</p>
 <ul>
 <li>The -R option will make the change recursively through the directory structure.</li>
 </ul>
-<p>copyFromLocal</p>
+<p><strong>copyFromLocal</strong></p>
 <p>Usage: hadoop fs -copyFromLocal <localsrc> URI</localsrc></p>
 <p>Similar to put command, except that the source is restricted to a local file reference.</p>
 <p>Options:</p>
 <ul>
 <li>The -f option will overwrite the destination if it already exists.</li>
 </ul>
-<p>copyToLocal</p>
+<p><strong>copyToLocal</strong></p>
 <p>Usage: hadoop fs -copyToLocal [-ignorecrc] [-crc] URI <localdst></localdst></p>
 <p>Similar to get command, except that the destination is restricted to a local file reference.</p>
-<p>count</p>
+<p><strong>count</strong></p>
 <p>Usage: hadoop fs -count [-q] [-h] [-v] <paths></paths></p>
 <p>Count the number of directories, files and bytes under the paths that match the specified file pattern. The output columns with -count are: DIR_COUNT, FILE_COUNT, CONTENT_SIZE, PATHNAME</p>
 <p>The output columns with -count -q are: QUOTA, REMAINING_QUATA, SPACE_QUOTA, REMAINING_SPACE_QUOTA, DIR_COUNT, FILE_COUNT, CONTENT_SIZE, PATHNAME</p>
@@ -286,10 +290,10 @@ The File System (FS) shell includes various shell-like commands that directly in
 </ul>
 <p>Exit Code:</p>
 <p>Returns 0 on success and -1 on error.</p>
-<p>cp</p>
+<p><strong>cp</strong></p>
 <p>Usage: hadoop fs -cp [-f] [-p | -p[topax]] URI [URI …] <dest></dest></p>
 <p>Copy files from source to destination. This command allows multiple sources as well in which case the destination must be a directory.</p>
-<p>‘raw.<em>’ namespace extended attributes are preserved if (1) the source and destination filesystems support them (HDFS only), and (2) all source and destination pathnames are in the /.reserved/raw hierarchy. Determination of whether raw.</em> namespace xattrs are preserved is independent of the -p (preserve) flag.</p>
+<p>‘raw.*’ namespace extended attributes are preserved if (1) the source and destination filesystems support them (HDFS only), and (2) all source and destination pathnames are in the /.reserved/raw hierarchy. Determination of whether raw.* namespace xattrs are preserved is independent of the -p (preserve) flag.</p>
 <p>Options:</p>
 <ul>
 <li>The -f option will overwrite the destination if it already exists.</li>
@@ -302,11 +306,11 @@ The File System (FS) shell includes various shell-like commands that directly in
 </ul>
 <p>Exit Code:</p>
 <p>Returns 0 on success and -1 on error.</p>
-<p>createSnapshot</p>
+<p><strong>createSnapshot</strong></p>
 <p>See HDFS Snapshots Guide.</p>
 <p>deleteSnapshot</p>
 <p>See HDFS Snapshots Guide.</p>
-<p>df</p>
+<p><strong>df</strong></p>
 <p>Usage: hadoop fs -df [-h] URI [URI …]</p>
 <p>Displays free space.</p>
 <p>Options:</p>
@@ -317,7 +321,7 @@ The File System (FS) shell includes various shell-like commands that directly in
 <ul>
 <li>hadoop dfs -df /user/hadoop/dir1</li>
 </ul>
-<p>du</p>
+<p><strong>du</strong></p>
 <p>Usage: hadoop fs -du [-s] [-h] URI [URI …]</p>
 <p>Displays sizes of files and directories contained in the given directory or the length of a file in case its just a file.</p>
 <p>Options:</p>
@@ -330,32 +334,36 @@ The File System (FS) shell includes various shell-like commands that directly in
 <li>hadoop fs -du /user/hadoop/dir1 /user/hadoop/file1 hdfs://nn.example.com/user/hadoop/dir1</li>
 </ul>
 <p>Exit Code: Returns 0 on success and -1 on error.</p>
-<p>dus</p>
+<p><strong>dus</strong></p>
 <p>Usage: hadoop fs -dus <args></args></p>
 <p>Displays a summary of file lengths.</p>
 <p>Note: This command is deprecated. Instead use hadoop fs -du -s.</p>
-<p>expunge</p>
+<p><strong>expunge</strong></p>
 <p>Usage: hadoop fs -expunge</p>
 <p>Empty the Trash. Refer to the HDFS Architecture Guide for more information on the Trash feature.</p>
-<p>find</p>
+<p><strong>find</strong></p>
 <p>Usage: hadoop fs -find <path></path> … <expression> …</expression></p>
 <p>Finds all files that match the specified expression and applies selected actions to them. If no path is specified then defaults to the current working directory. If no expression is specified then defaults to -print.</p>
 <p>The following primary expressions are recognised:</p>
 <ul>
-<li><p>-name pattern<br>-iname pattern<br>Evaluates as true if the basename of the file matches the pattern using standard file system globbing. If -iname is used then the match is case insensitive.</p>
+<li>-name pattern</li>
+<li><p>-iname pattern<br>Evaluates as true if the basename of the file matches the pattern using standard file system globbing. If -iname is used then the match is case insensitive.</p>
 </li>
-<li><p>-print<br>-print0Always<br>evaluates to true. Causes the current pathname to be written to standard output. If the -print0 expression is used then an ASCII NULL character is appended.</p>
+<li><p>-print</p>
 </li>
+<li>-print0Always<br>evaluates to true. Causes the current pathname to be written to standard output. If the -print0 expression is used then an ASCII NULL character is appended.</li>
 </ul>
 <p>The following operators are recognised:</p>
 <ul>
-<li>expression -a expression<br>expression -and expression<br>expression expression<br>Logical AND operator for joining two expressions. Returns true if both child expressions return true. Implied by the juxtaposition of two expressions and so does not need to be explicitly specified. The second expression will not be applied if the first fails.</li>
+<li>expression -a expression</li>
+<li>expression -and expression</li>
+<li>expression expression<br>Logical AND operator for joining two expressions. Returns true if both child expressions return true. Implied by the juxtaposition of two expressions and so does not need to be explicitly specified. The second expression will not be applied if the first fails.</li>
 </ul>
 <p>Example:</p>
-<p>hadoop fs -find / -name test -print</p>
+<p><strong>hadoop fs -find / -name test -print</strong></p>
 <p>Exit Code:</p>
 <p>Returns 0 on success and -1 on error.</p>
-<p>get</p>
+<p><strong>get</strong></p>
 <p>Usage: hadoop fs -get [-ignorecrc] [-crc] <src> <localdst></localdst></src></p>
 <p>Copy files to the local file system. Files that fail the CRC check may be copied with the -ignorecrc option. Files and CRCs may be copied using the -crc option.</p>
 <p>Example:</p>
@@ -365,7 +373,7 @@ The File System (FS) shell includes various shell-like commands that directly in
 </ul>
 <p>Exit Code:</p>
 <p>Returns 0 on success and -1 on error.</p>
-<p>getfacl</p>
+<p><strong>getfacl</strong></p>
 <p>Usage: hadoop fs -getfacl [-R] <path></path></p>
 <p>Displays the Access Control Lists (ACLs) of files and directories. If a directory has a default ACL, then getfacl also displays the default ACL.</p>
 <p>Options:</p>
@@ -380,7 +388,7 @@ The File System (FS) shell includes various shell-like commands that directly in
 </ul>
 <p>Exit Code:</p>
 <p>Returns 0 on success and non-zero on error.</p>
-<p>getfattr</p>
+<p><strong>getfattr</strong></p>
 <p>Usage: hadoop fs -getfattr [-R] -n name | -d [-e en] <path></path></p>
 <p>Displays the extended attribute names and values (if any) for a file or directory.</p>
 <p>Options:</p>
@@ -398,7 +406,7 @@ The File System (FS) shell includes various shell-like commands that directly in
 </ul>
 <p>Exit Code:</p>
 <p>Returns 0 on success and non-zero on error.</p>
-<p>getmerge</p>
+<p><strong>getmerge</strong></p>
 <p>Usage: hadoop fs -getmerge [-nl] <src> <localdst></localdst></src></p>
 <p>Takes a source directory and a destination file as input and concatenates files in src into the destination local file. Optionally -nl can be set to enable adding a newline character (LF) at the end of each file.</p>
 <p>Examples:</p>
@@ -408,10 +416,10 @@ The File System (FS) shell includes various shell-like commands that directly in
 </ul>
 <p>Exit Code:</p>
 <p>Returns 0 on success and non-zero on error.</p>
-<p>help</p>
+<p><strong>help</strong></p>
 <p>Usage: hadoop fs -help</p>
 <p>Return usage output.</p>
-<p>ls</p>
+<p><strong>ls</strong></p>
 <p>Usage: hadoop fs -ls [-d] [-h] [-R] <args></args></p>
 <p>Options:</p>
 <ul>
@@ -419,10 +427,8 @@ The File System (FS) shell includes various shell-like commands that directly in
 <li>-h: Format file sizes in a human-readable fashion (eg 64.0m instead of 67108864).</li>
 <li>-R: Recursively list subdirectories encountered.</li>
 </ul>
-<p>For a file ls returns stat on the file with the following format:</p>
-<p>permissions number_of_replicas userid groupid filesize modification_date modification_time filename</p>
-<p>For a directory it returns list of its direct children as in Unix. A directory is listed as:</p>
-<p>permissions userid groupid modification_date modification_time dirname</p>
+<p>For a file ls returns stat on the file with the following format:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">permissions number_of_replicas userid groupid filesize modification_date modification_time filename</div></pre></td></tr></table></figure></p>
+<p>For a directory it returns list of its direct children as in Unix. A directory is listed as:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">permissions userid groupid modification_date modification_time dirname</div></pre></td></tr></table></figure></p>
 <p>Files within a directory are order by filename by default.</p>
 <p>Example:</p>
 <ul>
@@ -430,11 +436,11 @@ The File System (FS) shell includes various shell-like commands that directly in
 </ul>
 <p>Exit Code:</p>
 <p>Returns 0 on success and -1 on error.</p>
-<p>lsr</p>
+<p><strong>lsr</strong></p>
 <p>Usage: hadoop fs -lsr <args></args></p>
 <p>Recursive version of ls.</p>
 <p>Note: This command is deprecated. Instead use hadoop fs -ls -R</p>
-<p>mkdir</p>
+<p><strong>mkdir</strong></p>
 <p>Usage: hadoop fs -mkdir [-p] <paths></paths></p>
 <p>Takes path uri’s as argument and creates directories.</p>
 <p>Options:</p>
@@ -448,13 +454,13 @@ The File System (FS) shell includes various shell-like commands that directly in
 </ul>
 <p>Exit Code:</p>
 <p>Returns 0 on success and -1 on error.</p>
-<p>moveFromLocal</p>
+<p><strong>moveFromLocal</strong></p>
 <p>Usage: hadoop fs -moveFromLocal <localsrc> <dst></dst></localsrc></p>
 <p>Similar to put command, except that the source localsrc is deleted after it’s copied.</p>
-<p>moveToLocal</p>
+<p><strong>moveToLocal</strong></p>
 <p>Usage: hadoop fs -moveToLocal [-crc] <src> <dst></dst></src></p>
 <p>Displays a “Not implemented yet” message.</p>
-<p>mv</p>
+<p><strong>mv</strong></p>
 <p>Usage: hadoop fs -mv URI [URI …] <dest></dest></p>
 <p>Moves files from source to destination. This command allows multiple sources as well in which case the destination needs to be a directory. Moving files across file systems is not permitted.</p>
 <p>Example:</p>
@@ -464,7 +470,7 @@ The File System (FS) shell includes various shell-like commands that directly in
 </ul>
 <p>Exit Code:</p>
 <p>Returns 0 on success and -1 on error.</p>
-<p>put</p>
+<p><strong>put</strong></p>
 <p>Usage: hadoop fs -put <localsrc> … <dst></dst></localsrc></p>
 <p>Copy single src, or multiple srcs from local file system to the destination file system. Also reads input from stdin and writes to destination file system.</p>
 <ul>
@@ -475,9 +481,9 @@ The File System (FS) shell includes various shell-like commands that directly in
 </ul>
 <p>Exit Code:</p>
 <p>Returns 0 on success and -1 on error.</p>
-<p>renameSnapshot</p>
+<p><strong>renameSnapshot</strong></p>
 <p>See HDFS Snapshots Guide.</p>
-<p>rm</p>
+<p><strong>rm</strong></p>
 <p>Usage: hadoop fs -rm [-f] [-r |-R] [-skipTrash] URI [URI …]</p>
 <p>Delete files specified as args.</p>
 <p>Options:</p>
@@ -493,7 +499,7 @@ The File System (FS) shell includes various shell-like commands that directly in
 </ul>
 <p>Exit Code:</p>
 <p>Returns 0 on success and -1 on error.</p>
-<p>rmdir</p>
+<p><strong>rmdir</strong></p>
 <p>Usage: hadoop fs -rmdir [–ignore-fail-on-non-empty] URI [URI …]</p>
 <p>Delete a directory.</p>
 <p>Options:</p>
@@ -504,11 +510,11 @@ The File System (FS) shell includes various shell-like commands that directly in
 <ul>
 <li>hadoop fs -rmdir /user/hadoop/emptydir</li>
 </ul>
-<p>rmr</p>
+<p><strong>rmr</strong></p>
 <p>Usage: hadoop fs -rmr [-skipTrash] URI [URI …]</p>
 <p>Recursive version of delete.</p>
 <p>Note: This command is deprecated. Instead use hadoop fs -rm -r</p>
-<p>setfacl</p>
+<p><strong>setfacl</strong></p>
 <p>Usage: hadoop fs -setfacl [-R] [-b |-k -m |-x <acl_spec> <path></path>] |[–set <acl_spec> <path></path>]</acl_spec></acl_spec></p>
 <p>Sets Access Control Lists (ACLs) of files and directories.</p>
 <p>Options:</p>
@@ -534,7 +540,7 @@ The File System (FS) shell includes various shell-like commands that directly in
 </ul>
 <p>Exit Code:</p>
 <p>Returns 0 on success and non-zero on error.</p>
-<p>setfattr</p>
+<p><strong>setfattr</strong></p>
 <p>Usage: hadoop fs -setfattr -n name [-v value] | -x name <path></path></p>
 <p>Sets an extended attribute name and value for a file or directory.</p>
 <p>Options:</p>
@@ -553,7 +559,7 @@ The File System (FS) shell includes various shell-like commands that directly in
 </ul>
 <p>Exit Code:</p>
 <p>Returns 0 on success and non-zero on error.</p>
-<p>setrep</p>
+<p><strong>setrep</strong></p>
 <p>Usage: hadoop fs -setrep [-R] [-w] <numreplicas> <path></path></numreplicas></p>
 <p>Changes the replication factor of a file. If path is a directory then the command recursively changes the replication factor of all files under the directory tree rooted at path.</p>
 <p>Options:</p>
@@ -567,7 +573,7 @@ The File System (FS) shell includes various shell-like commands that directly in
 </ul>
 <p>Exit Code:</p>
 <p>Returns 0 on success and -1 on error.</p>
-<p>stat</p>
+<p><strong>stat</strong></p>
 <p>Usage: hadoop fs -stat [format] <path></path> …</p>
 <p>Print statistics about the file/directory at <path></path> in the specified format. Format accepts filesize in blocks (%b), type (%F), group name of owner (%g), name (%n), block size (%o), replication (%r), user name of owner(%u), and modification date (%y, %Y). %y shows UTC date as “yyyy-MM-dd HH:mm:ss” and %Y shows milliseconds since January 1, 1970 UTC. If the format is not specified, %y is used by default.</p>
 <p>Example:</p>
@@ -575,7 +581,7 @@ The File System (FS) shell includes various shell-like commands that directly in
 <li>hadoop fs -stat “%F %u:%g %b %y %n” /file</li>
 </ul>
 <p>Exit Code: Returns 0 on success and -1 on error.</p>
-<p>tail</p>
+<p><strong>tail</strong></p>
 <p>Usage: hadoop fs -tail [-f] URI</p>
 <p>Displays last kilobyte of the file to stdout.</p>
 <p>Options:</p>
@@ -587,7 +593,7 @@ The File System (FS) shell includes various shell-like commands that directly in
 <li>hadoop fs -tail pathname</li>
 </ul>
 <p>Exit Code: Returns 0 on success and -1 on error.</p>
-<p>test</p>
+<p><strong>test</strong></p>
 <p>Usage: hadoop fs -test -[defsz] URI</p>
 <p>Options:</p>
 <ul>
@@ -601,10 +607,10 @@ The File System (FS) shell includes various shell-like commands that directly in
 <ul>
 <li>hadoop fs -test -e filename</li>
 </ul>
-<p>text</p>
+<p><strong>text</strong></p>
 <p>Usage: hadoop fs -text <src></src></p>
 <p>Takes a source file and outputs the file in text format. The allowed formats are zip and TextRecordInputStream.</p>
-<p>touchz</p>
+<p><strong>touchz</strong></p>
 <p>Usage: hadoop fs -touchz URI [URI …]</p>
 <p>Create a file of zero length.</p>
 <p>Example:</p>
@@ -612,7 +618,7 @@ The File System (FS) shell includes various shell-like commands that directly in
 <li>hadoop fs -touchz pathname</li>
 </ul>
 <p>Exit Code: Returns 0 on success and -1 on error.</p>
-<p>truncate</p>
+<p><strong>truncate</strong></p>
 <p>Usage: hadoop fs -truncate [-w] <length> <paths></paths></length></p>
 <p>Truncate all files that match the specified file pattern to the specified length.</p>
 <p>Options:</p>
@@ -624,7 +630,7 @@ The File System (FS) shell includes various shell-like commands that directly in
 <li>hadoop fs -truncate 55 /user/hadoop/file1 /user/hadoop/file2</li>
 <li>hadoop fs -truncate -w 127 hdfs://nn1.example.com/user/hadoop/file1</li>
 </ul>
-<p>usage</p>
+<p><strong>usage</strong></p>
 <p>Usage: hadoop fs -usage command</p>
 <p>Return the help for an individual command.</p>
 
@@ -638,7 +644,7 @@ The File System (FS) shell includes various shell-like commands that directly in
       
 	<div class="article-tag tagcloud">
 		<i class="icon-price-tags"></i>
-		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/大数据-Hadoop/">大数据, Hadoop</a></li></ul>
+		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/大数据/">大数据</a></li></ul>
 	</div>
 
       
@@ -655,6 +661,15 @@ The File System (FS) shell includes various shell-like commands that directly in
 
   
 <nav id="article-nav">
+  
+    <a href="/Hadoop MapReduce/" id="article-nav-newer" class="article-nav-link-wrap">
+      <i class="icon-circle-left"></i>
+      <div class="article-nav-title">
+        
+          Hadoop MapReduce
+        
+      </div>
+    </a>
   
   
     <a href="/Hadoop HDFS介绍及安装/" id="article-nav-older" class="article-nav-link-wrap">
@@ -767,7 +782,7 @@ MathJax.Hub.Queue(function() {
     
     	<section class="tools-section tools-section-tag">
     			<div class="widget tagcloud" id="js-tagcloud">
-    				<a href="/tags/大数据/" style="font-size: 20px;">大数据</a> <a href="/tags/大数据-Hadoop/" style="font-size: 10px;">大数据, Hadoop</a> <a href="/tags/简介/" style="font-size: 10px;">简介</a> <a href="/tags/随笔/" style="font-size: 10px;">随笔</a>
+    				<a href="/tags/大数据/" style="font-size: 20px;">大数据</a> <a href="/tags/简介/" style="font-size: 10px;">简介</a> <a href="/tags/随笔/" style="font-size: 10px;">随笔</a>
     			</div>
     	</section>
     

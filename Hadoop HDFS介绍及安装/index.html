@@ -8,30 +8,27 @@
   <link rel="dns-prefetch" href="http://yoursite.com">
   <title>Hadoop HDFS介绍及安装 | SStar1314</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="Hadoop HDFS 1.x vs 2.xHadoop HDFS有2个版本，1.x和2.x，两者之间还有比较大的差距：
+  <meta name="description" content="The project includes these modules:
 
-1.x只支持MapReduce运算. 2.x除了MapReduce之外，还支持Spark，MPI，Hama，Giraph等多种类型运算。
-1.x中的MR组件既分发任务还需要进行资源调度。 2.x由另一个组件YARN来进行资源调度，MR至进行任务分发。
-1.x无法实现HA，只有">
+Hadoop Common: The common utilities that support the other Hadoop modules.
+Hadoop Distributed File System (HDFS™): A distributed file system that provides high-thr">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Hadoop HDFS介绍及安装">
 <meta property="og:url" content="http://yoursite.com/Hadoop HDFS介绍及安装/index.html">
 <meta property="og:site_name" content="SStar1314">
-<meta property="og:description" content="Hadoop HDFS 1.x vs 2.xHadoop HDFS有2个版本，1.x和2.x，两者之间还有比较大的差距：
+<meta property="og:description" content="The project includes these modules:
 
-1.x只支持MapReduce运算. 2.x除了MapReduce之外，还支持Spark，MPI，Hama，Giraph等多种类型运算。
-1.x中的MR组件既分发任务还需要进行资源调度。 2.x由另一个组件YARN来进行资源调度，MR至进行任务分发。
-1.x无法实现HA，只有">
+Hadoop Common: The common utilities that support the other Hadoop modules.
+Hadoop Distributed File System (HDFS™): A distributed file system that provides high-thr">
 <meta property="og:image" content="http://yoursite.com/images/Hadoop_1_x_vs_2_x.png">
 <meta property="og:image" content="http://yoursite.com/images/Hadoop_HDFS_2_x.png">
-<meta property="og:updated_time" content="2016-11-08T05:38:53.000Z">
+<meta property="og:updated_time" content="2016-11-08T07:56:17.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Hadoop HDFS介绍及安装">
-<meta name="twitter:description" content="Hadoop HDFS 1.x vs 2.xHadoop HDFS有2个版本，1.x和2.x，两者之间还有比较大的差距：
+<meta name="twitter:description" content="The project includes these modules:
 
-1.x只支持MapReduce运算. 2.x除了MapReduce之外，还支持Spark，MPI，Hama，Giraph等多种类型运算。
-1.x中的MR组件既分发任务还需要进行资源调度。 2.x由另一个组件YARN来进行资源调度，MR至进行任务分发。
-1.x无法实现HA，只有">
+Hadoop Common: The common utilities that support the other Hadoop modules.
+Hadoop Distributed File System (HDFS™): A distributed file system that provides high-thr">
 <meta name="twitter:image" content="http://yoursite.com/images/Hadoop_1_x_vs_2_x.png">
   
     <link rel="alternative" href="/atom.xml" title="SStar1314" type="application/atom+xml">
@@ -173,7 +170,28 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h2 id="Hadoop-HDFS-1-x-vs-2-x"><a href="#Hadoop-HDFS-1-x-vs-2-x" class="headerlink" title="Hadoop HDFS 1.x vs 2.x"></a>Hadoop HDFS 1.x vs 2.x</h2><p><img src="/images/Hadoop_1_x_vs_2_x.png" alt=""><br>Hadoop HDFS有2个版本，1.x和2.x，两者之间还有比较大的差距：</p>
+        <p>The project includes these modules:</p>
+<ul>
+<li><strong>Hadoop Common</strong>: The common utilities that support the other Hadoop modules.</li>
+<li><strong>Hadoop Distributed File System (HDFS™)</strong>: A distributed file system that provides high-throughput access to application data.</li>
+<li><strong>Hadoop YARN</strong>: A framework for job scheduling and cluster resource management.</li>
+<li><strong>Hadoop MapReduce</strong>: A YARN-based system for parallel processing of large data sets.</li>
+</ul>
+<p>Other Hadoop-related projects at Apache include:</p>
+<ul>
+<li><strong>Ambari™</strong>: A web-based tool for provisioning, managing, and monitoring Apache Hadoop clusters which includes support for Hadoop HDFS, Hadoop MapReduce, Hive, HCatalog, HBase, ZooKeeper, Oozie, Pig and Sqoop. Ambari also provides a dashboard for viewing cluster health such as heatmaps and ability to view MapReduce, Pig and Hive applications visually alongwith features to diagnose their performance characteristics in a user-friendly manner.</li>
+<li><strong>Avro™</strong>: A data serialization system.</li>
+<li><strong>Cassandra™</strong>: A scalable multi-master database with no single points of failure.</li>
+<li><strong>Chukwa™</strong>: A data collection system for managing large distributed systems.</li>
+<li><strong>HBase™</strong>: A scalable, distributed database that supports structured data storage for large tables.</li>
+<li><strong>Hive™</strong>: A data warehouse infrastructure that provides data summarization and ad hoc querying.</li>
+<li><strong>Mahout™:</strong> A Scalable machine learning and data mining library.</li>
+<li><strong>Pig™</strong>: A high-level data-flow language and execution framework for parallel computation.</li>
+<li><strong>Spark™</strong>: A fast and general compute engine for Hadoop data. Spark provides a simple and expressive programming model that supports a wide range of applications, including ETL, machine learning, stream processing, and graph computation.</li>
+<li><strong>Tez™</strong>: A generalized data-flow programming framework, built on Hadoop YARN, which provides a powerful and flexible engine to execute an arbitrary DAG of tasks to process data for both batch and interactive use-cases. Tez is being adopted by Hive™, Pig™ and other frameworks in the Hadoop ecosystem, and also by other commercial software (e.g. ETL tools), to replace Hadoop™ MapReduce as the underlying execution engine.</li>
+<li><strong>ZooKeeper™</strong>: A high-performance coordination service for distributed applications.</li>
+</ul>
+<h2 id="Hadoop-HDFS-1-x-vs-2-x"><a href="#Hadoop-HDFS-1-x-vs-2-x" class="headerlink" title="Hadoop HDFS 1.x vs 2.x"></a>Hadoop HDFS 1.x vs 2.x</h2><p><img src="/images/Hadoop_1_x_vs_2_x.png" alt=""><br>Hadoop HDFS有2个版本，1.x和2.x，两者之间还有比较大的差距：</p>
 <ol>
 <li>1.x只支持MapReduce运算. 2.x除了MapReduce之外，还支持Spark，MPI，Hama，Giraph等多种类型运算。</li>
 <li>1.x中的MR组件既分发任务还需要进行资源调度。 2.x由另一个组件YARN来进行资源调度，MR至进行任务分发。</li>
@@ -298,14 +316,14 @@
       <i class="icon-circle-left"></i>
       <div class="article-nav-title">
         
-          Hadoop HDFS 文件系统命令
+          Hadoop HDFS FS Command
         
       </div>
     </a>
   
   
-    <a href="/hello-world_161107141345/" id="article-nav-older" class="article-nav-link-wrap">
-      <div class="article-nav-title"></div>
+    <a href="/hello-world/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">Hello World1</div>
       <i class="icon-circle-right"></i>
     </a>
   
@@ -414,7 +432,7 @@ MathJax.Hub.Queue(function() {
     
     	<section class="tools-section tools-section-tag">
     			<div class="widget tagcloud" id="js-tagcloud">
-    				<a href="/tags/大数据/" style="font-size: 20px;">大数据</a> <a href="/tags/大数据-Hadoop/" style="font-size: 10px;">大数据, Hadoop</a> <a href="/tags/简介/" style="font-size: 10px;">简介</a> <a href="/tags/随笔/" style="font-size: 10px;">随笔</a>
+    				<a href="/tags/大数据/" style="font-size: 20px;">大数据</a> <a href="/tags/简介/" style="font-size: 10px;">简介</a> <a href="/tags/随笔/" style="font-size: 10px;">随笔</a>
     			</div>
     	</section>
     
