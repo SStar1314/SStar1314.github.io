@@ -16,7 +16,7 @@
 <meta property="og:site_name" content="SStar1314">
 <meta property="og:description" content="长久以来，大数据非常火，各大新闻app上都在谈这个名词，然而自己并不十分清楚，只是大约上知道有Hadoop和MapReduce这么2个东西，为什么会有大数据的名词？从何而来？为什么以前没有这个名词，却出现在几年前？为什么这几年突然蹦出个Spark，也是大数据领域的，这又是个啥东西。。。
 现在想起来，自己第一次接触大数据还是为了参加一个公司内部的竞赛，被迫响应了本地公司领导的号召，代表了西安site">
-<meta property="og:updated_time" content="2016-11-07T12:44:26.000Z">
+<meta property="og:updated_time" content="2016-11-08T08:23:06.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="我的大数据起步之旅">
 <meta name="twitter:description" content="长久以来，大数据非常火，各大新闻app上都在谈这个名词，然而自己并不十分清楚，只是大约上知道有Hadoop和MapReduce这么2个东西，为什么会有大数据的名词？从何而来？为什么以前没有这个名词，却出现在几年前？为什么这几年突然蹦出个Spark，也是大数据领域的，这又是个啥东西。。。
@@ -169,7 +169,7 @@
 <li>存了这么多数据，目的是什么？这些数据怎么利用？</li>
 <li>数据从哪来？到哪去？</li>
 </ol>
-<h2 id="我的回答"><a href="#我的回答" class="headerlink" title="我的回答"></a>我的回答</h2><p>作为一个非大数据领域的外行程序员，自问自答，貌似有点班门弄斧，呵呵<br>那我只能说，我的博客我做主，就是这么任性～～哈哈</p>
+<h2 id="我的回答"><a href="#我的回答" class="headerlink" title="我的回答"></a>我的回答</h2><p>作为一个非大数据领域的外行程序员，自问自答，貌似有点班门弄斧，呵呵</p>
 <ol>
 <li>大数据，大数据，数据量有多大？这些数据怎么存储？<br>数量级：数百TB至几十PB，并且赠长速度很快。这么多数据，一块磁盘才2TB，怎么存啊，我得买成百上千个磁盘才能存下来呀。这些数据存到磁盘上，是存到文件里，还是存到数据库里呢？<br>我可以告诉你的是，传统关系型数据库(MySQL,Oracle,SQL Server)无法存储这么大数据量的数据，就算可以存的下，查询／插入／更新操作会让用户抓狂的。那只能存到文件里面喽，放一个文件肯定是不可能的，想象以下一个2TB的文件，你要怎么打开？所以只能分开存成很多个文件，每个文件存储一部分信息。<br>试想一下，每台机器上都存很多文件，那么多台机器，无论是数据存储／备份／查询都很是问题，在这样一个情况之下，分布式文件系统应时而生，代表性的就是Hadoop HDFS。<br>HDFS解决了，大数据存储以及检索困难的问题，并且通过数据分布式备份解决了硬件设备错误的问题。</li>
 <li>存了这么多数据，目的是什么？这些数据怎么利用？<br>为什么需要存储这么多数据呢，现在有一个普遍的认识，就是“我们没有更好的算法，我们只有更多的数据”。这意味着，基于大量数据，通过数据挖掘＋机器学习算法的结合，能够得到比纯算法推导更好的结果。所以，数据很重要。<br>针对于PB级大数据的使用／分析，又成了一个头疼的问题，通过传统的高新能计算的加速手段(比如: MPI)，无法取得良好的加速效果，表现的现象是：数据传输的时间远大于计算所需要的时间。原因是：实际的大数据应用中，对数据的分析算法往往很简单，痛点在于数据的读入及输出，而传统的高性能计算领域的加速效果侧重于算法加速，不适用于大数据领域。<br>于是，Hadoop MapReduce应时而生，将对大数据的分析任务划分成非常多的子任务，通过Map／Reduce两个过程，将计算任务分到集群中的每一台机器，借助于Hadoop Yarn资源调度器，达到“计算向数据靠近”的目标，从而可以利用上大数据。</li>
@@ -211,15 +211,20 @@
   
 <nav id="article-nav">
   
-    <a href="/title/" id="article-nav-newer" class="article-nav-link-wrap">
+    <a href="/Hadoop HDFS介绍及安装/" id="article-nav-newer" class="article-nav-link-wrap">
       <i class="icon-circle-left"></i>
       <div class="article-nav-title">
         
-          hello world
+          Hadoop HDFS介绍及安装
         
       </div>
     </a>
   
+  
+    <a href="/title/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">hello world</div>
+      <i class="icon-circle-right"></i>
+    </a>
   
 </nav>
 
@@ -326,7 +331,7 @@ MathJax.Hub.Queue(function() {
     
     	<section class="tools-section tools-section-tag">
     			<div class="widget tagcloud" id="js-tagcloud">
-    				<a href="/tags/大数据/" style="font-size: 20px;">大数据</a> <a href="/tags/简介/" style="font-size: 10px;">简介</a> <a href="/tags/随笔/" style="font-size: 10px;">随笔</a>
+    				<a href="/tags/Cassandra/" style="font-size: 10px;">Cassandra</a> <a href="/tags/NoSQL/" style="font-size: 10px;">NoSQL</a> <a href="/tags/Spark/" style="font-size: 16.67px;">Spark</a> <a href="/tags/ZooKeeper/" style="font-size: 13.33px;">ZooKeeper</a> <a href="/tags/etcd/" style="font-size: 10px;">etcd</a> <a href="/tags/大数据/" style="font-size: 20px;">大数据</a> <a href="/tags/简介/" style="font-size: 10px;">简介</a> <a href="/tags/随笔/" style="font-size: 10px;">随笔</a>
     			</div>
     	</section>
     
