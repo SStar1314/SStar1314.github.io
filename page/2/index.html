@@ -138,6 +138,273 @@
       <div class="body-wrap">
         
   
+    <article id="post-Cassandra" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/Cassandra/">Cassandra 数据库</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="Cassandra-数据库"><a href="#Cassandra-数据库" class="headerlink" title="Cassandra 数据库"></a>Cassandra 数据库</h3><p>Apache Cassandra是一套开源分布式NoSQL数据库系统。它最初由Facebook开发，用于储存收件箱等简单格式数据，集Google BigTable的数据模型与AmazonDynamo的完全分布式架构于一身。Facebook于2008将 Cassandra 开源，此后，由于Cassandra良好的可扩展性和性能，被Apple, Comcast,Instagram, Spotify, eBay, Rackspace, Netflix等知名网站所采用，成为了一种流行的分布式结构化数据存储方案。</p>
+<p>在数据库排行榜“DB-Engines Ranking”中，Cassandra排在第七位，是非关系型数据库中排名第二高的（仅次于MongoDB）。</p>
+<h3 id="数据模型"><a href="#数据模型" class="headerlink" title="数据模型"></a>数据模型</h3><p>Cassandra使用了Google 设计的 BigTable的数据模型，Cassandra使用的是宽列存储模型(Wide Column Stores)，每行数据由row key唯一标识之后，可以有最多20亿个列，每个列由一个column key标识，每个column key下对应若干value。这种模型可以理解为是一个二维的key-value存储，即整个数据模型被定义成一个类似 map&lt; key1, map&lt; key2,value&gt;&gt;的类型。</p>
+<h3 id="存储模型"><a href="#存储模型" class="headerlink" title="存储模型"></a>存储模型</h3><p>与BigTable和其模仿者HBase不同，Cassandra的数据并不存储在分布式文件系统如GFS或HDFS中，而是直接存于本地。与BigTable一样，Cassandra也是日志型数据库，即把新写入的数据存储在内存的Memtable中并通过磁盘中的CommitLog来做持久化，内存填满后将数据按照key的顺序写进一个只读文件SSTable中，每次读取数据时将所有SSTable和内存中的数据进行查找和合并。这种系统的特点是写入比读取更快，因为写入一条数据是顺序计入commit log中，不需要随机读取磁盘以及搜索。</p>
+<h3 id="与类似开源系统的比较"><a href="#与类似开源系统的比较" class="headerlink" title="与类似开源系统的比较"></a>与类似开源系统的比较</h3><p>HBase是Apache Hadoop项目的一个子项目，是Google BigTable的一个克隆，与Cassandra一样，它们都使用了BigTable的列族式的数据模型，但是：</p>
+<ul>
+<li>Cassandra只有一种节点，而HBase有多种不同角色，除了处理读写请求的region server之外，其架构在一套完整的HDFS分布式文件系统之上，并需要ZooKeeper来同步集群状态，部署上Cassandra更简单。</li>
+<li>Cassandra的数据一致性策略是可配置的，可选择是强一致性还是性能更高的最终一致性；而HBase总是强一致性的。</li>
+<li>Cassandra通过一致性哈希来决定一行数据存储在哪些节点，靠概率上的平均来实现负载均衡；而HBase每段数据(region)只有一个节点负责处理，由master来动态分配一个region是否大到需要拆分成两个，同时会将过热的节点上的一些region动态的分配给负载较低的节点，因此实现动态的负载均衡。</li>
+<li>因为每个region同时只能有一个节点处理，一旦这个节点无响应，在系统将这个节点的所有region转移到其他节点之前这些数据便无法读写，加上master也只有一个节点，备用master的恢复也需要时间，因此HBase在一定程度上有单点问题；而Cassandra无单点问题。</li>
+<li>Cassandra的读写性能优于HBase。</li>
+</ul>
+<h3 id="Cassandra-服务启动"><a href="#Cassandra-服务启动" class="headerlink" title="Cassandra 服务启动"></a>Cassandra 服务启动</h3><ul>
+<li><p>1.启动服务</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">./cassandra   </div><div class="line">org.apache.cassandra.service.CassandraDaemon</div></pre></td></tr></table></figure>
+</li>
+<li><p>2.启动用户交互              实际启动cqlsh.py来进行交互</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">./cqlsh</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>Cassandra Shell 命令：  <a href="http://www.w3ii.com/cassandra/cassandra_shell_commands.html" target="_blank" rel="external">http://www.w3ii.com/cassandra/cassandra_shell_commands.html</a><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">cassandra -f           前台启动 cassandra</div></pre></td></tr></table></figure></p>
+<ul>
+<li>3.停止服务<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">kill  pid</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<h3 id="Cql-使用"><a href="#Cql-使用" class="headerlink" title="Cql 使用"></a>Cql 使用</h3><p><strong>创建使用Cqlsh一个密钥空间</strong><br><a href="http://www.w3ii.com/cassandra/cassandra_create_keyspace.html" target="_blank" rel="external">http://www.w3ii.com/cassandra/cassandra_create_keyspace.html</a><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">CREATE KEYSPACE tutorialspoint</div><div class="line">WITH replication = &#123;&apos;class&apos;:&apos;SimpleStrategy&apos;, &apos;replication_factor&apos; : 3&#125;;</div><div class="line">DESCRIBE keyspaces;</div></pre></td></tr></table></figure></p>
+<p><strong>使用Java创建API密钥空间一</strong><br><a href="http://www.w3ii.com/cassandra/cassandra_create_keyspace.html" target="_blank" rel="external">http://www.w3ii.com/cassandra/cassandra_create_keyspace.html</a></p>
+<p><strong>改变使用Cqlsh KEYSPACE</strong><br><a href="http://www.w3ii.com/cassandra/cassandra_alter_keyspace.html" target="_blank" rel="external">http://www.w3ii.com/cassandra/cassandra_alter_keyspace.html</a><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">ALTER KEYSPACE “KeySpace Name”</div><div class="line">WITH replication = &#123;&apos;class&apos;: ‘Strategy name’, &apos;replication_factor&apos; : ‘No.Of  replicas’&#125;;</div><div class="line"></div><div class="line">ALTER KEYSPACE tutorialspoint</div><div class="line">WITH replication = &#123;&apos;class’:&apos;SimpleStrategy&apos;, &apos;replication_factor&apos; : 2&#125;;</div></pre></td></tr></table></figure></p>
+<p><strong>测试密钥空间的durable_writes属性</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">cqlsh&gt; SELECT * FROM system_schema.keyspaces;</div><div class="line">ALTER KEYSPACE test</div><div class="line">WITH REPLICATION = &#123;&apos;class&apos; : &apos;NetworkTopologyStrategy&apos;, &apos;datacenter1&apos; : 3&#125;</div><div class="line"></div><div class="line">AND DURABLE_WRITES = true;</div></pre></td></tr></table></figure></p>
+<p><strong>删除使用Cqlsh一个密钥空间</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">DROP KEYSPACE tutorialspoint;</div></pre></td></tr></table></figure></p>
+<p><strong>Cassandra创建表</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">USE tutorialspoint;</div><div class="line">cqlsh:tutorialspoint&gt;; CREATE TABLE emp(</div><div class="line">   emp_id int PRIMARY KEY,</div><div class="line">   emp_name text,</div><div class="line">   emp_city text,</div><div class="line">   emp_sal varint,</div><div class="line">   emp_phone varint</div><div class="line">   );</div><div class="line"></div><div class="line">cqlsh:tutorialspoint&gt; select * from emp;</div></pre></td></tr></table></figure></p>
+<p><strong>Cassandra修改表</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">cqlsh:tutorialspoint&gt; ALTER TABLE emp</div><div class="line">   ... ADD emp_email text;</div></pre></td></tr></table></figure></p>
+<p><strong>Cassandra删除表</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">cqlsh:tutorialspoint&gt; DROP TABLE emp;</div><div class="line"></div><div class="line">cqlsh:tutorialspoint&gt; DESCRIBE COLUMNFAMILIES;</div></pre></td></tr></table></figure></p>
+<p><strong>Cassandra截断表</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">cqlsh:tp&gt; TRUNCATE student;</div></pre></td></tr></table></figure></p>
+<p><strong>Cassandra创建索引</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">cqlsh:tutorialspoint&gt; CREATE INDEX name ON emp1 (emp_name);</div><div class="line"></div><div class="line">Cassandra DROP INDEX</div><div class="line">cqlsh:tp&gt; drop index name;</div></pre></td></tr></table></figure></p>
+<p><strong>Cassandra批量</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">cqlsh:tutorialspoint&gt; BEGIN BATCH</div><div class="line">     INSERT INTO emp (emp_id, emp_city, emp_name, emp_phone, emp_sal) values(  4,&apos;Pune&apos;,&apos;rajeev&apos;,9848022331, 30000);</div><div class="line">     UPDATE emp SET emp_sal = 50000 WHERE emp_id =3;</div><div class="line">     DELETE emp_city FROM emp WHERE emp_id = 2;</div><div class="line">     APPLY BATCH;</div></pre></td></tr></table></figure></p>
+<p><strong>Cassandra创建数据</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">cqlsh:tutorialspoint&gt; INSERT INTO emp (emp_id, emp_name, emp_city,</div><div class="line">   emp_phone, emp_sal) VALUES(1,&apos;ram&apos;, &apos;Hyderabad&apos;, 9848022338, 50000);</div><div class="line"></div><div class="line">cqlsh:tutorialspoint&gt; INSERT INTO emp (emp_id, emp_name, emp_city,</div><div class="line">   emp_phone, emp_sal) VALUES(2,&apos;robin&apos;, &apos;Hyderabad&apos;, 9848022339, 40000);</div><div class="line"></div><div class="line">cqlsh:tutorialspoint&gt; INSERT INTO emp (emp_id, emp_name, emp_city,</div><div class="line">   emp_phone, emp_sal) VALUES(3,&apos;rahman&apos;, &apos;Chennai&apos;, 9848022330, 45000);</div></pre></td></tr></table></figure></p>
+<p><strong>Cassandra更新数据</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">cqlsh:tutorialspoint&gt; UPDATE emp SET emp_city=&apos;Delhi&apos;,emp_sal=50000</div><div class="line">   WHERE emp_id=2;</div></pre></td></tr></table></figure></p>
+<p><strong>Cassandra删除数据</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">cqlsh:tutorialspoint&gt; DELETE emp_sal FROM emp WHERE emp_id=3;</div></pre></td></tr></table></figure></p>
+<p><strong>Cassandra CQL集合</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line">cqlsh:tutorialspoint&gt; CREATE TABLE data(name text PRIMARY KEY, email list&lt;text&gt;);</div><div class="line"></div><div class="line">cqlsh:tutorialspoint&gt; INSERT INTO data(name, email) VALUES (&apos;ramu&apos;,</div><div class="line">[&apos;abc@gmail.com&apos;,&apos;cba@yahoo.com&apos;])</div><div class="line"></div><div class="line">cqlsh:tutorialspoint&gt; UPDATE data</div><div class="line">... SET email = email +[&apos;xyz@w3ii.com&apos;]</div><div class="line">... where name = &apos;ramu&apos;;</div><div class="line"></div><div class="line">cqlsh:tutorialspoint&gt; CREATE TABLE data2 (name text PRIMARY KEY, phone set&lt;varint&gt;);</div><div class="line"></div><div class="line">cqlsh:tutorialspoint&gt; INSERT INTO data2(name, phone)VALUES (&apos;rahman&apos;,    &#123;9848022338,9848022339&#125;);</div><div class="line"></div><div class="line">cqlsh:tutorialspoint&gt; UPDATE data2</div><div class="line">  ... SET phone = phone + &#123;9848022330&#125;</div><div class="line">  ... where name = &apos;rahman&apos;;</div><div class="line"></div><div class="line">cqlsh:tutorialspoint&gt; CREATE TABLE data3 (name text PRIMARY KEY, address map&lt;timestamp, text&gt;);</div><div class="line"></div><div class="line">cqlsh:tutorialspoint&gt; INSERT INTO data3 (name, address)</div><div class="line">   VALUES (&apos;robin&apos;, &#123;&apos;home&apos; : &apos;hyderabad&apos; , &apos;office&apos; : &apos;Delhi&apos; &#125; );</div><div class="line"></div><div class="line">cqlsh:tutorialspoint&gt; UPDATE data3</div><div class="line">   ... SET address = address+&#123;&apos;office&apos;:&apos;mumbai&apos;&#125;</div><div class="line">   ... WHERE name = &apos;robin&apos;;</div></pre></td></tr></table></figure></p>
+<h3 id="Cassandra-安装-及-源代码分析"><a href="#Cassandra-安装-及-源代码分析" class="headerlink" title="Cassandra 安装 及 源代码分析"></a>Cassandra 安装 及 源代码分析</h3><p><strong>service 启动入口函数：</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">org.apache.cassandra.service.CassandraDaemon</div></pre></td></tr></table></figure></p>
+<p><strong>installation:</strong><br><a href="http://cassandra.apache.org/doc/latest/getting_started/installing.html" target="_blank" rel="external">http://cassandra.apache.org/doc/latest/getting_started/installing.html</a></p>
+<p><strong>import源代码进Eclipse：</strong></p>
+<ul>
+<li>1.ant build</li>
+<li>2.ant generate-eclipse-files</li>
+</ul>
+<p>还有其它操作：</p>
+<ul>
+<li>执行ant avro-generate</li>
+<li>执行ant gen-thrift-java</li>
+<li>执行ant generate-eclipse-files</li>
+</ul>
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      <a href="/Cassandra/" class="archive-article-date">
+  	<time datetime="2016-11-08T13:09:51.000Z" itemprop="datePublished"><i class="icon-clock"></i>2016-11-08</time>
+</a>
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags"></i>
+		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Cassandra/">Cassandra</a></li></ul>
+	</div>
+
+      
+	<div class="article-category tagcloud">
+	<i class="icon-price-tags"></i>
+	<a class="article-category-link" href="/categories/NoSQL/">NoSQL</a>
+	</div>
+
+
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+
+
+
+
+
+
+
+
+
+  
+    <article id="post-NoSQL介绍" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/NoSQL介绍/">NoSQL参考</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="NoSQL-参考"><a href="#NoSQL-参考" class="headerlink" title="NoSQL 参考"></a>NoSQL 参考</h3><p><img src="/images/NoSQL.png" alt=""></p>
+<h3 id="NoSQL-对比"><a href="#NoSQL-对比" class="headerlink" title="NoSQL 对比"></a>NoSQL 对比</h3><p><img src="/images/NoSQL_Compare.png" alt=""></p>
+<h3 id="CAP-原理"><a href="#CAP-原理" class="headerlink" title="CAP 原理"></a>CAP 原理</h3><p><img src="/images/CAP.png" alt=""></p>
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      <a href="/NoSQL介绍/" class="archive-article-date">
+  	<time datetime="2016-11-08T12:49:48.000Z" itemprop="datePublished"><i class="icon-clock"></i>2016-11-08</time>
+</a>
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags"></i>
+		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/NoSQL/">NoSQL</a></li></ul>
+	</div>
+
+      
+	<div class="article-category tagcloud">
+	<i class="icon-price-tags"></i>
+	<a class="article-category-link" href="/categories/NoSQL/">NoSQL</a>
+	</div>
+
+
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+
+
+
+
+
+
+
+
+
+  
+    <article id="post-Storm" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/Storm/">Storm(流计算)</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="Storm-简介"><a href="#Storm-简介" class="headerlink" title="Storm 简介"></a>Storm 简介</h2><p>参考： <a href="http://storm.apache.org/releases/0.10.2/index.html" target="_blank" rel="external">http://storm.apache.org/releases/0.10.2/index.html</a><br>Storm是一个分布式计算框架，主要由Clojure编程语言编写。最初是由Nathan Marz[1]及其团队创建于BackType，[2]该项目在被Twitter取得后开源。[3]它使用用户创建的“管（spouts）”和“螺栓（bolts）”来定义信息源和操作来允许批量、分布式处理流式数据。</p>
+<h3 id="Storm-源代码导入-Eclipse"><a href="#Storm-源代码导入-Eclipse" class="headerlink" title="Storm 源代码导入 Eclipse"></a>Storm 源代码导入 Eclipse</h3><p>下载源代码并导入Eclipse： （可参考网页：<a href="http://ylzhj02.iteye.com/blog/2162197）" target="_blank" rel="external">http://ylzhj02.iteye.com/blog/2162197）</a></p>
+<ul>
+<li>1.git clone git://github.com/apache/storm.git</li>
+<li>2.mvn clean package install -DskipTests=true</li>
+<li>3.mvn eclipse:eclipse</li>
+</ul>
+<h3 id="Storm-Topology-架构"><a href="#Storm-Topology-架构" class="headerlink" title="Storm Topology 架构"></a>Storm Topology 架构</h3><p><img src="/images/Storm_Topology.png" alt=""></p>
+<ul>
+<li>Topology：storm中运行的一个实时应用程序，因为各个组件间的消息流动形成逻辑上的一个拓扑结构。</li>
+<li>Spout：在一个topology中产生源数据流的组件。通常情况下spout会从外部数据源中读取数据，然后转换为topology内部的源数据。Spout是一个主动的角色，其接口中有个nextTuple()函数，storm框架会不停地调用此函数，用户只要在其中生成源数据即可。</li>
+<li>Bolt：在一个topology中接受数据然后执行处理的组件。Bolt可以执行过滤、函数操作、合并、写数据库等任何操作。Bolt是一个被动的角色，其接口中有个execute(Tuple input)函数,在接受到消息后会调用此函数，用户可以在其中执行自己想要的操作。</li>
+<li>Tuple：一次消息传递的基本单元。本来应该是一个key-value的map，但是由于各个组件间传递的tuple的字段名称已经事先定义好，所以tuple中只要按序填入各个value就行了，所以就是一个value list.</li>
+<li>Stream：源源不断传递的tuple就组成了stream。</li>
+</ul>
+<h3 id="Storm-Detail"><a href="#Storm-Detail" class="headerlink" title="Storm Detail"></a>Storm Detail</h3><p>在Storm的集群里面有两种节点： 控制节点(master node)和工作节点(worker node)。控制节点上面运行一个叫Nimbus后台程序，它的作用类似Hadoop里面的JobTracker。Nimbus负责在集群里面分发代码，分配计算任务给机器，并且监控状态。<br>每一个工作节点上面运行一个叫做Supervisor的节点。Supervisor会监听分配给它那台机器的工作，根据需要启动/关闭工作进程。每一个工作进程执行一个topology的一个子集；一个运行的topology由运行在很多机器上的很多工作进程组成。<br><img src="/images/Storm1.png" alt="">  <img src="/images/Storm2.jpg" alt="">  <img src="/images/Storm3.png" alt=""></p>
+<ul>
+<li>Storm提供的最基本的处理stream的原语是spout和bolt。你可以实现spout和bolt提供的接口来处理你的业务逻辑。</li>
+<li>消息源spout是Storm里面一个topology里面的消息生产者。一般来说消息源会从一个外部源读取数据并且向topology里面发出消息：tuple。Spout可以是可靠的也可以是不可靠的。如果这个tuple没有被storm成功处理，可靠的消息源spouts可以重新发射一个tuple， 但是不可靠的消息源spouts一旦发出一个tuple就不能重发了。</li>
+<li>消息源可以发射多条消息流stream。使用OutputFieldsDeclarer.declareStream来定义多个stream，然后使用SpoutOutputCollector来发射指定的stream。</li>
+<li>Spout类里面最重要的方法是nextTuple。要么发射一个新的tuple到topology里面或者简单的返回如果已经没有新的tuple。要注意的是nextTuple方法不能阻塞，因为storm在同一个线程上面调用所有消息源spout的方法。</li>
+<li>另外两个比较重要的spout方法是ack和fail。storm在检测到一个tuple被整个topology成功处理的时候调用ack，否则调用fail。storm只对可靠的spout调用ack和fail。</li>
+<li>所有的消息处理逻辑被封装在bolts里面。Bolts可以做很多事情：过滤，聚合，查询数据库等等。</li>
+<li>Bolts可以简单的做消息流的传递。复杂的消息流处理往往需要很多步骤，从而也就需要经过很多bolts。比如算出一堆图片里面被转发最多的图片就至少需要两步：第一步算出每个图片的转发数量。第二步找出转发最多的前10个图片。(如果要把这个过程做得更具有扩展性那么可能需要更多的步骤)。</li>
+<li>Bolts可以发射多条消息流， 使用OutputFieldsDeclarer.declareStream定义stream，使用OutputCollector.emit来选择要发射的stream。</li>
+<li>Bolts的主要方法是execute, 它以一个tuple作为输入，bolts使用OutputCollector来发射tuple，bolts必须要为它处理的每一个tuple调用OutputCollector的ack方法，以通知Storm这个tuple被处理完成了，从而通知这个tuple的发射者spouts。 一般的流程是： bolts处理一个输入tuple, 发射0个或者多个tuple, 然后调用ack通知storm自己已经处理过这个tuple了。storm提供了一个IBasicBolt会自动调用ack。</li>
+<li>定义一个topology的其中一步是定义每个bolt接收什么样的流作为输入。stream grouping就是用来定义一个stream应该如果分配数据给bolts上面的多个tasks。</li>
+</ul>
+<h3 id="Storm里面有7种类型的stream-grouping"><a href="#Storm里面有7种类型的stream-grouping" class="headerlink" title="Storm里面有7种类型的stream grouping"></a>Storm里面有7种类型的stream grouping</h3><ul>
+<li>　　Shuffle Grouping: 随机分组， 随机派发stream里面的tuple，保证每个bolt接收到的tuple数目大致相同。</li>
+<li>　　Fields Grouping：按字段分组， 比如按userid来分组， 具有同样userid的tuple会被分到相同的Bolts里的一个task， 而不同的userid则会被分配到不同的bolts里的task。</li>
+<li>　　All Grouping：广播发送，对于每一个tuple，所有的bolts都会收到。</li>
+<li>　　Global Grouping：全局分组， 这个tuple被分配到storm中的一个bolt的其中一个task。再具体一点就是分配给id值最低的那个task。</li>
+<li>　　Non Grouping：不分组，这个分组的意思是说stream不关心到底谁会收到它的tuple。目前这种分组和Shuffle grouping是一样的效果， 有一点不同的是storm会把这个bolt放到这个bolt的订阅者同一个线程里面去执行。</li>
+<li>　　Direct Grouping： 直接分组， 这是一种比较特别的分组方法，用这种分组意味着消息的发送者指定由消息接收者的哪个task处理这个消息。 只有被声明为Direct Stream的消息流可以声明这种分组方法。而且这种消息tuple必须使用emitDirect方法来发射。消息处理者可以通过TopologyContext来获取处理它的消息的task的id (OutputCollector.emit方法也会返回task的id)。</li>
+<li>　　Local or shuffle grouping：如果目标bolt有一个或者多个task在同一个工作进程中，tuple将会被随机发生给这些tasks。否则，和普通的Shuffle Grouping行为一致。</li>
+</ul>
+<h3 id="Storm-集群安装和配置"><a href="#Storm-集群安装和配置" class="headerlink" title="Storm 集群安装和配置"></a>Storm 集群安装和配置</h3><p><strong>Summary of the steps for setting up a Storm cluster:</strong></p>
+<ul>
+<li>Set up a Zookeeper cluster</li>
+<li>Install dependencies on Nimbus and worker machines</li>
+<li>Download and extract a Storm release to Nimbus and worker machines</li>
+<li>Fill in mandatory configurations into storm.yaml</li>
+<li>Launch daemons under supervision using “storm” script and a supervisor of your choice</li>
+</ul>
+<p><strong>配置：</strong><br><img src="/images/Storm_Config.png" alt=""></p>
+<p><strong>源代码入口：</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">bin/storm nimbus                                   org.apache.storm.daemon.nimbus</div><div class="line">bin/storm supervisor                              org.apache.storm.daemon.supervisor</div><div class="line">bin/storm ui                                             org.apache.storm.ui.core</div></pre></td></tr></table></figure></p>
+<p><strong>运行测试案例：</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">bin/storm   jar   examples/storm-starter/storm-starter-topologies-1.0.2.jar    org.apache.storm.starter.WordCountTopology</div></pre></td></tr></table></figure></p>
+<p><strong>nimbus 与 supervisor之间通过zookeeper 进行通信</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">[zk: localhost:2181(CONNECTED) 9] ls /storm</div><div class="line">[backpressure, workerbeats, nimbuses, supervisors, errors, logconfigs, storms, assignments, leader-lock, blobstore]</div></pre></td></tr></table></figure></p>
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      <a href="/Storm/" class="archive-article-date">
+  	<time datetime="2016-11-08T12:27:38.000Z" itemprop="datePublished"><i class="icon-clock"></i>2016-11-08</time>
+</a>
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags"></i>
+		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/大数据/">大数据</a></li></ul>
+	</div>
+
+      
+	<div class="article-category tagcloud">
+	<i class="icon-price-tags"></i>
+	<a class="article-category-link" href="/categories/bigdata/">bigdata</a>
+	</div>
+
+
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+
+
+
+
+
+
+
+
+
+  
     <article id="post-Hive" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -1280,195 +1547,6 @@
 
 
   
-    <article id="post-大数据" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <input type="hidden" class="isFancy" />
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/大数据/">我的大数据起步之旅</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>长久以来，大数据非常火，各大新闻app上都在谈这个名词，然而自己并不十分清楚，只是大约上知道有Hadoop和MapReduce这么2个东西，为什么会有大数据的名词？从何而来？为什么以前没有这个名词，却出现在几年前？为什么这几年突然蹦出个Spark，也是大数据领域的，这又是个啥东西。。。</p>
-<p>现在想起来，自己第一次接触大数据还是为了参加一个公司内部的竞赛，被迫响应了本地公司领导的号召，代表了西安site去参加Spark编程竞赛。。。于是，一共6个人组了一个小队，基于Spark GraphX＋GeoJson做了个<a href="https://github.com/SStar1314/sp_roadmap" target="_blank" rel="external">地图</a>，期间被scala快折腾疯了，到现在我还认为scala是世上最屎的语言，没有之一！不过结果是好的，最后拿了个第一名回来，公司请吃了个大餐，还算值，哈哈</p>
-<h2 id="言归正传"><a href="#言归正传" class="headerlink" title="言归正传"></a>言归正传</h2><p>要想知道大数据是什么？包括哪些技术？怎么应用？为什么大数据这年纪突然之间火起来？我认为我们可以问以下这些问题，当能正确回答这些问题，并理解为什么需要问这些问题的时候，那么我认为你已经走进了大数据这个圈子了。</p>
-<ol>
-<li>大数据，大数据，数据量有多大？这些数据怎么存储？</li>
-<li>存了这么多数据，目的是什么？这些数据怎么利用？</li>
-<li>数据从哪来？到哪去？</li>
-</ol>
-<h2 id="我的回答"><a href="#我的回答" class="headerlink" title="我的回答"></a>我的回答</h2><p>作为一个非大数据领域的外行程序员，自问自答，貌似有点班门弄斧，呵呵</p>
-<ol>
-<li>大数据，大数据，数据量有多大？这些数据怎么存储？<br>数量级：数百TB至几十PB，并且赠长速度很快。这么多数据，一块磁盘才2TB，怎么存啊，我得买成百上千个磁盘才能存下来呀。这些数据存到磁盘上，是存到文件里，还是存到数据库里呢？<br>我可以告诉你的是，传统关系型数据库(MySQL,Oracle,SQL Server)无法存储这么大数据量的数据，就算可以存的下，查询／插入／更新操作会让用户抓狂的。那只能存到文件里面喽，放一个文件肯定是不可能的，想象以下一个2TB的文件，你要怎么打开？所以只能分开存成很多个文件，每个文件存储一部分信息。<br>试想一下，每台机器上都存很多文件，那么多台机器，无论是数据存储／备份／查询都很是问题，在这样一个情况之下，分布式文件系统应时而生，代表性的就是Hadoop HDFS。<br>HDFS解决了，大数据存储以及检索困难的问题，并且通过数据分布式备份解决了硬件设备错误的问题。</li>
-<li>存了这么多数据，目的是什么？这些数据怎么利用？<br>为什么需要存储这么多数据呢，现在有一个普遍的认识，就是“我们没有更好的算法，我们只有更多的数据”。这意味着，基于大量数据，通过数据挖掘＋机器学习算法的结合，能够得到比纯算法推导更好的结果。所以，数据很重要。<br>针对于PB级大数据的使用／分析，又成了一个头疼的问题，通过传统的高新能计算的加速手段(比如: MPI)，无法取得良好的加速效果，表现的现象是：数据传输的时间远大于计算所需要的时间。原因是：实际的大数据应用中，对数据的分析算法往往很简单，痛点在于数据的读入及输出，而传统的高性能计算领域的加速效果侧重于算法加速，不适用于大数据领域。<br>于是，Hadoop MapReduce应时而生，将对大数据的分析任务划分成非常多的子任务，通过Map／Reduce两个过程，将计算任务分到集群中的每一台机器，借助于Hadoop Yarn资源调度器，达到“计算向数据靠近”的目标，从而可以利用上大数据。</li>
-<li>数据从哪来？到哪去？<br>数据来源太广了，任何领域都能产生数据，我们应当分析出什么领域带动了大数据，他们的数据来自于哪。我个人任务大数据发源地是“互联网”，由人制作／产生的文档／音频／视频／直播将数据拉到第一个高度，让传统方法无法处理这么大规模的数据，随之来临的就是<a href="https://book.douban.com/subject/20429677/" target="_blank" rel="external">《大数据时代》</a>。“互联网”是一个不可避免的趋势及未来，传统企业在“互联网”的冲击和带动下，必然会逐渐重视数据的重要性，从而构建和自身企业核心业务相关的数据分析平台，甚至构建更大规模的云计算平台。众多传统企业的参与，会将数据拉到另一个高度，进入IOT物联网时代。这些是我个人对数据来源形势的理解。对于数据到哪去的问题，很简单，为了更好的服务于人。</li>
-</ol>
-<p>感谢你们花了大把时间看完，在这里我推荐一本书<a href="http://item.jd.com/11966465.html" target="_blank" rel="external">《云计算架构 技术与实践 第2版》</a>，华为 顾炯炯 编著，一定要是第2版哦，这本书很全面，作者没有藏私，很赞！不过阅读这本书，需要多多google。</p>
-<h2 id="转到正题"><a href="#转到正题" class="headerlink" title="转到正题"></a>转到正题</h2><p>作为程序员，技术还是第一重要的，了解完高逼格的大趋势之后，搬砖的还是乖乖的回归原位，老老实实的谈技术吧。我会在其它文章中谈到以下内容：</p>
-<ol>
-<li>Hadoop<br>MapReduce, HDFS, Yarn, Hbase, Hive, Storm.<br>Hadoop1.x vs 2.x</li>
-<li>Spark<br> RDD, Spark-shell, Spark SQL, Spark Streaming, MLlib, GraphX</li>
-<li>NoSQL<br>HBase, Cassandra, MongoDB, Redis</li>
-</ol>
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      <a href="/大数据/" class="archive-article-date">
-  	<time datetime="2016-11-07T02:31:11.000Z" itemprop="datePublished"><i class="icon-clock"></i>2016-11-07</time>
-</a>
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags"></i>
-		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/大数据/">大数据</a></li></ul>
-	</div>
-
-      
-	<div class="article-category tagcloud">
-	<i class="icon-price-tags"></i>
-	<a class="article-category-link" href="/categories/bigdata/">bigdata</a>
-	</div>
-
-
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-
-
-
-
-
-
-
-
-
-  
-    <article id="post-title" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <input type="hidden" class="isFancy" />
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/title/">hello world</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>Welcome to <a href="https://hexo.io/" target="_blank" rel="external">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/" target="_blank" rel="external">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html" target="_blank" rel="external">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="external">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo new <span class="string">"My New Post"</span></div></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/writing.html" target="_blank" rel="external">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo server</div></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/server.html" target="_blank" rel="external">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo generate</div></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/generating.html" target="_blank" rel="external">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo deploy</div></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/deployment.html" target="_blank" rel="external">Deployment</a></p>
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      <a href="/title/" class="archive-article-date">
-  	<time datetime="2016-11-07T02:31:11.000Z" itemprop="datePublished"><i class="icon-clock"></i>2016-11-07</time>
-</a>
-      
-      
-
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-
-
-
-
-
-
-
-
-
-  
-    <article id="post-personal-profile" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <input type="hidden" class="isFancy" />
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/personal-profile/">个人简介</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>欢迎浏览 <a href="https://sstar1314.github.io/" target="_blank" rel="external">SStar1314</a>! 我的个人博客. 以及 <a href="https://github.com/SStar1314/" target="_blank" rel="external">SStar1314</a>，我的github主页. 我的主页开通于2016年11月，一直想写点什么，两年多的时间，在Evernote上记录很多自己研究的东西，一直想开通一个博客，把Evernote上的东西搬上来，顺道梳理一下以前的知识点.</p>
-<h2 id="介绍一下本人"><a href="#介绍一下本人" class="headerlink" title="介绍一下本人"></a>介绍一下本人</h2><h3 id="就业单位"><a href="#就业单位" class="headerlink" title="就业单位"></a>就业单位</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">现就业于 国际商业机器有限公司（IBM） 中国系统研发实验室（CSL） 西安分公司。</div><div class="line">职位： 软件开发工程师</div></pre></td></tr></table></figure>
-<h3 id="毕业院校"><a href="#毕业院校" class="headerlink" title="毕业院校"></a>毕业院校</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">硕士： 西安交通大学</div><div class="line">学士： 西安交通大学</div></pre></td></tr></table></figure>
-<h3 id="工作／研究生-相关方向"><a href="#工作／研究生-相关方向" class="headerlink" title="工作／研究生 相关方向"></a>工作／研究生 相关方向</h3><h4 id="工作"><a href="#工作" class="headerlink" title="工作"></a>工作</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">集群管理。</div></pre></td></tr></table></figure>
-<h4 id="研究生"><a href="#研究生" class="headerlink" title="研究生"></a>研究生</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">高新能计算，GPU加速，MPI＋OpenMP＋CUDA，解决非线性规划问题。</div></pre></td></tr></table></figure>
-<h3 id="个人关心的方向或技术"><a href="#个人关心的方向或技术" class="headerlink" title="个人关心的方向或技术"></a>个人关心的方向或技术</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">OpenStack云计算框架: Keystone／Nova／Neutron／Glance／Cinder／Swift／Ironic</div><div class="line">	Keystone: RabbitMQ,Qpid,AMQP(Producer+Consumer+Exchange+Queue)</div><div class="line">	Nova: nova-scheduler,nova-compute,虚拟化</div><div class="line">	Neutron: OVS,Linux Bridge,vlan,vxlan,gre.</div><div class="line">		Provider network ---- Self-defined network</div><div class="line">虚拟化: KVM／Xen</div><div class="line">大数据: Headoop／Spark</div><div class="line">	Headoop: MapReduce,HDFS,Yarn,Hbase,Hive,Storm. Hadoop1.x vs 2.x</div><div class="line">	Spark: RDD,Spark-shell,Spark SQL,Spark Streaming,MLlib,GraphX</div><div class="line">NoSQL: HBase, Cassandra, MongoDB, Redis</div><div class="line">容器化: Docker, Kubernetes, rkt, CoreOS</div><div class="line">数据中心操作系统: DCOS, Mesos, Marathon, Chronos</div><div class="line">分布式协同: ZooKeeper, etcd</div><div class="line">其它: Kafka, Elastic Search, Logstash</div></pre></td></tr></table></figure>
-<p>More info: <a href="https://github.com/SStar1314/" target="_blank" rel="external">我的github主页</a></p>
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      <a href="/personal-profile/" class="archive-article-date">
-  	<time datetime="2016-11-07T02:31:11.000Z" itemprop="datePublished"><i class="icon-clock"></i>2016-11-07</time>
-</a>
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags"></i>
-		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/简介/">简介</a></li></ul>
-	</div>
-
-      
-	<div class="article-category tagcloud">
-	<i class="icon-price-tags"></i>
-	<a class="article-category-link" href="/categories/个人简介/">个人简介</a>
-	</div>
-
-
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-
-
-
-
-
-
-
-
-
-  
   
     <nav id="page-nav">
       <a class="extend prev" rel="prev" href="/">&laquo; Prev</a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/">3</a><a class="extend next" rel="next" href="/page/3/">Next &raquo;</a>
@@ -1550,7 +1628,7 @@ MathJax.Hub.Queue(function() {
     
     	<section class="tools-section tools-section-tag">
     			<div class="widget tagcloud" id="js-tagcloud">
-    				<a href="/tags/Cassandra/" style="font-size: 10px;">Cassandra</a> <a href="/tags/NoSQL/" style="font-size: 10px;">NoSQL</a> <a href="/tags/Spark/" style="font-size: 16.67px;">Spark</a> <a href="/tags/ZooKeeper/" style="font-size: 13.33px;">ZooKeeper</a> <a href="/tags/etcd/" style="font-size: 10px;">etcd</a> <a href="/tags/大数据/" style="font-size: 20px;">大数据</a> <a href="/tags/简介/" style="font-size: 10px;">简介</a> <a href="/tags/随笔/" style="font-size: 10px;">随笔</a>
+    				<a href="/tags/Cassandra/" style="font-size: 10px;">Cassandra</a> <a href="/tags/Kafka/" style="font-size: 15px;">Kafka</a> <a href="/tags/NoSQL/" style="font-size: 10px;">NoSQL</a> <a href="/tags/Spark/" style="font-size: 17.5px;">Spark</a> <a href="/tags/ZooKeeper/" style="font-size: 12.5px;">ZooKeeper</a> <a href="/tags/etcd/" style="font-size: 10px;">etcd</a> <a href="/tags/大数据/" style="font-size: 20px;">大数据</a> <a href="/tags/简介/" style="font-size: 10px;">简介</a> <a href="/tags/随笔/" style="font-size: 10px;">随笔</a>
     			</div>
     	</section>
     
