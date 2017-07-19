@@ -6,27 +6,20 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://yoursite.com">
-  <title>etcd | SStar1314</title>
+  <title>etcd 源码解析 | SStar1314</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="etcd 相关网站https://coreos.com/etcd/docs/latest/https://coreos.com/etcd/docs/latest/api.htmlhttps://coreos.com/etcd/docs/latest/libraries-and-tools.html
-Eclipse go plugin安装：Installation Requirements:
-
-Ja">
+  <meta name="description" content="etcd 相关网站https://coreos.com/etcd/docs/latest/https://coreos.com/etcd/docs/latest/api.htmlhttps://coreos.com/etcd/docs/latest/libraries-and-tools.html Eclipse安装golang语言plugin：Installation Requirements:">
+<meta name="keywords" content="etcd">
 <meta property="og:type" content="article">
-<meta property="og:title" content="etcd">
+<meta property="og:title" content="etcd 源码解析">
 <meta property="og:url" content="http://yoursite.com/etcd/index.html">
 <meta property="og:site_name" content="SStar1314">
-<meta property="og:description" content="etcd 相关网站https://coreos.com/etcd/docs/latest/https://coreos.com/etcd/docs/latest/api.htmlhttps://coreos.com/etcd/docs/latest/libraries-and-tools.html
-Eclipse go plugin安装：Installation Requirements:
-
-Ja">
-<meta property="og:updated_time" content="2016-11-10T05:35:06.000Z">
+<meta property="og:description" content="etcd 相关网站https://coreos.com/etcd/docs/latest/https://coreos.com/etcd/docs/latest/api.htmlhttps://coreos.com/etcd/docs/latest/libraries-and-tools.html Eclipse安装golang语言plugin：Installation Requirements:">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2017-07-19T01:34:02.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="etcd">
-<meta name="twitter:description" content="etcd 相关网站https://coreos.com/etcd/docs/latest/https://coreos.com/etcd/docs/latest/api.htmlhttps://coreos.com/etcd/docs/latest/libraries-and-tools.html
-Eclipse go plugin安装：Installation Requirements:
-
-Ja">
+<meta name="twitter:title" content="etcd 源码解析">
+<meta name="twitter:description" content="etcd 相关网站https://coreos.com/etcd/docs/latest/https://coreos.com/etcd/docs/latest/api.htmlhttps://coreos.com/etcd/docs/latest/libraries-and-tools.html Eclipse安装golang语言plugin：Installation Requirements:">
   
     <link rel="alternative" href="/atom.xml" title="SStar1314" type="application/atom+xml">
   
@@ -159,7 +152,7 @@ Ja">
         
   
     <h1 class="article-title" itemprop="name">
-      etcd
+      etcd 源码解析
     </h1>
   
 
@@ -168,7 +161,7 @@ Ja">
     <div class="article-entry" itemprop="articleBody">
       
         <h3 id="etcd-相关网站"><a href="#etcd-相关网站" class="headerlink" title="etcd 相关网站"></a>etcd 相关网站</h3><p><a href="https://coreos.com/etcd/docs/latest/" target="_blank" rel="external">https://coreos.com/etcd/docs/latest/</a><br><a href="https://coreos.com/etcd/docs/latest/api.html" target="_blank" rel="external">https://coreos.com/etcd/docs/latest/api.html</a><br><a href="https://coreos.com/etcd/docs/latest/libraries-and-tools.html" target="_blank" rel="external">https://coreos.com/etcd/docs/latest/libraries-and-tools.html</a></p>
-<h3 id="Eclipse-go-plugin安装："><a href="#Eclipse-go-plugin安装：" class="headerlink" title="Eclipse go plugin安装："></a>Eclipse go plugin安装：</h3><p>Installation Requirements:</p>
+<h3 id="Eclipse安装golang语言plugin："><a href="#Eclipse安装golang语言plugin：" class="headerlink" title="Eclipse安装golang语言plugin："></a>Eclipse安装golang语言plugin：</h3><p>Installation Requirements:</p>
 <ul>
 <li>Java VM version 8 or later.</li>
 <li>Eclipse 4.6 (Neon) or later.</li>
@@ -272,7 +265,7 @@ Ja">
   <div class="outer">
     <div id="footer-info">
     	<div class="footer-left">
-    		&copy; 2016 Xia,MingXing
+    		&copy; 2017 Xia,MingXing
     	</div>
       	<div class="footer-right">
       		<a href="http://hexo.io/" target="_blank">Hexo</a>  Theme <a href="https://github.com/litten/hexo-theme-yilia" target="_blank">Yilia</a> by Litten
@@ -341,7 +334,7 @@ MathJax.Hub.Queue(function() {
     
     	<section class="tools-section tools-section-tag">
     			<div class="widget tagcloud" id="js-tagcloud">
-    				<a href="/tags/Cassandra/" style="font-size: 10px;">Cassandra</a> <a href="/tags/Kafka/" style="font-size: 15px;">Kafka</a> <a href="/tags/NoSQL/" style="font-size: 10px;">NoSQL</a> <a href="/tags/Spark/" style="font-size: 17.5px;">Spark</a> <a href="/tags/ZooKeeper/" style="font-size: 12.5px;">ZooKeeper</a> <a href="/tags/etcd/" style="font-size: 10px;">etcd</a> <a href="/tags/大数据/" style="font-size: 20px;">大数据</a> <a href="/tags/简介/" style="font-size: 10px;">简介</a> <a href="/tags/随笔/" style="font-size: 10px;">随笔</a>
+    				<a href="/tags/Cassandra/" style="font-size: 10px;">Cassandra</a> <a href="/tags/Kafka/" style="font-size: 15px;">Kafka</a> <a href="/tags/NoSQL/" style="font-size: 10px;">NoSQL</a> <a href="/tags/Spark/" style="font-size: 17.5px;">Spark</a> <a href="/tags/ZooKeeper/" style="font-size: 12.5px;">ZooKeeper</a> <a href="/tags/etcd/" style="font-size: 10px;">etcd</a> <a href="/tags/分布式协同/" style="font-size: 10px;">分布式协同</a> <a href="/tags/大数据/" style="font-size: 20px;">大数据</a> <a href="/tags/简介/" style="font-size: 10px;">简介</a> <a href="/tags/随笔/" style="font-size: 10px;">随笔</a>
     			</div>
     	</section>
     

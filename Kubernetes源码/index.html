@@ -6,20 +6,19 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://yoursite.com">
-  <title>大数据相关目录 | SStar1314</title>
+  <title>SStar1314</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="推荐一本书《云计算架构 技术与实践 第2版》，华为 顾炯炯 编著，一定要是第2版，这本书很全面，很赞！ 目录列表：  HadoopMapReduce, HDFS, Yarn, Hbase, Hive, Storm.Hadoop1.x vs 2.x Spark RDD, Spark-shell, Spark SQL, Spark Streaming, MLlib, GraphX NoSQLHBase">
-<meta name="keywords" content="大数据">
+  <meta name="description" content="Kubectl.go1.logs.InitLogs()k8s.io/kubernetes/pkg/util/logs 日志管理代码每30秒刷新一次日志。 使用了github.com/golang/glog  NewDefaultClientConfigLoadingRulescurrentMigrationRules  type Factory struct {    clients Client">
 <meta property="og:type" content="article">
-<meta property="og:title" content="大数据相关目录">
-<meta property="og:url" content="http://yoursite.com/大数据/index.html">
+<meta property="og:title" content="SStar1314">
+<meta property="og:url" content="http://yoursite.com/Kubernetes源码/index.html">
 <meta property="og:site_name" content="SStar1314">
-<meta property="og:description" content="推荐一本书《云计算架构 技术与实践 第2版》，华为 顾炯炯 编著，一定要是第2版，这本书很全面，很赞！ 目录列表：  HadoopMapReduce, HDFS, Yarn, Hbase, Hive, Storm.Hadoop1.x vs 2.x Spark RDD, Spark-shell, Spark SQL, Spark Streaming, MLlib, GraphX NoSQLHBase">
+<meta property="og:description" content="Kubectl.go1.logs.InitLogs()k8s.io/kubernetes/pkg/util/logs 日志管理代码每30秒刷新一次日志。 使用了github.com/golang/glog  NewDefaultClientConfigLoadingRulescurrentMigrationRules  type Factory struct {    clients Client">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2017-07-19T01:32:19.000Z">
+<meta property="og:updated_time" content="2016-12-15T14:09:12.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="大数据相关目录">
-<meta name="twitter:description" content="推荐一本书《云计算架构 技术与实践 第2版》，华为 顾炯炯 编著，一定要是第2版，这本书很全面，很赞！ 目录列表：  HadoopMapReduce, HDFS, Yarn, Hbase, Hive, Storm.Hadoop1.x vs 2.x Spark RDD, Spark-shell, Spark SQL, Spark Streaming, MLlib, GraphX NoSQLHBase">
+<meta name="twitter:title" content="SStar1314">
+<meta name="twitter:description" content="Kubectl.go1.logs.InitLogs()k8s.io/kubernetes/pkg/util/logs 日志管理代码每30秒刷新一次日志。 使用了github.com/golang/glog  NewDefaultClientConfigLoadingRulescurrentMigrationRules  type Factory struct {    clients Client">
   
     <link rel="alternative" href="/atom.xml" title="SStar1314" type="application/atom+xml">
   
@@ -142,51 +141,108 @@
 </nav>
 
       <div class="body-wrap">
-        <article id="post-大数据" class="article article-type-post" itemscope itemprop="blogPost">
+        <article id="post-Kubernetes源码" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-inner">
     
       <input type="hidden" class="isFancy" />
     
     
-      <header class="article-header">
-        
-  
-    <h1 class="article-title" itemprop="name">
-      大数据相关目录
-    </h1>
-  
-
-      </header>
-    
     <div class="article-entry" itemprop="articleBody">
       
-        <p>推荐一本书<a href="http://item.jd.com/11966465.html" target="_blank" rel="external">《云计算架构 技术与实践 第2版》</a>，华为 顾炯炯 编著，一定要是第2版，这本书很全面，很赞！</p>
-<h2 id="目录"><a href="#目录" class="headerlink" title="目录"></a>目录</h2><p>列表：</p>
+        <h1 id="Kubectl-go"><a href="#Kubectl-go" class="headerlink" title="Kubectl.go"></a>Kubectl.go</h1><p>1.logs.InitLogs()<br>k8s.io/kubernetes/pkg/util/logs 日志管理代码<br>每30秒刷新一次日志。 使用了github.com/golang/glog</p>
 <ol>
-<li>Hadoop<br>MapReduce, HDFS, Yarn, Hbase, Hive, Storm.<br>Hadoop1.x vs 2.x</li>
-<li>Spark<br> RDD, Spark-shell, Spark SQL, Spark Streaming, MLlib, GraphX</li>
-<li>NoSQL<br>HBase, Cassandra, MongoDB, Redis</li>
+<li>NewDefaultClientConfigLoadingRules<br>currentMigrationRules</li>
 </ol>
+<p>type Factory struct {<br>    clients <em>ClientCache<br>    flags   </em>pflag.FlagSet</p>
+<pre><code>// Returns interfaces for dealing with arbitrary runtime.Objects.
+Object func() (meta.RESTMapper, runtime.ObjectTyper)
+// Returns interfaces for dealing with arbitrary
+// runtime.Unstructured. This performs API calls to discover types.
+UnstructuredObject func() (meta.RESTMapper, runtime.ObjectTyper, error)
+// Returns interfaces for decoding objects - if toInternal is set, decoded objects will be converted
+// into their internal form (if possible). Eventually the internal form will be removed as an option,
+// and only versioned objects will be returned.
+Decoder func(toInternal bool) runtime.Decoder
+// Returns an encoder capable of encoding a provided object into JSON in the default desired version.
+JSONEncoder func() runtime.Encoder
+// ClientSet gives you back an internal, generated clientset
+ClientSet func() (*internalclientset.Clientset, error)
+// Returns a RESTClient for accessing Kubernetes resources or an error.
+RESTClient func() (*restclient.RESTClient, error)
+// Returns a client.Config for accessing the Kubernetes server.
+ClientConfig func() (*restclient.Config, error)
+// Returns a RESTClient for working with the specified RESTMapping or an error. This is intended
+// for working with arbitrary resources and is not guaranteed to point to a Kubernetes APIServer.
+ClientForMapping func(mapping *meta.RESTMapping) (resource.RESTClient, error)
+// Returns a RESTClient for working with Unstructured objects.
+UnstructuredClientForMapping func(mapping *meta.RESTMapping) (resource.RESTClient, error)
+// Returns a Describer for displaying the specified RESTMapping type or an error.
+Describer func(mapping *meta.RESTMapping) (kubectl.Describer, error)
+// Returns a Printer for formatting objects of the given type or an error.
+Printer func(mapping *meta.RESTMapping, options kubectl.PrintOptions) (kubectl.ResourcePrinter, error)
+// Returns a Scaler for changing the size of the specified RESTMapping type or an error
+Scaler func(mapping *meta.RESTMapping) (kubectl.Scaler, error)
+// Returns a Reaper for gracefully shutting down resources.
+Reaper func(mapping *meta.RESTMapping) (kubectl.Reaper, error)
+// Returns a HistoryViewer for viewing change history
+HistoryViewer func(mapping *meta.RESTMapping) (kubectl.HistoryViewer, error)
+// Returns a Rollbacker for changing the rollback version of the specified RESTMapping type or an error
+Rollbacker func(mapping *meta.RESTMapping) (kubectl.Rollbacker, error)
+// Returns a StatusViewer for printing rollout status.
+StatusViewer func(mapping *meta.RESTMapping) (kubectl.StatusViewer, error)
+// MapBasedSelectorForObject returns the map-based selector associated with the provided object. If a
+// new set-based selector is provided, an error is returned if the selector cannot be converted to a
+// map-based selector
+MapBasedSelectorForObject func(object runtime.Object) (string, error)
+// PortsForObject returns the ports associated with the provided object
+PortsForObject func(object runtime.Object) ([]string, error)
+// ProtocolsForObject returns the &lt;port, protocol&gt; mapping associated with the provided object
+ProtocolsForObject func(object runtime.Object) (map[string]string, error)
+// LabelsForObject returns the labels associated with the provided object
+LabelsForObject func(object runtime.Object) (map[string]string, error)
+// LogsForObject returns a request for the logs associated with the provided object
+LogsForObject func(object, options runtime.Object) (*restclient.Request, error)
+// PauseObject marks the provided object as paused ie. it will not be reconciled by its controller.
+PauseObject func(object runtime.Object) (bool, error)
+// ResumeObject resumes a paused object ie. it will be reconciled by its controller.
+ResumeObject func(object runtime.Object) (bool, error)
+// Returns a schema that can validate objects stored on disk.
+Validator func(validate bool, cacheDir string) (validation.Schema, error)
+// SwaggerSchema returns the schema declaration for the provided group version kind.
+SwaggerSchema func(unversioned.GroupVersionKind) (*swagger.ApiDeclaration, error)
+// Returns the default namespace to use in cases where no
+// other namespace is specified and whether the namespace was
+// overridden.
+DefaultNamespace func() (string, bool, error)
+// Generators returns the generators for the provided command
+Generators func(cmdName string) map[string]kubectl.Generator
+// Check whether the kind of resources could be exposed
+CanBeExposed func(kind unversioned.GroupKind) error
+// Check whether the kind of resources could be autoscaled
+CanBeAutoscaled func(kind unversioned.GroupKind) error
+// AttachablePodForObject returns the pod to which to attach given an object.
+AttachablePodForObject func(object runtime.Object) (*api.Pod, error)
+// UpdatePodSpecForObject will call the provided function on the pod spec this object supports,
+// return false if no pod spec is supported, or return an error.
+UpdatePodSpecForObject func(obj runtime.Object, fn func(*api.PodSpec) error) (bool, error)
+// EditorEnvs returns a group of environment variables that the edit command
+// can range over in order to determine if the user has specified an editor
+// of their choice.
+EditorEnvs func() []string
+// PrintObjectSpecificMessage prints object-specific messages on the provided writer
+PrintObjectSpecificMessage func(obj runtime.Object, out io.Writer)
+</code></pre><p>}</p>
+<p>const (<br>    RunV1GeneratorName                          = “run/v1”<br>    RunPodV1GeneratorName                       = “run-pod/v1”<br>    ServiceV1GeneratorName                      = “service/v1”<br>    ServiceV2GeneratorName                      = “service/v2”<br>    ServiceNodePortGeneratorV1Name              = “service-nodeport/v1”<br>    ServiceClusterIPGeneratorV1Name             = “service-clusterip/v1”<br>    ServiceLoadBalancerGeneratorV1Name          = “service-loadbalancer/v1”<br>    ServiceAccountV1GeneratorName               = “serviceaccount/v1”<br>    HorizontalPodAutoscalerV1Beta1GeneratorName = “horizontalpodautoscaler/v1beta1”<br>    HorizontalPodAutoscalerV1GeneratorName      = “horizontalpodautoscaler/v1”<br>    DeploymentV1Beta1GeneratorName              = “deployment/v1beta1”<br>    DeploymentBasicV1Beta1GeneratorName         = “deployment-basic/v1beta1”<br>    JobV1Beta1GeneratorName                     = “job/v1beta1”<br>    JobV1GeneratorName                          = “job/v1”<br>    ScheduledJobV2Alpha1GeneratorName           = “scheduledjob/v2alpha1”<br>    NamespaceV1GeneratorName                    = “namespace/v1”<br>    ResourceQuotaV1GeneratorName                = “resourcequotas/v1”<br>    SecretV1GeneratorName                       = “secret/v1”<br>    SecretForDockerRegistryV1GeneratorName      = “secret-for-docker-registry/v1”<br>    SecretForTLSV1GeneratorName                 = “secret-for-tls/v1”<br>    ConfigMapV1GeneratorName                    = “configmap/v1”<br>)</p>
 
       
     </div>
     <div class="article-info article-info-index">
       
-      <a href="/大数据/" class="archive-article-date">
-  	<time datetime="2016-11-07T02:31:11.000Z" itemprop="datePublished"><i class="icon-clock"></i>2016-11-07</time>
+      <a href="/Kubernetes源码/" class="archive-article-date">
+  	<time datetime="2016-12-15T12:28:08.000Z" itemprop="datePublished"><i class="icon-clock"></i>2016-12-15</time>
 </a>
       
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags"></i>
-		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/大数据/">大数据</a></li></ul>
-	</div>
-
       
-	<div class="article-category tagcloud">
-	<i class="icon-price-tags"></i>
-	<a class="article-category-link" href="/categories/bigdata/">bigdata</a>
-	</div>
-
 
       <div class="clearfix"></div>
     </div>
@@ -196,18 +252,18 @@
   
 <nav id="article-nav">
   
-    <a href="/personal-profile/" id="article-nav-newer" class="article-nav-link-wrap">
+    <a href="/分布式协同/" id="article-nav-newer" class="article-nav-link-wrap">
       <i class="icon-circle-left"></i>
       <div class="article-nav-title">
         
-          个人简介
+          分布式协同技术
         
       </div>
     </a>
   
   
-    <a href="/title/" id="article-nav-older" class="article-nav-link-wrap">
-      <div class="article-nav-title">hello world</div>
+    <a href="/Kafka 源码/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">Kafka 启动＋源代码import进Eclipse</div>
       <i class="icon-circle-right"></i>
     </a>
   

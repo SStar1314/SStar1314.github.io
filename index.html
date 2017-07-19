@@ -12,6 +12,7 @@
 <meta property="og:title" content="SStar1314">
 <meta property="og:url" content="http://yoursite.com/index.html">
 <meta property="og:site_name" content="SStar1314">
+<meta property="og:locale" content="zh-CN">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="SStar1314">
   
@@ -137,6 +138,193 @@
 
       <div class="body-wrap">
         
+  
+    <article id="post-分布式协同" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/分布式协同/">分布式协同技术</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="分布式协同技术"><a href="#分布式协同技术" class="headerlink" title="分布式协同技术"></a>分布式协同技术</h2><p>分布式协同技术诞生于分布式系统中，致力于解决各大分布式系统或分布式计算平台点到点的同步问题。 代表性的有 etcd, ZooKeeper, Consul, Doozerd。 其中：</p>
+<h3 id="etcd"><a href="#etcd" class="headerlink" title="etcd"></a>etcd</h3><ul>
+<li>golang 语言编写</li>
+<li>coreos 公司研发</li>
+<li>被mesos kubernetes等 热门分布式平台所应用</li>
+<li>支持RESTful api</li>
+<li>基于 Raft 算法<h3 id="ZooKeeper"><a href="#ZooKeeper" class="headerlink" title="ZooKeeper"></a>ZooKeeper</h3></li>
+<li>java 语言编写</li>
+<li>Apache 基金会maintain</li>
+<li>被Hadoop Kafka等 热门分布式平台所应用</li>
+<li>支持RESTful api</li>
+<li>基于 Paxos 算法</li>
+</ul>
+<h2 id="分布式协同算法-Raft-和-Paxos"><a href="#分布式协同算法-Raft-和-Paxos" class="headerlink" title="分布式协同算法 Raft 和 Paxos"></a>分布式协同算法 Raft 和 Paxos</h2><p>推荐一个Raft算法动态描述的网站： <a href="https://raft.github.io/" target="_blank" rel="external">https://raft.github.io/</a></p>
+<p>至于 Raft 和 Paxos 算法的区别，网上文章有一些，可以阅读一下，但是本人至今没仔细钻研过两个算法的区别，以后如果有时间再补上。</p>
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      <a href="/分布式协同/" class="archive-article-date">
+  	<time datetime="2017-07-19T01:36:10.000Z" itemprop="datePublished"><i class="icon-clock"></i>2017-07-19</time>
+</a>
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags"></i>
+		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/分布式协同/">分布式协同</a></li></ul>
+	</div>
+
+      
+	<div class="article-category tagcloud">
+	<i class="icon-price-tags"></i>
+	<a class="article-category-link" href="/categories/分布式协同/">分布式协同</a>
+	</div>
+
+
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+
+
+
+
+
+
+
+
+
+  
+    <article id="post-Kubernetes源码" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="Kubectl-go"><a href="#Kubectl-go" class="headerlink" title="Kubectl.go"></a>Kubectl.go</h1><p>1.logs.InitLogs()<br>k8s.io/kubernetes/pkg/util/logs 日志管理代码<br>每30秒刷新一次日志。 使用了github.com/golang/glog</p>
+<ol>
+<li>NewDefaultClientConfigLoadingRules<br>currentMigrationRules</li>
+</ol>
+<p>type Factory struct {<br>    clients <em>ClientCache<br>    flags   </em>pflag.FlagSet</p>
+<pre><code>// Returns interfaces for dealing with arbitrary runtime.Objects.
+Object func() (meta.RESTMapper, runtime.ObjectTyper)
+// Returns interfaces for dealing with arbitrary
+// runtime.Unstructured. This performs API calls to discover types.
+UnstructuredObject func() (meta.RESTMapper, runtime.ObjectTyper, error)
+// Returns interfaces for decoding objects - if toInternal is set, decoded objects will be converted
+// into their internal form (if possible). Eventually the internal form will be removed as an option,
+// and only versioned objects will be returned.
+Decoder func(toInternal bool) runtime.Decoder
+// Returns an encoder capable of encoding a provided object into JSON in the default desired version.
+JSONEncoder func() runtime.Encoder
+// ClientSet gives you back an internal, generated clientset
+ClientSet func() (*internalclientset.Clientset, error)
+// Returns a RESTClient for accessing Kubernetes resources or an error.
+RESTClient func() (*restclient.RESTClient, error)
+// Returns a client.Config for accessing the Kubernetes server.
+ClientConfig func() (*restclient.Config, error)
+// Returns a RESTClient for working with the specified RESTMapping or an error. This is intended
+// for working with arbitrary resources and is not guaranteed to point to a Kubernetes APIServer.
+ClientForMapping func(mapping *meta.RESTMapping) (resource.RESTClient, error)
+// Returns a RESTClient for working with Unstructured objects.
+UnstructuredClientForMapping func(mapping *meta.RESTMapping) (resource.RESTClient, error)
+// Returns a Describer for displaying the specified RESTMapping type or an error.
+Describer func(mapping *meta.RESTMapping) (kubectl.Describer, error)
+// Returns a Printer for formatting objects of the given type or an error.
+Printer func(mapping *meta.RESTMapping, options kubectl.PrintOptions) (kubectl.ResourcePrinter, error)
+// Returns a Scaler for changing the size of the specified RESTMapping type or an error
+Scaler func(mapping *meta.RESTMapping) (kubectl.Scaler, error)
+// Returns a Reaper for gracefully shutting down resources.
+Reaper func(mapping *meta.RESTMapping) (kubectl.Reaper, error)
+// Returns a HistoryViewer for viewing change history
+HistoryViewer func(mapping *meta.RESTMapping) (kubectl.HistoryViewer, error)
+// Returns a Rollbacker for changing the rollback version of the specified RESTMapping type or an error
+Rollbacker func(mapping *meta.RESTMapping) (kubectl.Rollbacker, error)
+// Returns a StatusViewer for printing rollout status.
+StatusViewer func(mapping *meta.RESTMapping) (kubectl.StatusViewer, error)
+// MapBasedSelectorForObject returns the map-based selector associated with the provided object. If a
+// new set-based selector is provided, an error is returned if the selector cannot be converted to a
+// map-based selector
+MapBasedSelectorForObject func(object runtime.Object) (string, error)
+// PortsForObject returns the ports associated with the provided object
+PortsForObject func(object runtime.Object) ([]string, error)
+// ProtocolsForObject returns the &lt;port, protocol&gt; mapping associated with the provided object
+ProtocolsForObject func(object runtime.Object) (map[string]string, error)
+// LabelsForObject returns the labels associated with the provided object
+LabelsForObject func(object runtime.Object) (map[string]string, error)
+// LogsForObject returns a request for the logs associated with the provided object
+LogsForObject func(object, options runtime.Object) (*restclient.Request, error)
+// PauseObject marks the provided object as paused ie. it will not be reconciled by its controller.
+PauseObject func(object runtime.Object) (bool, error)
+// ResumeObject resumes a paused object ie. it will be reconciled by its controller.
+ResumeObject func(object runtime.Object) (bool, error)
+// Returns a schema that can validate objects stored on disk.
+Validator func(validate bool, cacheDir string) (validation.Schema, error)
+// SwaggerSchema returns the schema declaration for the provided group version kind.
+SwaggerSchema func(unversioned.GroupVersionKind) (*swagger.ApiDeclaration, error)
+// Returns the default namespace to use in cases where no
+// other namespace is specified and whether the namespace was
+// overridden.
+DefaultNamespace func() (string, bool, error)
+// Generators returns the generators for the provided command
+Generators func(cmdName string) map[string]kubectl.Generator
+// Check whether the kind of resources could be exposed
+CanBeExposed func(kind unversioned.GroupKind) error
+// Check whether the kind of resources could be autoscaled
+CanBeAutoscaled func(kind unversioned.GroupKind) error
+// AttachablePodForObject returns the pod to which to attach given an object.
+AttachablePodForObject func(object runtime.Object) (*api.Pod, error)
+// UpdatePodSpecForObject will call the provided function on the pod spec this object supports,
+// return false if no pod spec is supported, or return an error.
+UpdatePodSpecForObject func(obj runtime.Object, fn func(*api.PodSpec) error) (bool, error)
+// EditorEnvs returns a group of environment variables that the edit command
+// can range over in order to determine if the user has specified an editor
+// of their choice.
+EditorEnvs func() []string
+// PrintObjectSpecificMessage prints object-specific messages on the provided writer
+PrintObjectSpecificMessage func(obj runtime.Object, out io.Writer)
+</code></pre><p>}</p>
+<p>const (<br>    RunV1GeneratorName                          = “run/v1”<br>    RunPodV1GeneratorName                       = “run-pod/v1”<br>    ServiceV1GeneratorName                      = “service/v1”<br>    ServiceV2GeneratorName                      = “service/v2”<br>    ServiceNodePortGeneratorV1Name              = “service-nodeport/v1”<br>    ServiceClusterIPGeneratorV1Name             = “service-clusterip/v1”<br>    ServiceLoadBalancerGeneratorV1Name          = “service-loadbalancer/v1”<br>    ServiceAccountV1GeneratorName               = “serviceaccount/v1”<br>    HorizontalPodAutoscalerV1Beta1GeneratorName = “horizontalpodautoscaler/v1beta1”<br>    HorizontalPodAutoscalerV1GeneratorName      = “horizontalpodautoscaler/v1”<br>    DeploymentV1Beta1GeneratorName              = “deployment/v1beta1”<br>    DeploymentBasicV1Beta1GeneratorName         = “deployment-basic/v1beta1”<br>    JobV1Beta1GeneratorName                     = “job/v1beta1”<br>    JobV1GeneratorName                          = “job/v1”<br>    ScheduledJobV2Alpha1GeneratorName           = “scheduledjob/v2alpha1”<br>    NamespaceV1GeneratorName                    = “namespace/v1”<br>    ResourceQuotaV1GeneratorName                = “resourcequotas/v1”<br>    SecretV1GeneratorName                       = “secret/v1”<br>    SecretForDockerRegistryV1GeneratorName      = “secret-for-docker-registry/v1”<br>    SecretForTLSV1GeneratorName                 = “secret-for-tls/v1”<br>    ConfigMapV1GeneratorName                    = “configmap/v1”<br>)</p>
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      <a href="/Kubernetes源码/" class="archive-article-date">
+  	<time datetime="2016-12-15T12:28:08.000Z" itemprop="datePublished"><i class="icon-clock"></i>2016-12-15</time>
+</a>
+      
+      
+
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+
+
+
+
+
+
+
+
+
   
     <article id="post-Kafka 源码" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-inner">
@@ -530,7 +718,7 @@
         
   
     <h1 itemprop="name">
-      <a class="article-title" href="/etcd/">etcd</a>
+      <a class="article-title" href="/etcd/">etcd 源码解析</a>
     </h1>
   
 
@@ -539,7 +727,7 @@
     <div class="article-entry" itemprop="articleBody">
       
         <h3 id="etcd-相关网站"><a href="#etcd-相关网站" class="headerlink" title="etcd 相关网站"></a>etcd 相关网站</h3><p><a href="https://coreos.com/etcd/docs/latest/" target="_blank" rel="external">https://coreos.com/etcd/docs/latest/</a><br><a href="https://coreos.com/etcd/docs/latest/api.html" target="_blank" rel="external">https://coreos.com/etcd/docs/latest/api.html</a><br><a href="https://coreos.com/etcd/docs/latest/libraries-and-tools.html" target="_blank" rel="external">https://coreos.com/etcd/docs/latest/libraries-and-tools.html</a></p>
-<h3 id="Eclipse-go-plugin安装："><a href="#Eclipse-go-plugin安装：" class="headerlink" title="Eclipse go plugin安装："></a>Eclipse go plugin安装：</h3><p>Installation Requirements:</p>
+<h3 id="Eclipse安装golang语言plugin："><a href="#Eclipse安装golang语言plugin：" class="headerlink" title="Eclipse安装golang语言plugin："></a>Eclipse安装golang语言plugin：</h3><p>Installation Requirements:</p>
 <ul>
 <li>Java VM version 8 or later.</li>
 <li>Eclipse 4.6 (Neon) or later.</li>
@@ -684,7 +872,7 @@
         
   
     <h1 itemprop="name">
-      <a class="article-title" href="/ZooKeeper/">ZooKeeper</a>
+      <a class="article-title" href="/ZooKeeper/">ZooKeeper简介</a>
     </h1>
   
 
@@ -692,12 +880,12 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h3 id="ZooKeeper-Service-导图"><a href="#ZooKeeper-Service-导图" class="headerlink" title="ZooKeeper Service 导图"></a>ZooKeeper Service 导图</h3><p><strong>ZooKeeper Service:</strong><br><img src="/images/ZooKeeper_1.png" alt=""></p>
-<p><strong>ZooKeeper NameSpace:</strong><br><img src="/images/ZooKeeper_2.png" alt=""></p>
+        <h3 id="ZooKeeper导图"><a href="#ZooKeeper导图" class="headerlink" title="ZooKeeper导图"></a>ZooKeeper导图</h3><p><strong>ZooKeeper 服务:</strong><br><img src="/images/ZooKeeper_1.png =600*200" alt=""></p>
+<p><strong>ZooKeeper 名字空间:</strong><br><img src="/images/ZooKeeper_2.png" alt=""></p>
 <h3 id="推荐一本书"><a href="#推荐一本书" class="headerlink" title="推荐一本书"></a>推荐一本书</h3><p>《ZooKeeper分布式过程协同技术详解》</p>
-<h3 id="Paxos／Raft-算法"><a href="#Paxos／Raft-算法" class="headerlink" title="Paxos／Raft 算法"></a>Paxos／Raft 算法</h3><p>推荐一个算法动态描述的网站： <a href="https://raft.github.io/" target="_blank" rel="external">https://raft.github.io/</a></p>
-<h3 id="ZooKeeper-detail"><a href="#ZooKeeper-detail" class="headerlink" title="ZooKeeper detail"></a>ZooKeeper detail</h3><p><strong>ZooKeeper API:</strong><br>1.create /path data<br>2.delete /path<br>3.exists /path<br>4.setData /path data<br>5.getData /path<br>6.getChildren /path</p>
-<p><strong>ZooKeeper服务器的两种工作模式： 独立模式(standalone)和仲裁模式(quorum)</strong><br><strong>独立模式(standalone)</strong>: 单独的ZooKeeper服务器。<br><strong>仲裁模式(quorum)</strong>: ZooKeeper集合(ZooKeeper ensemble)。 仲裁模式中，为减少ZooKeeper Server数据同步的延迟，法定人数 的概念被使用，法定人数的大小设置非常重要。</p>
+<h3 id="基于-Paxos-算法"><a href="#基于-Paxos-算法" class="headerlink" title="基于 Paxos 算法"></a>基于 Paxos 算法</h3><p>wiki: <a href="https://en.wikipedia.org/wiki/Paxos_(computer_science" target="_blank" rel="external">https://en.wikipedia.org/wiki/Paxos_(computer_science</a>)</p>
+<h3 id="ZooKeeper-支持的api"><a href="#ZooKeeper-支持的api" class="headerlink" title="ZooKeeper 支持的api"></a>ZooKeeper 支持的api</h3><p><strong>ZooKeeper API:</strong><br>1.create /path data<br>2.delete /path<br>3.exists /path<br>4.setData /path data<br>5.getData /path<br>6.getChildren /path</p>
+<h3 id="单点ZooKeeper-与-ZooKeeper集群"><a href="#单点ZooKeeper-与-ZooKeeper集群" class="headerlink" title="单点ZooKeeper 与 ZooKeeper集群"></a>单点ZooKeeper 与 ZooKeeper集群</h3><p><strong>ZooKeeper服务器的两种工作模式： 独立模式(standalone)和仲裁模式(quorum)</strong><br><strong>独立模式(standalone)</strong>: 单独的ZooKeeper服务器。<br><strong>仲裁模式(quorum)</strong>: ZooKeeper集合(ZooKeeper ensemble)。 仲裁模式中，为减少ZooKeeper Server数据同步的延迟，法定人数 的概念被使用，法定人数的大小设置非常重要。</p>
 <p><strong>仲裁模式试验：</strong><br><strong>configure 文件：</strong><br><em>z1.cfg</em><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">tickTime=2000</div><div class="line">initLimit=10</div><div class="line">syncLimit=5</div><div class="line">dataDir=/root/zookeeper-3.4.8/conf/z1/data</div><div class="line">clientPort=2181</div><div class="line">server.1=127.0.0.1:2222:2223</div><div class="line">server.2=127.0.0.1:3333:3334</div><div class="line">server.3=127.0.0.1:4444:4445</div></pre></td></tr></table></figure></p>
 <p><em>z2.cfg</em><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">tickTime=2000</div><div class="line">initLimit=10</div><div class="line">syncLimit=5</div><div class="line">dataDir=/root/zookeeper-3.4.8/conf/z2/data</div><div class="line">clientPort=2182</div><div class="line">server.1=127.0.0.1:2222:2223</div><div class="line">server.2=127.0.0.1:3333:3334</div><div class="line">server.3=127.0.0.1:4444:4445</div></pre></td></tr></table></figure></p>
 <p><em>z3.cfg</em><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">tickTime=2000</div><div class="line">initLimit=10</div><div class="line">syncLimit=5</div><div class="line">dataDir=/root/zookeeper-3.4.8/conf/z3/data</div><div class="line">clientPort=2183</div><div class="line">server.1=127.0.0.1:2222:2223</div><div class="line">server.2=127.0.0.1:3333:3334</div><div class="line">server.3=127.0.0.1:4444:4445</div></pre></td></tr></table></figure></p>
@@ -885,177 +1073,6 @@
 
 
   
-    <article id="post-Spark Cluster三种模式" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <input type="hidden" class="isFancy" />
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/Spark Cluster三种模式/">Spark Cluster 三种模式</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h2 id="Spark-Cluster-三种模式"><a href="#Spark-Cluster-三种模式" class="headerlink" title="Spark Cluster 三种模式"></a>Spark Cluster 三种模式</h2><ul>
-<li><strong>Standalone</strong> – a simple cluster manager included with Spark that makes it easy to set up a cluster.</li>
-<li><strong>Apache Mesos</strong> – a general cluster manager that can also run Hadoop MapReduce and service applications.</li>
-<li><strong>Hadoop YARN</strong> – the resource manager in Hadoop 2.</li>
-</ul>
-<h3 id="Standalone-模式："><a href="#Standalone-模式：" class="headerlink" title="Standalone 模式："></a>Standalone 模式：</h3><p>start Master:<br><code>./sbin/start-master.sh</code><br>start Slave:<br><code>./sbin/start-slave.sh &lt;master-spark-URL&gt;</code></p>
-<ul>
-<li>sbin/start-master.sh - Starts a master instance on the machine the script is executed on.</li>
-<li>sbin/start-slaves.sh - Starts a slave instance on each machine specified in the conf/slaves file.</li>
-<li>sbin/start-slave.sh - Starts a slave instance on the machine the script is executed on.</li>
-<li>sbin/start-all.sh - Starts both a master and a number of slaves as described above.</li>
-<li>sbin/stop-master.sh - Stops the master that was started via the bin/start-master.sh script.</li>
-<li>sbin/stop-slaves.sh - Stops all slave instances on the machines specified in the conf/slaves file.</li>
-<li>sbin/stop-all.sh - Stops both the master and the slaves as described above.</li>
-</ul>
-<p>Connecting an Application to the Cluster:<br><code>./bin/spark-shell --master spark://IP:PORT</code><br>Launching Spark Applications:<br><code>./bin/spark-class org.apache.spark.deploy.Client kill &lt;master url&gt; &lt;driver ID&gt;</code><br>Resource Scheduling:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">val conf = new SparkConf()</div><div class="line">             .setMaster(...)</div><div class="line">             .setAppName(...)</div><div class="line">             .set(&quot;spark.cores.max&quot;, &quot;10&quot;)</div><div class="line">val sc = new SparkContext(conf)</div></pre></td></tr></table></figure></p>
-<h3 id="Running-Spark-on-Mesos-模式："><a href="#Running-Spark-on-Mesos-模式：" class="headerlink" title="Running Spark on Mesos 模式："></a>Running Spark on Mesos 模式：</h3><p>参考： <a href="http://spark.apache.org/docs/latest/running-on-mesos.html" target="_blank" rel="external">http://spark.apache.org/docs/latest/running-on-mesos.html</a></p>
-<p><strong>Installing Mesos:</strong></p>
-<ul>
-<li>Spark 2.0.1 is designed for use with Mesos 0.21.0. <a href="http://mesos.apache.org/gettingstarted/" target="_blank" rel="external">http://mesos.apache.org/gettingstarted/</a><br><strong>Connecting  Spark  to  Mesos:</strong></li>
-<li>To use Mesos from Spark, you need a Spark binary package available in a place accessible by Mesos, and a Spark driver program configured to connect to Mesos.<br><strong>Uploading  Spark Package:</strong></li>
-<li>Download a Spark binary package from the Spark download page</li>
-<li>Upload to hdfs/http/s3<br><strong>To host on HDFS, use the Hadoop fs put command:</strong><br><code>hadoop fs -put spark-2.0.1.tar.gz /path/to/spark-2.0.1.tar.gz</code><br><strong>Using a  Mesos Master URL:</strong></li>
-<li>The Master URLs for Mesos are in the form <code>mesos://host:5050</code> for a single-master Mesos cluster, or <code>mesos://zk://host1:2181,host2:2181,host3:2181/mesos</code> for a multi-master Mesos cluster using ZooKeeper.<br><strong>Client Mode:</strong><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">val conf = new SparkConf()</div><div class="line">       .setMaster(&quot;mesos://HOST:5050&quot;)</div><div class="line">       .setAppName(&quot;My app&quot;)</div><div class="line">       .set(&quot;spark.executor.uri&quot;, &quot;&lt;path to spark-2.0.1.tar.gz uploaded above&gt;&quot;)</div><div class="line">val sc = new SparkContext(conf)</div><div class="line">     ./bin/spark-shell --master mesos://host:5050</div></pre></td></tr></table></figure>
-</li>
-</ul>
-<p><strong>Cluster Mode:</strong><br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">./bin/spark-submit \</div><div class="line">       --class org.apache.spark.examples.SparkPi \</div><div class="line">       --master mesos://207.184.161.138:7077 \</div><div class="line">       --deploy-mode cluster \</div><div class="line">       --supervise \</div><div class="line">       --executor-memory 20G \</div><div class="line">       --total-executor-cores 100 \</div><div class="line">       http://path/to/examples.jar \</div><div class="line">       1000 \</div></pre></td></tr></table></figure></p>
-<h3 id="Running-Spark-on-YARN-模式："><a href="#Running-Spark-on-YARN-模式：" class="headerlink" title="Running Spark on YARN 模式："></a>Running Spark on YARN 模式：</h3><p><strong>Cluster mode:</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">$ ./bin/spark-submit --class path.to.your.Class --master yarn --deploy-mode cluster [options] &lt;app jar&gt; [app options]</div><div class="line"></div><div class="line">$ ./bin/spark-submit --class org.apache.spark.examples.SparkPi \</div><div class="line">    --master yarn \</div><div class="line">    --deploy-mode cluster \</div><div class="line">    --driver-memory 4g \</div><div class="line">    --executor-memory 2g \</div><div class="line">    --executor-cores 1 \</div><div class="line">    --queue thequeue \</div><div class="line">    lib/spark-examples*.jar \</div><div class="line">    10</div></pre></td></tr></table></figure></p>
-<p><strong>Client mode:</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ ./bin/spark-shell --master yarn --deploy-mode client</div></pre></td></tr></table></figure></p>
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      <a href="/Spark Cluster三种模式/" class="archive-article-date">
-  	<time datetime="2016-11-09T02:11:16.000Z" itemprop="datePublished"><i class="icon-clock"></i>2016-11-09</time>
-</a>
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags"></i>
-		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Spark/">Spark</a></li></ul>
-	</div>
-
-      
-	<div class="article-category tagcloud">
-	<i class="icon-price-tags"></i>
-	<a class="article-category-link" href="/categories/bigdata/">bigdata</a>
-	</div>
-
-
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-
-
-
-
-
-
-
-
-
-  
-    <article id="post-Spark介绍" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <input type="hidden" class="isFancy" />
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/Spark介绍/">Spark介绍</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h3 id="Spark-运行架构"><a href="#Spark-运行架构" class="headerlink" title="Spark 运行架构"></a>Spark 运行架构</h3><p><img src="/images/Spark_Arch.png" alt=""></p>
-<p><img src="/images/Spark_Arch_1.png" alt=""></p>
-<p>Spark架构采用了分布式计算中的Master-Slave模型。Master是对应集群中的含有Master进程的节点，Slave是集群中含有Worker进程的节点。Master作为整个集群的控制器，负责整个集群的正常运行；Worker相当于计算节点，接收主节点命令与进行状态汇报；Executor负责任务的执行；Client作为用户的客户端负责提交应用，Driver负责控制一个应用的执行。</p>
-<p>Spark集群部署后，需要在主节点和从节点分别启动Master进程和Worker进程，对整个集群进行控制。在一个Spark应用的执行过程中，Driver和Worker是两个重要角色。<strong>Driver 程序是应用逻辑执行的起点，负责作业的调度，即Task任务的分发，而多个Worker用来管理计算节点和创建Executor并行处理任务。在执行阶段，Driver会将Task和Task所依赖的file和jar序列化后传递给对应的Worker机器，同时Executor对相应数据分区的任务进行处理。</strong></p>
-<h3 id="Spark-组件"><a href="#Spark-组件" class="headerlink" title="Spark 组件"></a>Spark 组件</h3><ul>
-<li>ClusterManager：在Standalone模式中即为Master（主节点），控制整个集群，监控Worker。在YARN模式中为资源管理器。</li>
-<li>Worker：从节点，负责控制计算节点，启动Executor或Driver。在YARN模式中为NodeManager，负责计算节点的控制。</li>
-<li>Driver：运行Application的main()函数并创建SparkContext。</li>
-<li>Executor：执行器，在worker node上执行任务的组件、用于启动线程池运行任务。每个Application拥有独立的一组Executors。</li>
-<li>SparkContext：整个应用的上下文，控制应用的生命周期。</li>
-<li>RDD：Spark的基本计算单元，一组RDD可形成执行的有向无环图RDD Graph。</li>
-<li>DAG Scheduler：根据作业（Job）构建基于Stage的DAG，并提交Stage给TaskScheduler。</li>
-<li>TaskScheduler：将任务（Task）分发给Executor执行。</li>
-<li>SparkEnv：线程级别的上下文，存储运行时的重要组件的引用。</li>
-<li>SparkEnv内创建并包含如下一些重要组件的引用。</li>
-<li>MapOutPutTracker：负责Shuffle元信息的存储。</li>
-<li>BroadcastManager：负责广播变量的控制与元信息的存储。</li>
-<li>BlockManager：负责存储管理、创建和查找块。</li>
-<li>MetricsSystem：监控运行时性能指标信息。</li>
-<li>SparkConf：负责存储配置信息。</li>
-</ul>
-<h3 id="Spark-提交Job"><a href="#Spark-提交Job" class="headerlink" title="Spark 提交Job"></a>Spark 提交Job</h3><p>参考： <a href="http://spark.apache.org/docs/latest/submitting-applications.html" target="_blank" rel="external">http://spark.apache.org/docs/latest/submitting-applications.html</a><br>可向 本地 或 集群 提交。</p>
-<h3 id="Spark-源代码-import-进-Eclipse"><a href="#Spark-源代码-import-进-Eclipse" class="headerlink" title="Spark 源代码 import 进 Eclipse"></a>Spark 源代码 import 进 Eclipse</h3><p>参考： <a href="https://cwiki.apache.org/confluence/display/SPARK/Useful+Developer+Tools" target="_blank" rel="external">https://cwiki.apache.org/confluence/display/SPARK/Useful+Developer+Tools</a></p>
-<p>到Spark源代码目录下，运行：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">mvn -DskipTests clean package</div><div class="line">mvn eclipse:eclipse</div></pre></td></tr></table></figure></p>
-<h3 id="推荐一本书"><a href="#推荐一本书" class="headerlink" title="推荐一本书"></a>推荐一本书</h3><p>《Advanced Analytics with Spark. 2015.4》</p>
-<h3 id="生态"><a href="#生态" class="headerlink" title="生态"></a>生态</h3><p><img src="/images/Spark_Eco.jpg" alt=""></p>
-<p>Spark can integaration with Hadoop ecosystem.</p>
-<ul>
-<li>1.Avro and Parquet can store data on Hadoop.</li>
-<li>2.Can read and write to NoSQL databases like HBase and Cassandra.</li>
-<li>3.Spark Streaming can ingest data from Flume and Kafka.</li>
-<li>4.SparkSQL can interact with Hive Metastore.</li>
-<li>5.It can run inside YARN, Hadoop’s scheduler and resource manager.</li>
-</ul>
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      <a href="/Spark介绍/" class="archive-article-date">
-  	<time datetime="2016-11-09T01:48:14.000Z" itemprop="datePublished"><i class="icon-clock"></i>2016-11-09</time>
-</a>
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags"></i>
-		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Spark/">Spark</a></li></ul>
-	</div>
-
-      
-	<div class="article-category tagcloud">
-	<i class="icon-price-tags"></i>
-	<a class="article-category-link" href="/categories/bigdata/">bigdata</a>
-	</div>
-
-
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-
-
-
-
-
-
-
-
-
-  
   
     <nav id="page-nav">
       <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><a class="extend next" rel="next" href="/page/2/">Next &raquo;</a>
@@ -1068,7 +1085,7 @@
   <div class="outer">
     <div id="footer-info">
     	<div class="footer-left">
-    		&copy; 2016 Xia,MingXing
+    		&copy; 2017 Xia,MingXing
     	</div>
       	<div class="footer-right">
       		<a href="http://hexo.io/" target="_blank">Hexo</a>  Theme <a href="https://github.com/litten/hexo-theme-yilia" target="_blank">Yilia</a> by Litten
@@ -1137,7 +1154,7 @@ MathJax.Hub.Queue(function() {
     
     	<section class="tools-section tools-section-tag">
     			<div class="widget tagcloud" id="js-tagcloud">
-    				<a href="/tags/Cassandra/" style="font-size: 10px;">Cassandra</a> <a href="/tags/Kafka/" style="font-size: 15px;">Kafka</a> <a href="/tags/NoSQL/" style="font-size: 10px;">NoSQL</a> <a href="/tags/Spark/" style="font-size: 17.5px;">Spark</a> <a href="/tags/ZooKeeper/" style="font-size: 12.5px;">ZooKeeper</a> <a href="/tags/etcd/" style="font-size: 10px;">etcd</a> <a href="/tags/大数据/" style="font-size: 20px;">大数据</a> <a href="/tags/简介/" style="font-size: 10px;">简介</a> <a href="/tags/随笔/" style="font-size: 10px;">随笔</a>
+    				<a href="/tags/Cassandra/" style="font-size: 10px;">Cassandra</a> <a href="/tags/Kafka/" style="font-size: 15px;">Kafka</a> <a href="/tags/NoSQL/" style="font-size: 10px;">NoSQL</a> <a href="/tags/Spark/" style="font-size: 17.5px;">Spark</a> <a href="/tags/ZooKeeper/" style="font-size: 12.5px;">ZooKeeper</a> <a href="/tags/etcd/" style="font-size: 10px;">etcd</a> <a href="/tags/分布式协同/" style="font-size: 10px;">分布式协同</a> <a href="/tags/大数据/" style="font-size: 20px;">大数据</a> <a href="/tags/简介/" style="font-size: 10px;">简介</a> <a href="/tags/随笔/" style="font-size: 10px;">随笔</a>
     			</div>
     	</section>
     

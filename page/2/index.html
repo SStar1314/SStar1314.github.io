@@ -12,6 +12,7 @@
 <meta property="og:title" content="SStar1314">
 <meta property="og:url" content="http://yoursite.com/page/2/index.html">
 <meta property="og:site_name" content="SStar1314">
+<meta property="og:locale" content="zh-CN">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="SStar1314">
   
@@ -137,6 +138,177 @@
 
       <div class="body-wrap">
         
+  
+    <article id="post-Spark Cluster三种模式" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/Spark Cluster三种模式/">Spark Cluster 三种模式</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="Spark-Cluster-三种模式"><a href="#Spark-Cluster-三种模式" class="headerlink" title="Spark Cluster 三种模式"></a>Spark Cluster 三种模式</h2><ul>
+<li><strong>Standalone</strong> – a simple cluster manager included with Spark that makes it easy to set up a cluster.</li>
+<li><strong>Apache Mesos</strong> – a general cluster manager that can also run Hadoop MapReduce and service applications.</li>
+<li><strong>Hadoop YARN</strong> – the resource manager in Hadoop 2.</li>
+</ul>
+<h3 id="Standalone-模式："><a href="#Standalone-模式：" class="headerlink" title="Standalone 模式："></a>Standalone 模式：</h3><p>start Master:<br><code>./sbin/start-master.sh</code><br>start Slave:<br><code>./sbin/start-slave.sh &lt;master-spark-URL&gt;</code></p>
+<ul>
+<li>sbin/start-master.sh - Starts a master instance on the machine the script is executed on.</li>
+<li>sbin/start-slaves.sh - Starts a slave instance on each machine specified in the conf/slaves file.</li>
+<li>sbin/start-slave.sh - Starts a slave instance on the machine the script is executed on.</li>
+<li>sbin/start-all.sh - Starts both a master and a number of slaves as described above.</li>
+<li>sbin/stop-master.sh - Stops the master that was started via the bin/start-master.sh script.</li>
+<li>sbin/stop-slaves.sh - Stops all slave instances on the machines specified in the conf/slaves file.</li>
+<li>sbin/stop-all.sh - Stops both the master and the slaves as described above.</li>
+</ul>
+<p>Connecting an Application to the Cluster:<br><code>./bin/spark-shell --master spark://IP:PORT</code><br>Launching Spark Applications:<br><code>./bin/spark-class org.apache.spark.deploy.Client kill &lt;master url&gt; &lt;driver ID&gt;</code><br>Resource Scheduling:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">val conf = new SparkConf()</div><div class="line">             .setMaster(...)</div><div class="line">             .setAppName(...)</div><div class="line">             .set(&quot;spark.cores.max&quot;, &quot;10&quot;)</div><div class="line">val sc = new SparkContext(conf)</div></pre></td></tr></table></figure></p>
+<h3 id="Running-Spark-on-Mesos-模式："><a href="#Running-Spark-on-Mesos-模式：" class="headerlink" title="Running Spark on Mesos 模式："></a>Running Spark on Mesos 模式：</h3><p>参考： <a href="http://spark.apache.org/docs/latest/running-on-mesos.html" target="_blank" rel="external">http://spark.apache.org/docs/latest/running-on-mesos.html</a></p>
+<p><strong>Installing Mesos:</strong></p>
+<ul>
+<li>Spark 2.0.1 is designed for use with Mesos 0.21.0. <a href="http://mesos.apache.org/gettingstarted/" target="_blank" rel="external">http://mesos.apache.org/gettingstarted/</a><br><strong>Connecting  Spark  to  Mesos:</strong></li>
+<li>To use Mesos from Spark, you need a Spark binary package available in a place accessible by Mesos, and a Spark driver program configured to connect to Mesos.<br><strong>Uploading  Spark Package:</strong></li>
+<li>Download a Spark binary package from the Spark download page</li>
+<li>Upload to hdfs/http/s3<br><strong>To host on HDFS, use the Hadoop fs put command:</strong><br><code>hadoop fs -put spark-2.0.1.tar.gz /path/to/spark-2.0.1.tar.gz</code><br><strong>Using a  Mesos Master URL:</strong></li>
+<li>The Master URLs for Mesos are in the form <code>mesos://host:5050</code> for a single-master Mesos cluster, or <code>mesos://zk://host1:2181,host2:2181,host3:2181/mesos</code> for a multi-master Mesos cluster using ZooKeeper.<br><strong>Client Mode:</strong><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">val conf = new SparkConf()</div><div class="line">       .setMaster(&quot;mesos://HOST:5050&quot;)</div><div class="line">       .setAppName(&quot;My app&quot;)</div><div class="line">       .set(&quot;spark.executor.uri&quot;, &quot;&lt;path to spark-2.0.1.tar.gz uploaded above&gt;&quot;)</div><div class="line">val sc = new SparkContext(conf)</div><div class="line">     ./bin/spark-shell --master mesos://host:5050</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<p><strong>Cluster Mode:</strong><br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">./bin/spark-submit \</div><div class="line">       --class org.apache.spark.examples.SparkPi \</div><div class="line">       --master mesos://207.184.161.138:7077 \</div><div class="line">       --deploy-mode cluster \</div><div class="line">       --supervise \</div><div class="line">       --executor-memory 20G \</div><div class="line">       --total-executor-cores 100 \</div><div class="line">       http://path/to/examples.jar \</div><div class="line">       1000 \</div></pre></td></tr></table></figure></p>
+<h3 id="Running-Spark-on-YARN-模式："><a href="#Running-Spark-on-YARN-模式：" class="headerlink" title="Running Spark on YARN 模式："></a>Running Spark on YARN 模式：</h3><p><strong>Cluster mode:</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">$ ./bin/spark-submit --class path.to.your.Class --master yarn --deploy-mode cluster [options] &lt;app jar&gt; [app options]</div><div class="line"></div><div class="line">$ ./bin/spark-submit --class org.apache.spark.examples.SparkPi \</div><div class="line">    --master yarn \</div><div class="line">    --deploy-mode cluster \</div><div class="line">    --driver-memory 4g \</div><div class="line">    --executor-memory 2g \</div><div class="line">    --executor-cores 1 \</div><div class="line">    --queue thequeue \</div><div class="line">    lib/spark-examples*.jar \</div><div class="line">    10</div></pre></td></tr></table></figure></p>
+<p><strong>Client mode:</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ ./bin/spark-shell --master yarn --deploy-mode client</div></pre></td></tr></table></figure></p>
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      <a href="/Spark Cluster三种模式/" class="archive-article-date">
+  	<time datetime="2016-11-09T02:11:16.000Z" itemprop="datePublished"><i class="icon-clock"></i>2016-11-09</time>
+</a>
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags"></i>
+		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Spark/">Spark</a></li></ul>
+	</div>
+
+      
+	<div class="article-category tagcloud">
+	<i class="icon-price-tags"></i>
+	<a class="article-category-link" href="/categories/bigdata/">bigdata</a>
+	</div>
+
+
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+
+
+
+
+
+
+
+
+
+  
+    <article id="post-Spark介绍" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/Spark介绍/">Spark介绍</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="Spark-运行架构"><a href="#Spark-运行架构" class="headerlink" title="Spark 运行架构"></a>Spark 运行架构</h3><p><img src="/images/Spark_Arch.png" alt=""></p>
+<p><img src="/images/Spark_Arch_1.png" alt=""></p>
+<p>Spark架构采用了分布式计算中的Master-Slave模型。Master是对应集群中的含有Master进程的节点，Slave是集群中含有Worker进程的节点。Master作为整个集群的控制器，负责整个集群的正常运行；Worker相当于计算节点，接收主节点命令与进行状态汇报；Executor负责任务的执行；Client作为用户的客户端负责提交应用，Driver负责控制一个应用的执行。</p>
+<p>Spark集群部署后，需要在主节点和从节点分别启动Master进程和Worker进程，对整个集群进行控制。在一个Spark应用的执行过程中，Driver和Worker是两个重要角色。<strong>Driver 程序是应用逻辑执行的起点，负责作业的调度，即Task任务的分发，而多个Worker用来管理计算节点和创建Executor并行处理任务。在执行阶段，Driver会将Task和Task所依赖的file和jar序列化后传递给对应的Worker机器，同时Executor对相应数据分区的任务进行处理。</strong></p>
+<h3 id="Spark-组件"><a href="#Spark-组件" class="headerlink" title="Spark 组件"></a>Spark 组件</h3><ul>
+<li>ClusterManager：在Standalone模式中即为Master（主节点），控制整个集群，监控Worker。在YARN模式中为资源管理器。</li>
+<li>Worker：从节点，负责控制计算节点，启动Executor或Driver。在YARN模式中为NodeManager，负责计算节点的控制。</li>
+<li>Driver：运行Application的main()函数并创建SparkContext。</li>
+<li>Executor：执行器，在worker node上执行任务的组件、用于启动线程池运行任务。每个Application拥有独立的一组Executors。</li>
+<li>SparkContext：整个应用的上下文，控制应用的生命周期。</li>
+<li>RDD：Spark的基本计算单元，一组RDD可形成执行的有向无环图RDD Graph。</li>
+<li>DAG Scheduler：根据作业（Job）构建基于Stage的DAG，并提交Stage给TaskScheduler。</li>
+<li>TaskScheduler：将任务（Task）分发给Executor执行。</li>
+<li>SparkEnv：线程级别的上下文，存储运行时的重要组件的引用。</li>
+<li>SparkEnv内创建并包含如下一些重要组件的引用。</li>
+<li>MapOutPutTracker：负责Shuffle元信息的存储。</li>
+<li>BroadcastManager：负责广播变量的控制与元信息的存储。</li>
+<li>BlockManager：负责存储管理、创建和查找块。</li>
+<li>MetricsSystem：监控运行时性能指标信息。</li>
+<li>SparkConf：负责存储配置信息。</li>
+</ul>
+<h3 id="Spark-提交Job"><a href="#Spark-提交Job" class="headerlink" title="Spark 提交Job"></a>Spark 提交Job</h3><p>参考： <a href="http://spark.apache.org/docs/latest/submitting-applications.html" target="_blank" rel="external">http://spark.apache.org/docs/latest/submitting-applications.html</a><br>可向 本地 或 集群 提交。</p>
+<h3 id="Spark-源代码-import-进-Eclipse"><a href="#Spark-源代码-import-进-Eclipse" class="headerlink" title="Spark 源代码 import 进 Eclipse"></a>Spark 源代码 import 进 Eclipse</h3><p>参考： <a href="https://cwiki.apache.org/confluence/display/SPARK/Useful+Developer+Tools" target="_blank" rel="external">https://cwiki.apache.org/confluence/display/SPARK/Useful+Developer+Tools</a></p>
+<p>到Spark源代码目录下，运行：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">mvn -DskipTests clean package</div><div class="line">mvn eclipse:eclipse</div></pre></td></tr></table></figure></p>
+<h3 id="推荐一本书"><a href="#推荐一本书" class="headerlink" title="推荐一本书"></a>推荐一本书</h3><p>《Advanced Analytics with Spark. 2015.4》</p>
+<h3 id="生态"><a href="#生态" class="headerlink" title="生态"></a>生态</h3><p><img src="/images/Spark_Eco.jpg" alt=""></p>
+<p>Spark can integaration with Hadoop ecosystem.</p>
+<ul>
+<li>1.Avro and Parquet can store data on Hadoop.</li>
+<li>2.Can read and write to NoSQL databases like HBase and Cassandra.</li>
+<li>3.Spark Streaming can ingest data from Flume and Kafka.</li>
+<li>4.SparkSQL can interact with Hive Metastore.</li>
+<li>5.It can run inside YARN, Hadoop’s scheduler and resource manager.</li>
+</ul>
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      <a href="/Spark介绍/" class="archive-article-date">
+  	<time datetime="2016-11-09T01:48:14.000Z" itemprop="datePublished"><i class="icon-clock"></i>2016-11-09</time>
+</a>
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags"></i>
+		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Spark/">Spark</a></li></ul>
+	</div>
+
+      
+	<div class="article-category tagcloud">
+	<i class="icon-price-tags"></i>
+	<a class="article-category-link" href="/categories/bigdata/">bigdata</a>
+	</div>
+
+
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+
+
+
+
+
+
+
+
+
   
     <article id="post-Cassandra" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-inner">
@@ -854,699 +1026,6 @@
 
 
   
-    <article id="post-Hadoop HDFS command" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <input type="hidden" class="isFancy" />
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/Hadoop HDFS command/">Hadoop HDFS FS Command</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h2 id="Hadoop-FS-Command"><a href="#Hadoop-FS-Command" class="headerlink" title="Hadoop FS Command"></a>Hadoop FS Command</h2><p>可以参考： <a href="http://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-common/FileSystemShell.html" target="_blank" rel="external">http://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-common/FileSystemShell.html</a></p>
-<p>The File System (FS) shell includes various shell-like commands that directly interact with the Hadoop Distributed File System (HDFS) as well as other file systems that Hadoop supports, such as Local FS, HFTP FS, S3 FS, and others. The FS shell is invoked by:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">bin/hadoop fs &lt;args&gt;</div></pre></td></tr></table></figure></p>
-<p>All FS shell commands take path URIs as arguments. The URI format is<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">scheme://authority/path</div></pre></td></tr></table></figure></p>
-<p>For <strong>HDFS</strong> the scheme is <strong>hdfs</strong> , and for the <strong>Local FS</strong> the scheme is <strong>file</strong>. The scheme and authority are optional. If not specified, the default scheme specified in the configuration is used. An HDFS file or directory such as /parent/child can be specified as <strong>hdfs://namenodehost/parent/child</strong> or simply as <strong>/parent/child</strong> (given that your configuration is set to point to <strong>hdfs://namenodehost</strong> ).</p>
-<p>args 可以为：</p>
-<ul>
-<li>appendToFile</li>
-<li>cat</li>
-<li>checksum</li>
-<li>chgrp</li>
-<li>chmod</li>
-<li>chown</li>
-<li>copyFromLocal</li>
-<li>copyToLocal</li>
-<li>count</li>
-<li>cp</li>
-<li>createSnapshot</li>
-<li>deleteSnapshot</li>
-<li>df</li>
-<li>du</li>
-<li>dus</li>
-<li>expunge</li>
-<li>find</li>
-<li>get</li>
-<li>getfacl</li>
-<li>getfattr</li>
-<li>getmerge</li>
-<li>help</li>
-<li>ls</li>
-<li>lsr</li>
-<li>mkdir</li>
-<li>moveFromLocal</li>
-<li>moveToLocal</li>
-<li>mv</li>
-<li>put</li>
-<li>renameSnapshot</li>
-<li>rm</li>
-<li>rmdir</li>
-<li>rmr</li>
-<li>setfacl</li>
-<li>setfattr</li>
-<li>setrep</li>
-<li>stat</li>
-<li>tail</li>
-<li>test</li>
-<li>text</li>
-<li>touchz</li>
-<li>truncate</li>
-<li>usage</li>
-</ul>
-<hr>
-<h3 id="Hadoop-FS-命令："><a href="#Hadoop-FS-命令：" class="headerlink" title="Hadoop FS 命令："></a>Hadoop FS 命令：</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line">hadoop fs :</div><div class="line">          [-ls &lt;path&gt;]</div><div class="line">          [-lsr &lt;path&gt;]</div><div class="line">           [-du &lt;path&gt;]</div><div class="line">           [-dus &lt;path&gt;]</div><div class="line">           [-count[-q] &lt;path&gt;]</div><div class="line">           [-mv &lt;src&gt; &lt;dst&gt;]</div><div class="line">           [-cp &lt;src&gt; &lt;dst&gt;]</div><div class="line">           [-rm [-skipTrash] &lt;path&gt;]</div><div class="line">           [-rmr [-skipTrash] &lt;path&gt;]</div><div class="line">           [-put &lt;localsrc&gt; ... &lt;dst&gt;]</div><div class="line">           [-copyFromLocal &lt;localsrc&gt; ... &lt;dst&gt;]</div><div class="line">           [-moveFromLocal &lt;localsrc&gt; ... &lt;dst&gt;]</div><div class="line"></div><div class="line">           [-getmerge &lt;src&gt; &lt;localdst&gt; [addnl]]</div><div class="line">           [-cat &lt;src&gt;]</div><div class="line">           [-text &lt;src&gt;]</div><div class="line">           [-copyToLocal [-ignoreCrc] [-crc] &lt;src&gt; &lt;localdst&gt;]</div><div class="line">           [-moveToLocal [-crc] &lt;src&gt; &lt;localdst&gt;]</div><div class="line">           [-mkdir &lt;path&gt;]</div><div class="line">           [-tail [-f] &lt;file&gt;]</div><div class="line">           [-chmod [-R] &lt;MODE[,MODE]... | OCTALMODE&gt; PATH...]</div><div class="line">           [-chown [-R] [OWNER][:[GROUP]] PATH...]</div><div class="line">           [-chgrp [-R] GROUP PATH...]</div><div class="line">           [-help [cmd]]</div></pre></td></tr></table></figure>
-<h3 id="Hadoop-DFS-Admin-命令："><a href="#Hadoop-DFS-Admin-命令：" class="headerlink" title="Hadoop DFS Admin 命令："></a>Hadoop DFS Admin 命令：</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line">hadoop dfsadmin :</div><div class="line">           [-report]</div><div class="line">             报告文件系统的基本信息</div><div class="line">           [-safemode enter | leave | get | wait]</div><div class="line">           安全模式维护命令</div><div class="line">           [-saveNamespace]</div><div class="line">             保存当前的命名空间</div><div class="line">           [-refreshNodes]</div><div class="line">              重新读取 Hosts 和 eclude 文件，使新的节点或需要退出集群的节点能够重新被 NameNode 识别。</div><div class="line">           [-finalizeUpgrade]</div><div class="line">            终结 HDFS 的升级操作</div><div class="line">           [-upgradeProgress status | details | force]</div><div class="line">          [-metasave filename]</div><div class="line">           保存 Namenode 的主要数据结构到 Hadoop.log.dir 属性指定目录下的 filename 上</div><div class="line">           [-setQuota &lt;quota&gt; &lt;dirname&gt;...&lt;dirname&gt;]</div><div class="line">           为每个目录设定配额，强制限定目录树下的名字个数。</div><div class="line">           [-clrQuota &lt;dirname&gt;...&lt;dirname&gt;]</div><div class="line">          为每个目录清除配额设定。</div><div class="line">           [-setBalancerBandwidth &lt;bandwidth in bytes per second&gt;]</div><div class="line">           设定负载均衡时使用的带宽</div></pre></td></tr></table></figure>
-<hr>
-<p><strong>appendToFile</strong></p>
-<p>Usage: hadoop fs -appendToFile <localsrc> … <dst></dst></localsrc></p>
-<p>Append single src, or multiple srcs from local file system to the destination file system. Also reads input from stdin and appends to destination file system.</p>
-<ul>
-<li>hadoop fs -appendToFile localfile /user/hadoop/hadoopfile</li>
-<li>hadoop fs -appendToFile localfile1 localfile2 /user/hadoop/hadoopfile</li>
-<li>hadoop fs -appendToFile localfile hdfs://nn.example.com/hadoop/hadoopfile</li>
-<li>hadoop fs -appendToFile - hdfs://nn.example.com/hadoop/hadoopfile Reads the input from stdin.</li>
-</ul>
-<p>Exit Code:</p>
-<p>Returns 0 on success and 1 on error.</p>
-<p><strong>cat</strong></p>
-<p>Usage: hadoop fs -cat URI [URI …]</p>
-<p>Copies source paths to stdout.</p>
-<p>Example:</p>
-<ul>
-<li>hadoop fs -cat hdfs://nn1.example.com/file1 hdfs://nn2.example.com/file2</li>
-<li>hadoop fs -cat file:///file3 /user/hadoop/file4</li>
-</ul>
-<p>Exit Code:</p>
-<p>Returns 0 on success and -1 on error.</p>
-<p><strong>checksum</strong></p>
-<p>Usage: hadoop fs -checksum URI</p>
-<p>Returns the checksum information of a file.</p>
-<p>Example:</p>
-<ul>
-<li>hadoop fs -checksum hdfs://nn1.example.com/file1</li>
-<li>hadoop fs -checksum file:///etc/hosts</li>
-</ul>
-<p><strong>chgrp</strong></p>
-<p>Usage: hadoop fs -chgrp [-R] GROUP URI [URI …]</p>
-<p>Change group association of files. The user must be the owner of files, or else a super-user. Additional information is in the Permissions Guide.</p>
-<p>Options</p>
-<ul>
-<li>The -R option will make the change recursively through the directory structure.</li>
-</ul>
-<p><strong>chmod</strong></p>
-<p>Usage: hadoop fs -chmod [-R] <mode[,mode]... |="" octalmode=""> URI [URI …]</mode[,mode]...></p>
-<p>Change the permissions of files. With -R, make the change recursively through the directory structure. The user must be the owner of the file, or else a super-user. Additional information is in the Permissions Guide.</p>
-<p>Options</p>
-<ul>
-<li>The -R option will make the change recursively through the directory structure.</li>
-</ul>
-<p><strong>chown</strong></p>
-<p>Usage: hadoop fs -chown [-R] [OWNER][:[GROUP]] URI [URI ]</p>
-<p>Change the owner of files. The user must be a super-user. Additional information is in the Permissions Guide.</p>
-<p>Options</p>
-<ul>
-<li>The -R option will make the change recursively through the directory structure.</li>
-</ul>
-<p><strong>copyFromLocal</strong></p>
-<p>Usage: hadoop fs -copyFromLocal <localsrc> URI</localsrc></p>
-<p>Similar to put command, except that the source is restricted to a local file reference.</p>
-<p>Options:</p>
-<ul>
-<li>The -f option will overwrite the destination if it already exists.</li>
-</ul>
-<p><strong>copyToLocal</strong></p>
-<p>Usage: hadoop fs -copyToLocal [-ignorecrc] [-crc] URI <localdst></localdst></p>
-<p>Similar to get command, except that the destination is restricted to a local file reference.</p>
-<p><strong>count</strong></p>
-<p>Usage: hadoop fs -count [-q] [-h] [-v] <paths></paths></p>
-<p>Count the number of directories, files and bytes under the paths that match the specified file pattern. The output columns with -count are: DIR_COUNT, FILE_COUNT, CONTENT_SIZE, PATHNAME</p>
-<p>The output columns with -count -q are: QUOTA, REMAINING_QUATA, SPACE_QUOTA, REMAINING_SPACE_QUOTA, DIR_COUNT, FILE_COUNT, CONTENT_SIZE, PATHNAME</p>
-<p>The -h option shows sizes in human readable format.</p>
-<p>The -v option displays a header line.</p>
-<p>Example:</p>
-<ul>
-<li>hadoop fs -count hdfs://nn1.example.com/file1 hdfs://nn2.example.com/file2</li>
-<li>hadoop fs -count -q hdfs://nn1.example.com/file1</li>
-<li>hadoop fs -count -q -h hdfs://nn1.example.com/file1</li>
-<li>hdfs dfs -count -q -h -v hdfs://nn1.example.com/file1</li>
-</ul>
-<p>Exit Code:</p>
-<p>Returns 0 on success and -1 on error.</p>
-<p><strong>cp</strong></p>
-<p>Usage: hadoop fs -cp [-f] [-p | -p[topax]] URI [URI …] <dest></dest></p>
-<p>Copy files from source to destination. This command allows multiple sources as well in which case the destination must be a directory.</p>
-<p>‘raw.*’ namespace extended attributes are preserved if (1) the source and destination filesystems support them (HDFS only), and (2) all source and destination pathnames are in the /.reserved/raw hierarchy. Determination of whether raw.* namespace xattrs are preserved is independent of the -p (preserve) flag.</p>
-<p>Options:</p>
-<ul>
-<li>The -f option will overwrite the destination if it already exists.</li>
-<li>The -p option will preserve file attributes [topx] (timestamps, ownership, permission, ACL, XAttr). If -p is specified with no arg, then preserves timestamps, ownership, permission. If -pa is specified, then preserves permission also because ACL is a super-set of permission. Determination of whether raw namespace extended attributes are preserved is independent of the -p flag.</li>
-</ul>
-<p>Example:</p>
-<ul>
-<li>hadoop fs -cp /user/hadoop/file1 /user/hadoop/file2</li>
-<li>hadoop fs -cp /user/hadoop/file1 /user/hadoop/file2 /user/hadoop/dir</li>
-</ul>
-<p>Exit Code:</p>
-<p>Returns 0 on success and -1 on error.</p>
-<p><strong>createSnapshot</strong></p>
-<p>See HDFS Snapshots Guide.</p>
-<p>deleteSnapshot</p>
-<p>See HDFS Snapshots Guide.</p>
-<p><strong>df</strong></p>
-<p>Usage: hadoop fs -df [-h] URI [URI …]</p>
-<p>Displays free space.</p>
-<p>Options:</p>
-<ul>
-<li>The -h option will format file sizes in a “human-readable” fashion (e.g 64.0m instead of 67108864)</li>
-</ul>
-<p>Example:</p>
-<ul>
-<li>hadoop dfs -df /user/hadoop/dir1</li>
-</ul>
-<p><strong>du</strong></p>
-<p>Usage: hadoop fs -du [-s] [-h] URI [URI …]</p>
-<p>Displays sizes of files and directories contained in the given directory or the length of a file in case its just a file.</p>
-<p>Options:</p>
-<ul>
-<li>The -s option will result in an aggregate summary of file lengths being displayed, rather than the individual files.</li>
-<li>The -h option will format file sizes in a “human-readable” fashion (e.g 64.0m instead of 67108864)</li>
-</ul>
-<p>Example:</p>
-<ul>
-<li>hadoop fs -du /user/hadoop/dir1 /user/hadoop/file1 hdfs://nn.example.com/user/hadoop/dir1</li>
-</ul>
-<p>Exit Code: Returns 0 on success and -1 on error.</p>
-<p><strong>dus</strong></p>
-<p>Usage: hadoop fs -dus <args></args></p>
-<p>Displays a summary of file lengths.</p>
-<p>Note: This command is deprecated. Instead use hadoop fs -du -s.</p>
-<p><strong>expunge</strong></p>
-<p>Usage: hadoop fs -expunge</p>
-<p>Empty the Trash. Refer to the HDFS Architecture Guide for more information on the Trash feature.</p>
-<p><strong>find</strong></p>
-<p>Usage: hadoop fs -find <path></path> … <expression> …</expression></p>
-<p>Finds all files that match the specified expression and applies selected actions to them. If no path is specified then defaults to the current working directory. If no expression is specified then defaults to -print.</p>
-<p>The following primary expressions are recognised:</p>
-<ul>
-<li>-name pattern</li>
-<li><p>-iname pattern<br>Evaluates as true if the basename of the file matches the pattern using standard file system globbing. If -iname is used then the match is case insensitive.</p>
-</li>
-<li><p>-print</p>
-</li>
-<li>-print0Always<br>evaluates to true. Causes the current pathname to be written to standard output. If the -print0 expression is used then an ASCII NULL character is appended.</li>
-</ul>
-<p>The following operators are recognised:</p>
-<ul>
-<li>expression -a expression</li>
-<li>expression -and expression</li>
-<li>expression expression<br>Logical AND operator for joining two expressions. Returns true if both child expressions return true. Implied by the juxtaposition of two expressions and so does not need to be explicitly specified. The second expression will not be applied if the first fails.</li>
-</ul>
-<p>Example:</p>
-<p><strong>hadoop fs -find / -name test -print</strong></p>
-<p>Exit Code:</p>
-<p>Returns 0 on success and -1 on error.</p>
-<p><strong>get</strong></p>
-<p>Usage: hadoop fs -get [-ignorecrc] [-crc] <src> <localdst></localdst></src></p>
-<p>Copy files to the local file system. Files that fail the CRC check may be copied with the -ignorecrc option. Files and CRCs may be copied using the -crc option.</p>
-<p>Example:</p>
-<ul>
-<li>hadoop fs -get /user/hadoop/file localfile</li>
-<li>hadoop fs -get hdfs://nn.example.com/user/hadoop/file localfile</li>
-</ul>
-<p>Exit Code:</p>
-<p>Returns 0 on success and -1 on error.</p>
-<p><strong>getfacl</strong></p>
-<p>Usage: hadoop fs -getfacl [-R] <path></path></p>
-<p>Displays the Access Control Lists (ACLs) of files and directories. If a directory has a default ACL, then getfacl also displays the default ACL.</p>
-<p>Options:</p>
-<ul>
-<li>-R: List the ACLs of all files and directories recursively.</li>
-<li>path: File or directory to list.</li>
-</ul>
-<p>Examples:</p>
-<ul>
-<li>hadoop fs -getfacl /file</li>
-<li>hadoop fs -getfacl -R /dir</li>
-</ul>
-<p>Exit Code:</p>
-<p>Returns 0 on success and non-zero on error.</p>
-<p><strong>getfattr</strong></p>
-<p>Usage: hadoop fs -getfattr [-R] -n name | -d [-e en] <path></path></p>
-<p>Displays the extended attribute names and values (if any) for a file or directory.</p>
-<p>Options:</p>
-<ul>
-<li>-R: Recursively list the attributes for all files and directories.</li>
-<li>-n name: Dump the named extended attribute value.</li>
-<li>-d: Dump all extended attribute values associated with pathname.</li>
-<li>-e encoding: Encode values after retrieving them. Valid encodings are “text”, “hex”, and “base64”. Values encoded as text strings are enclosed in double quotes (“), and values encoded as hexadecimal and base64 are prefixed with 0x and 0s, respectively.</li>
-<li>path: The file or directory.</li>
-</ul>
-<p>Examples:</p>
-<ul>
-<li>hadoop fs -getfattr -d /file</li>
-<li>hadoop fs -getfattr -R -n user.myAttr /dir</li>
-</ul>
-<p>Exit Code:</p>
-<p>Returns 0 on success and non-zero on error.</p>
-<p><strong>getmerge</strong></p>
-<p>Usage: hadoop fs -getmerge [-nl] <src> <localdst></localdst></src></p>
-<p>Takes a source directory and a destination file as input and concatenates files in src into the destination local file. Optionally -nl can be set to enable adding a newline character (LF) at the end of each file.</p>
-<p>Examples:</p>
-<ul>
-<li>hadoop fs -getmerge -nl /src /opt/output.txt</li>
-<li>hadoop fs -getmerge -nl /src/file1.txt /src/file2.txt /output.txt</li>
-</ul>
-<p>Exit Code:</p>
-<p>Returns 0 on success and non-zero on error.</p>
-<p><strong>help</strong></p>
-<p>Usage: hadoop fs -help</p>
-<p>Return usage output.</p>
-<p><strong>ls</strong></p>
-<p>Usage: hadoop fs -ls [-d] [-h] [-R] <args></args></p>
-<p>Options:</p>
-<ul>
-<li>-d: Directories are listed as plain files.</li>
-<li>-h: Format file sizes in a human-readable fashion (eg 64.0m instead of 67108864).</li>
-<li>-R: Recursively list subdirectories encountered.</li>
-</ul>
-<p>For a file ls returns stat on the file with the following format:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">permissions number_of_replicas userid groupid filesize modification_date modification_time filename</div></pre></td></tr></table></figure></p>
-<p>For a directory it returns list of its direct children as in Unix. A directory is listed as:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">permissions userid groupid modification_date modification_time dirname</div></pre></td></tr></table></figure></p>
-<p>Files within a directory are order by filename by default.</p>
-<p>Example:</p>
-<ul>
-<li>hadoop fs -ls /user/hadoop/file1</li>
-</ul>
-<p>Exit Code:</p>
-<p>Returns 0 on success and -1 on error.</p>
-<p><strong>lsr</strong></p>
-<p>Usage: hadoop fs -lsr <args></args></p>
-<p>Recursive version of ls.</p>
-<p>Note: This command is deprecated. Instead use hadoop fs -ls -R</p>
-<p><strong>mkdir</strong></p>
-<p>Usage: hadoop fs -mkdir [-p] <paths></paths></p>
-<p>Takes path uri’s as argument and creates directories.</p>
-<p>Options:</p>
-<ul>
-<li>The -p option behavior is much like Unix mkdir -p, creating parent directories along the path.</li>
-</ul>
-<p>Example:</p>
-<ul>
-<li>hadoop fs -mkdir /user/hadoop/dir1 /user/hadoop/dir2</li>
-<li>hadoop fs -mkdir hdfs://nn1.example.com/user/hadoop/dir hdfs://nn2.example.com/user/hadoop/dir</li>
-</ul>
-<p>Exit Code:</p>
-<p>Returns 0 on success and -1 on error.</p>
-<p><strong>moveFromLocal</strong></p>
-<p>Usage: hadoop fs -moveFromLocal <localsrc> <dst></dst></localsrc></p>
-<p>Similar to put command, except that the source localsrc is deleted after it’s copied.</p>
-<p><strong>moveToLocal</strong></p>
-<p>Usage: hadoop fs -moveToLocal [-crc] <src> <dst></dst></src></p>
-<p>Displays a “Not implemented yet” message.</p>
-<p><strong>mv</strong></p>
-<p>Usage: hadoop fs -mv URI [URI …] <dest></dest></p>
-<p>Moves files from source to destination. This command allows multiple sources as well in which case the destination needs to be a directory. Moving files across file systems is not permitted.</p>
-<p>Example:</p>
-<ul>
-<li>hadoop fs -mv /user/hadoop/file1 /user/hadoop/file2</li>
-<li>hadoop fs -mv hdfs://nn.example.com/file1 hdfs://nn.example.com/file2 hdfs://nn.example.com/file3 hdfs://nn.example.com/dir1</li>
-</ul>
-<p>Exit Code:</p>
-<p>Returns 0 on success and -1 on error.</p>
-<p><strong>put</strong></p>
-<p>Usage: hadoop fs -put <localsrc> … <dst></dst></localsrc></p>
-<p>Copy single src, or multiple srcs from local file system to the destination file system. Also reads input from stdin and writes to destination file system.</p>
-<ul>
-<li>hadoop fs -put localfile /user/hadoop/hadoopfile</li>
-<li>hadoop fs -put localfile1 localfile2 /user/hadoop/hadoopdir</li>
-<li>hadoop fs -put localfile hdfs://nn.example.com/hadoop/hadoopfile</li>
-<li>hadoop fs -put - hdfs://nn.example.com/hadoop/hadoopfile Reads the input from stdin.</li>
-</ul>
-<p>Exit Code:</p>
-<p>Returns 0 on success and -1 on error.</p>
-<p><strong>renameSnapshot</strong></p>
-<p>See HDFS Snapshots Guide.</p>
-<p><strong>rm</strong></p>
-<p>Usage: hadoop fs -rm [-f] [-r |-R] [-skipTrash] URI [URI …]</p>
-<p>Delete files specified as args.</p>
-<p>Options:</p>
-<ul>
-<li>The -f option will not display a diagnostic message or modify the exit status to reflect an error if the file does not exist.</li>
-<li>The -R option deletes the directory and any content under it recursively.</li>
-<li>The -r option is equivalent to -R.</li>
-<li>The -skipTrash option will bypass trash, if enabled, and delete the specified file(s) immediately. This can be useful when it is necessary to delete files from an over-quota directory.</li>
-</ul>
-<p>Example:</p>
-<ul>
-<li>hadoop fs -rm hdfs://nn.example.com/file /user/hadoop/emptydir</li>
-</ul>
-<p>Exit Code:</p>
-<p>Returns 0 on success and -1 on error.</p>
-<p><strong>rmdir</strong></p>
-<p>Usage: hadoop fs -rmdir [–ignore-fail-on-non-empty] URI [URI …]</p>
-<p>Delete a directory.</p>
-<p>Options:</p>
-<ul>
-<li>–ignore-fail-on-non-empty: When using wildcards, do not fail if a directory still contains files.</li>
-</ul>
-<p>Example:</p>
-<ul>
-<li>hadoop fs -rmdir /user/hadoop/emptydir</li>
-</ul>
-<p><strong>rmr</strong></p>
-<p>Usage: hadoop fs -rmr [-skipTrash] URI [URI …]</p>
-<p>Recursive version of delete.</p>
-<p>Note: This command is deprecated. Instead use hadoop fs -rm -r</p>
-<p><strong>setfacl</strong></p>
-<p>Usage: hadoop fs -setfacl [-R] [-b |-k -m |-x <acl_spec> <path></path>] |[–set <acl_spec> <path></path>]</acl_spec></acl_spec></p>
-<p>Sets Access Control Lists (ACLs) of files and directories.</p>
-<p>Options:</p>
-<ul>
-<li>-b: Remove all but the base ACL entries. The entries for user, group and others are retained for compatibility with permission bits.</li>
-<li>-k: Remove the default ACL.</li>
-<li>-R: Apply operations to all files and directories recursively.</li>
-<li>-m: Modify ACL. New entries are added to the ACL, and existing entries are retained.</li>
-<li>-x: Remove specified ACL entries. Other ACL entries are retained.</li>
-<li>–set: Fully replace the ACL, discarding all existing entries. The acl_spec must include entries for user, group, and others for compatibility with permission bits.</li>
-<li>acl_spec: Comma separated list of ACL entries.</li>
-<li>path: File or directory to modify.</li>
-</ul>
-<p>Examples:</p>
-<ul>
-<li>hadoop fs -setfacl -m user:hadoop:rw- /file</li>
-<li>hadoop fs -setfacl -x user:hadoop /file</li>
-<li>hadoop fs -setfacl -b /file</li>
-<li>hadoop fs -setfacl -k /dir</li>
-<li>hadoop fs -setfacl –set user::rw-,user:hadoop:rw-,group::r–,other::r– /file</li>
-<li>hadoop fs -setfacl -R -m user:hadoop:r-x /dir</li>
-<li>hadoop fs -setfacl -m default:user:hadoop:r-x /dir</li>
-</ul>
-<p>Exit Code:</p>
-<p>Returns 0 on success and non-zero on error.</p>
-<p><strong>setfattr</strong></p>
-<p>Usage: hadoop fs -setfattr -n name [-v value] | -x name <path></path></p>
-<p>Sets an extended attribute name and value for a file or directory.</p>
-<p>Options:</p>
-<ul>
-<li>-b: Remove all but the base ACL entries. The entries for user, group and others are retained for compatibility with permission bits.</li>
-<li>-n name: The extended attribute name.</li>
-<li>-v value: The extended attribute value. There are three different encoding methods for the value. If the argument is enclosed in double quotes, then the value is the string inside the quotes. If the argument is prefixed with 0x or 0X, then it is taken as a hexadecimal number. If the argument begins with 0s or 0S, then it is taken as a base64 encoding.</li>
-<li>-x name: Remove the extended attribute.</li>
-<li>path: The file or directory.</li>
-</ul>
-<p>Examples:</p>
-<ul>
-<li>hadoop fs -setfattr -n user.myAttr -v myValue /file</li>
-<li>hadoop fs -setfattr -n user.noValue /file</li>
-<li>hadoop fs -setfattr -x user.myAttr /file</li>
-</ul>
-<p>Exit Code:</p>
-<p>Returns 0 on success and non-zero on error.</p>
-<p><strong>setrep</strong></p>
-<p>Usage: hadoop fs -setrep [-R] [-w] <numreplicas> <path></path></numreplicas></p>
-<p>Changes the replication factor of a file. If path is a directory then the command recursively changes the replication factor of all files under the directory tree rooted at path.</p>
-<p>Options:</p>
-<ul>
-<li>The -w flag requests that the command wait for the replication to complete. This can potentially take a very long time.</li>
-<li>The -R flag is accepted for backwards compatibility. It has no effect.</li>
-</ul>
-<p>Example:</p>
-<ul>
-<li>hadoop fs -setrep -w 3 /user/hadoop/dir1</li>
-</ul>
-<p>Exit Code:</p>
-<p>Returns 0 on success and -1 on error.</p>
-<p><strong>stat</strong></p>
-<p>Usage: hadoop fs -stat [format] <path></path> …</p>
-<p>Print statistics about the file/directory at <path></path> in the specified format. Format accepts filesize in blocks (%b), type (%F), group name of owner (%g), name (%n), block size (%o), replication (%r), user name of owner(%u), and modification date (%y, %Y). %y shows UTC date as “yyyy-MM-dd HH:mm:ss” and %Y shows milliseconds since January 1, 1970 UTC. If the format is not specified, %y is used by default.</p>
-<p>Example:</p>
-<ul>
-<li>hadoop fs -stat “%F %u:%g %b %y %n” /file</li>
-</ul>
-<p>Exit Code: Returns 0 on success and -1 on error.</p>
-<p><strong>tail</strong></p>
-<p>Usage: hadoop fs -tail [-f] URI</p>
-<p>Displays last kilobyte of the file to stdout.</p>
-<p>Options:</p>
-<ul>
-<li>The -f option will output appended data as the file grows, as in Unix.</li>
-</ul>
-<p>Example:</p>
-<ul>
-<li>hadoop fs -tail pathname</li>
-</ul>
-<p>Exit Code: Returns 0 on success and -1 on error.</p>
-<p><strong>test</strong></p>
-<p>Usage: hadoop fs -test -[defsz] URI</p>
-<p>Options:</p>
-<ul>
-<li>-d: f the path is a directory, return 0.</li>
-<li>-e: if the path exists, return 0.</li>
-<li>-f: if the path is a file, return 0.</li>
-<li>-s: if the path is not empty, return 0.</li>
-<li>-z: if the file is zero length, return 0.</li>
-</ul>
-<p>Example:</p>
-<ul>
-<li>hadoop fs -test -e filename</li>
-</ul>
-<p><strong>text</strong></p>
-<p>Usage: hadoop fs -text <src></src></p>
-<p>Takes a source file and outputs the file in text format. The allowed formats are zip and TextRecordInputStream.</p>
-<p><strong>touchz</strong></p>
-<p>Usage: hadoop fs -touchz URI [URI …]</p>
-<p>Create a file of zero length.</p>
-<p>Example:</p>
-<ul>
-<li>hadoop fs -touchz pathname</li>
-</ul>
-<p>Exit Code: Returns 0 on success and -1 on error.</p>
-<p><strong>truncate</strong></p>
-<p>Usage: hadoop fs -truncate [-w] <length> <paths></paths></length></p>
-<p>Truncate all files that match the specified file pattern to the specified length.</p>
-<p>Options:</p>
-<ul>
-<li>The -w flag requests that the command waits for block recovery to complete, if necessary. Without -w flag the file may remain unclosed for some time while the recovery is in progress. During this time file cannot be reopened for append.</li>
-</ul>
-<p>Example:</p>
-<ul>
-<li>hadoop fs -truncate 55 /user/hadoop/file1 /user/hadoop/file2</li>
-<li>hadoop fs -truncate -w 127 hdfs://nn1.example.com/user/hadoop/file1</li>
-</ul>
-<p><strong>usage</strong></p>
-<p>Usage: hadoop fs -usage command</p>
-<p>Return the help for an individual command.</p>
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      <a href="/Hadoop HDFS command/" class="archive-article-date">
-  	<time datetime="2016-11-08T05:41:32.000Z" itemprop="datePublished"><i class="icon-clock"></i>2016-11-08</time>
-</a>
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags"></i>
-		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/大数据/">大数据</a></li></ul>
-	</div>
-
-      
-	<div class="article-category tagcloud">
-	<i class="icon-price-tags"></i>
-	<a class="article-category-link" href="/categories/bigdata/">bigdata</a>
-	</div>
-
-
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-
-
-
-
-
-
-
-
-
-  
-    <article id="post-Hadoop HDFS介绍及安装" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <input type="hidden" class="isFancy" />
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/Hadoop HDFS介绍及安装/">Hadoop HDFS介绍及安装</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>The project includes these modules:</p>
-<ul>
-<li><strong>Hadoop Common</strong>: The common utilities that support the other Hadoop modules.</li>
-<li><strong>Hadoop Distributed File System (HDFS™)</strong>: A distributed file system that provides high-throughput access to application data.</li>
-<li><strong>Hadoop YARN</strong>: A framework for job scheduling and cluster resource management.</li>
-<li><strong>Hadoop MapReduce</strong>: A YARN-based system for parallel processing of large data sets.</li>
-</ul>
-<p>Other Hadoop-related projects at Apache include:</p>
-<ul>
-<li><strong>Ambari™</strong>: A web-based tool for provisioning, managing, and monitoring Apache Hadoop clusters which includes support for Hadoop HDFS, Hadoop MapReduce, Hive, HCatalog, HBase, ZooKeeper, Oozie, Pig and Sqoop. Ambari also provides a dashboard for viewing cluster health such as heatmaps and ability to view MapReduce, Pig and Hive applications visually alongwith features to diagnose their performance characteristics in a user-friendly manner.</li>
-<li><strong>Avro™</strong>: A data serialization system.</li>
-<li><strong>Cassandra™</strong>: A scalable multi-master database with no single points of failure.</li>
-<li><strong>Chukwa™</strong>: A data collection system for managing large distributed systems.</li>
-<li><strong>HBase™</strong>: A scalable, distributed database that supports structured data storage for large tables.</li>
-<li><strong>Hive™</strong>: A data warehouse infrastructure that provides data summarization and ad hoc querying.</li>
-<li><strong>Mahout™:</strong> A Scalable machine learning and data mining library.</li>
-<li><strong>Pig™</strong>: A high-level data-flow language and execution framework for parallel computation.</li>
-<li><strong>Spark™</strong>: A fast and general compute engine for Hadoop data. Spark provides a simple and expressive programming model that supports a wide range of applications, including ETL, machine learning, stream processing, and graph computation.</li>
-<li><strong>Tez™</strong>: A generalized data-flow programming framework, built on Hadoop YARN, which provides a powerful and flexible engine to execute an arbitrary DAG of tasks to process data for both batch and interactive use-cases. Tez is being adopted by Hive™, Pig™ and other frameworks in the Hadoop ecosystem, and also by other commercial software (e.g. ETL tools), to replace Hadoop™ MapReduce as the underlying execution engine.</li>
-<li><strong>ZooKeeper™</strong>: A high-performance coordination service for distributed applications.</li>
-</ul>
-<h2 id="Hadoop-HDFS-1-x-vs-2-x"><a href="#Hadoop-HDFS-1-x-vs-2-x" class="headerlink" title="Hadoop HDFS 1.x vs 2.x"></a>Hadoop HDFS 1.x vs 2.x</h2><p><img src="/images/Hadoop_1_x_vs_2_x.png" alt=""><br>Hadoop HDFS有2个版本，1.x和2.x，两者之间还有比较大的差距：</p>
-<ol>
-<li>1.x只支持MapReduce运算. 2.x除了MapReduce之外，还支持Spark，MPI，Hama，Giraph等多种类型运算。</li>
-<li>1.x中的MR组件既分发任务还需要进行资源调度。 2.x由另一个组件YARN来进行资源调度，MR至进行任务分发。</li>
-<li>1.x无法实现HA，只有一个NameNode管理所有节点。 2.x支持HA，有SecondNameNode，但也只支持冷迁移。2.x还支持了Federation联邦，通过文件系统挂载点，将一个NameNode的负载分发下去。注意：HA和Federation可以结合使用。</li>
-</ol>
-<p>网上资料中包含了10点差异，但是从技术／架构角度上来说，这3点变化是核心的。</p>
-<h2 id="Hadoop-HDFS-2-x-架构图"><a href="#Hadoop-HDFS-2-x-架构图" class="headerlink" title="Hadoop HDFS 2.x 架构图"></a>Hadoop HDFS 2.x 架构图</h2><p><img src="/images/Hadoop_HDFS_2_x.png" alt=""></p>
-<h4 id="NameNode"><a href="#NameNode" class="headerlink" title="NameNode"></a>NameNode</h4><p>HDFS分布式文件系统中的管理者，负责管理文件系统的命名空间，集群配置信息，存储的复制。</p>
-<h4 id="Secondary-NameNode"><a href="#Secondary-NameNode" class="headerlink" title="Secondary NameNode"></a>Secondary NameNode</h4><p>并非NameNode的热备份，辅助NameNode，定期合并FSimage和EditLog。在NameNode失效的情况下，可以依据Secondary NameNode本地存储的FSimage和EditLog，恢复自身作为NameNode，但可能会有部分文件丢失，原因在于Secondary NameNode上的FSimage和EditLog并不是实时更新的。</p>
-<h4 id="DataNode"><a href="#DataNode" class="headerlink" title="DataNode"></a>DataNode</h4><p>DataNode是文件存储的节点，用于存放文件的Block，并且周期性的将Block信息发送给NameNode。值得提一句的是：HDFS中的Block大小设置很有讲究，通常为64M／128M，过小的Block会给NameNode带来巨大的管理压力，过大的Block可能会导致磁盘空间的浪费。</p>
-<h4 id="Client"><a href="#Client" class="headerlink" title="Client"></a>Client</h4><p>于NameNode交互，获取文件存放位置；再与DataNode交互，读取或写入数据；并且可以管理整个HDFS文件系统。</p>
-<h4 id="文件写入过程"><a href="#文件写入过程" class="headerlink" title="文件写入过程"></a>文件写入过程</h4><ol>
-<li>Client向NameNode发起文件写入请求。</li>
-<li>NameNode根据文件大小和文件块配置情况，返回给Client它所管理的DataNode信息。</li>
-<li>Client将文件划分为多个Block，更具DataNode的地址信息，按顺序写入到每一个DataNode块中。<h4 id="文件读取过程"><a href="#文件读取过程" class="headerlink" title="文件读取过程"></a>文件读取过程</h4></li>
-<li>Client向NameNode发起文件读取请求。</li>
-<li>NameNode返回文件存储的DataNode信息。</li>
-<li>Client读取文件信息。</li>
-</ol>
-<h2 id="Hadoop-优缺点"><a href="#Hadoop-优缺点" class="headerlink" title="Hadoop 优缺点"></a>Hadoop 优缺点</h2><h4 id="优点"><a href="#优点" class="headerlink" title="优点"></a>优点</h4><ol>
-<li>处理超大文件</li>
-<li>流式访问数据，一次写入，多次访问</li>
-<li>运行于廉价的商用机器上</li>
-</ol>
-<h4 id="缺点"><a href="#缺点" class="headerlink" title="缺点"></a>缺点</h4><ol>
-<li>不适合低延迟的数据访问</li>
-<li>无法高效存储大量的小文件</li>
-<li>不支持多用户写入及任意修改文件</li>
-</ol>
-<h2 id="Hadoop-HDFS-2-x-安装"><a href="#Hadoop-HDFS-2-x-安装" class="headerlink" title="Hadoop HDFS 2.x 安装"></a>Hadoop HDFS 2.x 安装</h2><p>Hadoop HDFS 2.x 包含了3种安装模式：</p>
-<ol>
-<li>Standalone. 独立模式</li>
-<li>Pseudo-Distributed Operation. 伪分布式</li>
-<li>Cluster. 集群</li>
-</ol>
-<h3 id="Standalone"><a href="#Standalone" class="headerlink" title="Standalone"></a>Standalone</h3><p>默认情况下，Hadoop被配置成以非分布式模式运行的一个独立Java进程。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">export</span> JAVA_HOME=/usr/java/latest</div><div class="line"><span class="built_in">cd</span>  hadoop_home/</div><div class="line">mkdir input</div><div class="line">cp etc/hadoop/*.xml input</div><div class="line">bin/hadoop jar share/hadoop/mapreduce/hadoop-mapreduce-examples-2.7.2.jar grep input output <span class="string">'dfs[a-z.]+'</span></div><div class="line">cat output/*</div></pre></td></tr></table></figure></p>
-<h3 id="Pseudo-Distributed-Operation"><a href="#Pseudo-Distributed-Operation" class="headerlink" title="Pseudo-Distributed Operation"></a>Pseudo-Distributed Operation</h3><p>Hadoop可以在单节点上以所谓的伪分布式模式运行，此时每一个Hadoop守护进程都作为一个独立的Java进程运行。</p>
-<h4 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h4><p><strong>不配置Yarn</strong><br><strong>etc/hadoop/core-site.xml:</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">&lt;configuration&gt;</div><div class="line">    &lt;property&gt;</div><div class="line">        &lt;name&gt;fs.defaultFS&lt;/name&gt;</div><div class="line">        &lt;value&gt;hdfs://localhost:9000&lt;/value&gt;</div><div class="line">    &lt;/property&gt;</div><div class="line">&lt;/configuration&gt;</div></pre></td></tr></table></figure></p>
-<p><strong>etc/hadoop/hdfs-site.xml:</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">&lt;configuration&gt;</div><div class="line">    &lt;property&gt;</div><div class="line">        &lt;name&gt;dfs.replication&lt;/name&gt;</div><div class="line">        &lt;value&gt;3&lt;/value&gt;</div><div class="line">    &lt;/property&gt;</div><div class="line">&lt;/configuration&gt;</div></pre></td></tr></table></figure></p>
-<p><strong>Setup passphraseless ssh:</strong><br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">ssh localhost</div><div class="line">ssh-keygen -t dsa -P <span class="string">''</span> <span class="_">-f</span> ~/.ssh/id_dsa</div><div class="line">cat ~/.ssh/id_dsa.pub &gt;&gt; ~/.ssh/authorized_keys</div><div class="line">chmod 0600 ~/.ssh/authorized_keys</div></pre></td></tr></table></figure></p>
-<hr>
-<h4 id="HDFS使用命令"><a href="#HDFS使用命令" class="headerlink" title="HDFS使用命令"></a>HDFS使用命令</h4><p>The following instructions are to run a MapReduce job locally.</p>
-<ol>
-<li><p>Format the filesystem:</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">bin/hdfs namenode -format</div></pre></td></tr></table></figure>
-</li>
-<li><p>Start NameNode daemon and DataNode daemon:</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">sbin/start-dfs.sh</div></pre></td></tr></table></figure>
-</li>
-</ol>
-<p>The hadoop daemon log output is written to the $(HADOOP_LOG_DIR) directory (defaults to $(HADOOP_HOME)/logs).</p>
-<ol>
-<li>Browse the web interface for the NameNode; by default it is available at:<br> NameNode - <a href="http://localhost:50070/" target="_blank" rel="external">http://localhost:50070/</a></li>
-<li><p>Make the HDFS directories required to execute MapReduce jobs:</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">bin/hdfs dfs -mkdir /user</div><div class="line">bin/hdfs dfs -mkdir /user/&lt;username&gt;</div></pre></td></tr></table></figure>
-</li>
-<li><p>Copy the input files into the distributed filesystem:</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">bin/hdfs dfs -put etc/hadoop input</div></pre></td></tr></table></figure>
-</li>
-<li><p>Run some of the examples provided:</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">bin/hadoop jar share/hadoop/mapreduce/hadoop-mapreduce-examples-2.7.2.jar grep input output <span class="string">'dfs[a-z.]+'</span></div></pre></td></tr></table></figure>
-</li>
-<li><p>Examine the output files: Copy the output files from the distributed filesystem to the local filesystem and examine them:</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">bin/hdfs dfs -get output output</div><div class="line">cat output/*</div></pre></td></tr></table></figure>
-</li>
-</ol>
-<p>or<br>View the output files on the distributed filesystem:<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">bin/hdfs dfs -cat output/*</div></pre></td></tr></table></figure></p>
-<ol>
-<li>When you’re done, stop the daemons with:<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">sbin/stop-dfs.sh</div></pre></td></tr></table></figure>
-</li>
-</ol>
-<h4 id="配置Yarn"><a href="#配置Yarn" class="headerlink" title="配置Yarn"></a>配置Yarn</h4><p><strong>配置Yarn on a Single Node</strong><br><strong>etc/hadoop/mapred-site.xml</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">&lt;configuration&gt;</div><div class="line">    &lt;property&gt;</div><div class="line">        &lt;name&gt;mapreduce.framework.name&lt;/name&gt;</div><div class="line">        &lt;value&gt;yarn&lt;/value&gt;</div><div class="line">    &lt;/property&gt;</div><div class="line">&lt;/configuration&gt;</div></pre></td></tr></table></figure></p>
-<p><strong>etc/hadoop/yarn-site.xml:</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">&lt;configuration&gt;</div><div class="line">    &lt;property&gt;</div><div class="line">        &lt;name&gt;yarn.nodemanager.aux-services&lt;/name&gt;</div><div class="line">        &lt;value&gt;mapreduce_shuffle&lt;/value&gt;</div><div class="line">    &lt;/property&gt;</div><div class="line">&lt;/configuration&gt;</div></pre></td></tr></table></figure></p>
-<ol>
-<li><p>Start ResourceManager daemon and NodeManager daemon:</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">sbin/start-yarn.sh</div></pre></td></tr></table></figure>
-</li>
-<li><p>Browse the web interface for the ResourceManager; by default it is available at:<br>ResourceManager - <a href="http://localhost:8088/" target="_blank" rel="external">http://localhost:8088/</a></p>
-</li>
-<li>Run a MapReduce job.<br>与不配置Yarn的HDFS使用命令类似，可参考上面的例子。</li>
-<li>When you’re done, stop the daemons with:<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">sbin/stop-yarn.sh</div></pre></td></tr></table></figure>
-</li>
-</ol>
-<h3 id="Cluster-Setup"><a href="#Cluster-Setup" class="headerlink" title="Cluster Setup"></a>Cluster Setup</h3><p>参考：<a href="http://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-common/ClusterSetup.html" target="_blank" rel="external">http://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-common/ClusterSetup.html</a><br>目前没有试过Hadoop Cluster的安装，网上资料很多，哪一天可以试试。<br>Hadoop’s Java configuration is driven by two types of important configuration files:</p>
-<ul>
-<li><p>Read-only default configuration - core-default.xml, hdfs-default.xml, yarn-default.xml and mapred-default.xml.</p>
-</li>
-<li><p>Site-specific configuration - etc/hadoop/core-site.xml, etc/hadoop/hdfs-site.xml, etc/hadoop/yarn-site.xml and etc/hadoop/mapred-site.xml.</p>
-</li>
-</ul>
-<p>Additionally, you can control the Hadoop scripts found in the bin/ directory of the distribution, by setting site-specific values via the etc/hadoop/hadoop-env.sh and etc/hadoop/yarn-env.sh.<br>HDFS daemons are NameNode, SecondaryNameNode, and DataNode. YARN damones are ResourceManager, NodeManager, and WebAppProxy.</p>
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      <a href="/Hadoop HDFS介绍及安装/" class="archive-article-date">
-  	<time datetime="2016-11-07T12:45:12.000Z" itemprop="datePublished"><i class="icon-clock"></i>2016-11-07</time>
-</a>
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags"></i>
-		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/大数据/">大数据</a></li></ul>
-	</div>
-
-      
-	<div class="article-category tagcloud">
-	<i class="icon-price-tags"></i>
-	<a class="article-category-link" href="/categories/bigdata/">bigdata</a>
-	</div>
-
-
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-
-
-
-
-
-
-
-
-
-  
   
     <nav id="page-nav">
       <a class="extend prev" rel="prev" href="/">&laquo; Prev</a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/">3</a><a class="extend next" rel="next" href="/page/3/">Next &raquo;</a>
@@ -1559,7 +1038,7 @@
   <div class="outer">
     <div id="footer-info">
     	<div class="footer-left">
-    		&copy; 2016 Xia,MingXing
+    		&copy; 2017 Xia,MingXing
     	</div>
       	<div class="footer-right">
       		<a href="http://hexo.io/" target="_blank">Hexo</a>  Theme <a href="https://github.com/litten/hexo-theme-yilia" target="_blank">Yilia</a> by Litten
@@ -1628,7 +1107,7 @@ MathJax.Hub.Queue(function() {
     
     	<section class="tools-section tools-section-tag">
     			<div class="widget tagcloud" id="js-tagcloud">
-    				<a href="/tags/Cassandra/" style="font-size: 10px;">Cassandra</a> <a href="/tags/Kafka/" style="font-size: 15px;">Kafka</a> <a href="/tags/NoSQL/" style="font-size: 10px;">NoSQL</a> <a href="/tags/Spark/" style="font-size: 17.5px;">Spark</a> <a href="/tags/ZooKeeper/" style="font-size: 12.5px;">ZooKeeper</a> <a href="/tags/etcd/" style="font-size: 10px;">etcd</a> <a href="/tags/大数据/" style="font-size: 20px;">大数据</a> <a href="/tags/简介/" style="font-size: 10px;">简介</a> <a href="/tags/随笔/" style="font-size: 10px;">随笔</a>
+    				<a href="/tags/Cassandra/" style="font-size: 10px;">Cassandra</a> <a href="/tags/Kafka/" style="font-size: 15px;">Kafka</a> <a href="/tags/NoSQL/" style="font-size: 10px;">NoSQL</a> <a href="/tags/Spark/" style="font-size: 17.5px;">Spark</a> <a href="/tags/ZooKeeper/" style="font-size: 12.5px;">ZooKeeper</a> <a href="/tags/etcd/" style="font-size: 10px;">etcd</a> <a href="/tags/分布式协同/" style="font-size: 10px;">分布式协同</a> <a href="/tags/大数据/" style="font-size: 20px;">大数据</a> <a href="/tags/简介/" style="font-size: 10px;">简介</a> <a href="/tags/随笔/" style="font-size: 10px;">随笔</a>
     			</div>
     	</section>
     
