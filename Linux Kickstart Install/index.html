@@ -6,19 +6,20 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://yoursite.com">
-  <title>目录 | SStar1314</title>
+  <title>Linux Kickstart Install(无人值守安装) | SStar1314</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="KafkaNoSQLbigdata分布式协同">
+  <meta name="description" content="Linux Install Linux dd：  driver disk 安装。 Linux ks：  kickstart 安装，无人值守安装。  boot:  linux  ks=nfs:192.168.0.254:/var/ftp/pub/ks.cfg anaconda 是python写的系统安装工具。 Linux 中有 4个主分区 ＋ 逻辑分区(需要将其中一个主分区变为扩展分区)。 Inst">
+<meta name="keywords" content="Linux">
 <meta property="og:type" content="article">
-<meta property="og:title" content="目录">
-<meta property="og:url" content="http://yoursite.com/categories/index.html">
+<meta property="og:title" content="Linux Kickstart Install(无人值守安装)">
+<meta property="og:url" content="http://yoursite.com/Linux Kickstart Install/index.html">
 <meta property="og:site_name" content="SStar1314">
-<meta property="og:description" content="KafkaNoSQLbigdata分布式协同">
+<meta property="og:description" content="Linux Install Linux dd：  driver disk 安装。 Linux ks：  kickstart 安装，无人值守安装。  boot:  linux  ks=nfs:192.168.0.254:/var/ftp/pub/ks.cfg anaconda 是python写的系统安装工具。 Linux 中有 4个主分区 ＋ 逻辑分区(需要将其中一个主分区变为扩展分区)。 Inst">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2017-07-19T13:01:22.000Z">
+<meta property="og:updated_time" content="2017-07-19T13:56:25.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="目录">
-<meta name="twitter:description" content="KafkaNoSQLbigdata分布式协同">
+<meta name="twitter:title" content="Linux Kickstart Install(无人值守安装)">
+<meta name="twitter:description" content="Linux Install Linux dd：  driver disk 安装。 Linux ks：  kickstart 安装，无人值守安装。  boot:  linux  ks=nfs:192.168.0.254:/var/ftp/pub/ks.cfg anaconda 是python写的系统安装工具。 Linux 中有 4个主分区 ＋ 逻辑分区(需要将其中一个主分区变为扩展分区)。 Inst">
   
     <link rel="alternative" href="/atom.xml" title="SStar1314" type="application/atom+xml">
   
@@ -149,7 +150,7 @@
 </nav>
 
       <div class="body-wrap">
-        <article id="post-categories" class="article article-type-post" itemscope itemprop="blogPost">
+        <article id="post-Linux Kickstart Install" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-inner">
     
       <input type="hidden" class="isFancy" />
@@ -159,7 +160,7 @@
         
   
     <h1 class="article-title" itemprop="name">
-      目录
+      Linux Kickstart Install(无人值守安装)
     </h1>
   
 
@@ -167,16 +168,36 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h4 id="Kafka"><a href="#Kafka" class="headerlink" title="Kafka"></a><a href="https://sstar1314.github.io/categories/Kafka/" target="_blank" rel="external">Kafka</a></h4><h4 id="NoSQL"><a href="#NoSQL" class="headerlink" title="NoSQL"></a><a href="https://sstar1314.github.io/categories/NoSQL/" target="_blank" rel="external">NoSQL</a></h4><h4 id="bigdata"><a href="#bigdata" class="headerlink" title="bigdata"></a><a href="https://sstar1314.github.io/categories/bigdata/" target="_blank" rel="external">bigdata</a></h4><h4 id="分布式协同"><a href="#分布式协同" class="headerlink" title="分布式协同"></a><a href="https://sstar1314.github.io/categories/%E5%88%86%E5%B8%83%E5%BC%8F%E5%8D%8F%E5%90%8C/" target="_blank" rel="external">分布式协同</a></h4>
+        <h3 id="Linux-Install"><a href="#Linux-Install" class="headerlink" title="Linux Install"></a>Linux Install</h3><ul>
+<li>Linux dd：  driver disk 安装。</li>
+<li>Linux ks：  kickstart 安装，无人值守安装。</li>
+</ul>
+<p>boot:  linux  ks=nfs:192.168.0.254:/var/ftp/pub/ks.cfg</p>
+<p><strong>anaconda</strong> 是python写的系统安装工具。</p>
+<p>Linux 中有 4个主分区 ＋ 逻辑分区(需要将其中一个主分区变为扩展分区)。</p>
+<p>Installation过程中可以切换窗口，Ctrl ＋ Alt ＋ F1,2,3,4,5,6,每个窗口分别有不同的作用。</p>
+<h3 id="Linux-Kickstart-Install"><a href="#Linux-Kickstart-Install" class="headerlink" title="Linux Kickstart Install"></a>Linux Kickstart Install</h3><p><strong>anaconda-ks.cfg</strong>       kickstart安装配置文件<br>python —&gt; anaconda —&gt; install Linux<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">yum install pykickstart</div><div class="line">yum install system-config-kickstart          无人值守需要先安装rpm包</div></pre></td></tr></table></figure></p>
+<p><strong>/tftpboot/n1.cfg配置文件：</strong><br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">delay=0</div><div class="line">image=/tftpboot/osimage/rhels7.1-x86_64-install-gss1/vmlinuz</div><div class="line">   label=<span class="string">"Kickstart"</span></div><div class="line">   initrd=/tftpboot/osimage/rhels7.1-x86_64-install-gss1/initrd.img</div><div class="line">   append=<span class="string">"quiet inst.repo=http://%N:80/install/rhels7.1/x86_64 inst.ks=http://%N:80/install/autoinst/cn1 ip=eth0:dhcp  net.ifnames=0 net.ifnames=0  BOOTIF=%B"</span></div></pre></td></tr></table></figure></p>
+
       
     </div>
     <div class="article-info article-info-index">
       
-      <a href="/categories/" class="archive-article-date">
-  	<time datetime="2017-07-19T09:45:04.000Z" itemprop="datePublished"><i class="icon-clock"></i>2017-07-19</time>
+      <a href="/Linux Kickstart Install/" class="archive-article-date">
+  	<time datetime="2017-07-19T13:51:12.000Z" itemprop="datePublished"><i class="icon-clock"></i>2017-07-19</time>
 </a>
       
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags"></i>
+		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Linux/">Linux</a></li></ul>
+	</div>
+
       
+	<div class="article-category tagcloud">
+	<i class="icon-price-tags"></i>
+	<a class="article-category-link" href="/categories/Linux/">Linux</a>
+	</div>
+
 
       <div class="clearfix"></div>
     </div>
@@ -186,18 +207,18 @@
   
 <nav id="article-nav">
   
-    <a href="/Linux奇形怪状的命令/" id="article-nav-newer" class="article-nav-link-wrap">
+    <a href="/Linux编译+文件IO/" id="article-nav-newer" class="article-nav-link-wrap">
       <i class="icon-circle-left"></i>
       <div class="article-nav-title">
         
-          Linux一些命令总结
+          Linux编译 + 文件I/O
         
       </div>
     </a>
   
   
-    <a href="/tags/" id="article-nav-older" class="article-nav-link-wrap">
-      <div class="article-nav-title">标签</div>
+    <a href="/Linux奇形怪状的命令/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">Linux一些命令总结</div>
       <i class="icon-circle-right"></i>
     </a>
   

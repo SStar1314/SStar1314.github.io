@@ -147,6 +147,451 @@
       <div class="body-wrap">
         
   
+    <article id="post-Linux系统启动源代码分析" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/Linux系统启动源代码分析/">Linux 系统启动源代码分析</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="Linux-系统启动源代码"><a href="#Linux-系统启动源代码" class="headerlink" title="Linux 系统启动源代码"></a>Linux 系统启动源代码</h2><p>以x86_64 arch机器为例：</p>
+<p>—————————————————— 内核load进内存阶段 （arch/*/boot/）—————————————————-</p>
+<p>入口文件是：  <strong>arch/x86/boot/compressed/head_64.S</strong>  注意：  kernel 代码不是以 main 函数为入口的。<br>head_64.S 是 汇编 代码文件， 该文件会 call  verify_cpu + make_boot_params(初始化boot_params) + efi_main(处理并返回boot_params)，最终里面  call  extract_kernel 会调用 入口函数 extract_kernel, 该 函数 位于 arch/x86/boot/compressed/misc.c 会：</p>
+<pre><code>1. 拿到 boot_params , 由汇编代码传入该参数      该 参数的结构体 位于 arch/x86/include/uapi/asm/bootparam.h .
+2. 通过 sanitize_boot_params 函数  初始化 boot_params 参数部分内容， 代码位于 arch/x86/include/asm/bootparam_utils.h .
+3. 通过 boot_params-&gt;screen_info 内容，  调用 arch/x86/boot/compressed/console.c  文件中的 console_init 函数, 初始化 tty 的console .
+4. (arch/x86/boot/compressed/kaslr.c) choose_random_location 函数 会随机挑选一段内存地址， 用于解压内核 压缩文件。
+5. 调用 (lib/decompress_bunzip2.c) __decompress 函数解压缩内核压缩文件, 根据不同的压缩文件类型，调用不同的解压缩函数， 压缩文件区分应该是发生在 编译内核时。
+6. 内核文件解压之后会成为 elf 文件， 位于内存中， 通过调用 parse_elf 函数 load 进 内核内容,  parse_elf 位于 arch/x86/boot/compressed/misc.c 中。
+7. 判断是否 需要重新 分配内存地址， 调用 handle_relocations 函数。
+</code></pre><p>arch/x86/boot/compressed/head_64.S 在解压缩内核之后会执行解压缩之后的内核代码！！！</p>
+<p>而 与arch 无关， 较为 common(legacy) 的 文件  arch/x86/boot/header.S  会 最终调用 (arch/x86/boot/main.c) main 函数 ， 该函数会：</p>
+<pre><code>1. copy_boot_params   拷贝启动参数
+2. console_init  初始化console
+3. init_heap
+4. validate_cpu
+5. set_bios_mode
+6. detect_memory
+7. keyboard_init
+8. query_ist
+9. query_apm_bios (if  config_apm)
+10. query_edd  (if config_edd)
+11. set_video
+12. go_to_protected_mode
+</code></pre><p>—————————————————— 内核启动阶段 （init/main.c） —————————————————-</p>
+<p>入口文件是 ： init/main.c        启动函数是：  start_kernel   该函数会：</p>
+<pre><code>1. 调用 (kernel/fork.c)  set_task_stack_end_magic(&amp;init_task) 函数， 注册系统内核启动后的 idle(PID=0)  进程。 该 init_task 在 init_task.h 文件中定义，在 fork.c 文件中设置栈边界。
+2. smp_setup_processor_id 函数, 检查cpu是否为多处理器，获取当前处理器逻辑号。
+3. 调用(debugobjects.c)debug_objects_early_init 函数,  初始化debug对象的锁，并将debug对象链接成链表。
+4. 调用(stackprotector.h)boot_init_stack_canary函数, 尽可能早地进行stack protect，防止 栈越界 canary 攻击，关于canary attack 可以参照： https://hardenedlinux.github.io/2016/11/27/canary.html
+5.  调用(group.c)group_init_early 函数,  初始化 group_root 结构体， 并且将每一个 cgroup_subsys 加入到 group_root 对象中，并初始化每一个 cgroup_subsys 对象。 支持的 cgroup_subsys 位于 include/linux/cgroup_subsys.h 文件中。
+6. local_irq_disable() 函数 将本地中断暂时disabled。
+7. 调用(kernel/cpu.c)boot_cpu_init函数，  设置 获得 cpu 第一个处理器标志对象， 标志 该处理器对象为 online+active+present+possible.
+8. 调用 (mm/highmem.c)page_address_init 函数,  初始化 高端内存页表 page_address_htable 对象 .
+9. 调用 pr_notice 函数 打印 Linux 版本信息(linux_banner) .
+10. 调用 setup_arch(command_line) 函数， 设置与 硬件架构相关的 配置,  command_line 为内核启动参数。 相关结构体有：  hwrpb_struct， notifier_block(中断处理结构体,注册形成notifier_chain)，alpha_using_srm/alpha_using_qemu(使用 srm或者qemu), callback_init(初始化 kernel_page + kernel_PCB + third_level_PTE)  
+11. 调用 mm_types.h(mm_init_cpumask)函数， 初始化 init_mm 对象，init_mm 是 mm_struct 结构体对象，位于 init-mm.c 文件中.
+12. 调用 setup_command_line 函数，保存 原始的 command_line 对象， 保存给以后分析。    
+13. cpu 相关的4个函数(不太明白)： setup_nr_cpu_ids + setup_per_cpu_areas + boot_cpu_state_init + smp_prepare_boot_cpu
+14. 调用 (page_alloc.c)build_all_zonelists 函数 初始化 页表区， 建立系统内存页表链表 .
+15. 调用 (page_alloc.c)page_alloc_init 函数 初始化页表， 初始化内存页表。
+16. 调用 parse_early_param 函数, 解析 command_line 对象，拿到 早期 参数, 参数以 kernel_param 结构体保存 。
+17. 调用 pase_args 函数， 解析不能被 pase_early_param 函数解析的参数。
+18. 调用 (pid.c)pidhash_init 函数,  call  (page_alloc.c)alloc_large_system_hash 函数, allocate 一个大的系统 hash table，名字为 PID .
+19. 调用 (dcache.c)bfs_caches_init_early 函数, call 两次 alloc_large_system_hash 函数, allocate 两个大的系统 hash table，名字为 Dentry Cache + Inode-Cache .
+20. 调用 (eatable.c)sort_main_extable 函数, 对异常处理函数table进行排序。
+21. 调用 (arch/x86/kernel/traps.c)trap_init 函数,  初始化 硬件中断.
+22. 调用 (main.c)mm_init 函数, 建立内存分配器.   该函数会调用  page_ext_init_flatmem + mem_init + kmem_cache_init + percpu_init_late + pgtable_init + vmalloc_init + ioremap_huge_init  .
+23. 调用 (core.c)sched_init 函数， 初始化 调度器 .  该调度器会处理各种中断.  很复杂.
+24. preempt_disable 函数， 禁止调度抢占.
+25. 调用 idr_init_cache 函数， call  kmem_cache_create 函数 创建 kmem_cache , 该cache 名为 idr_layer_cache .
+26. 调用 (workqueue.c)workqueue_init_early 函数,  该函数 建立 各种数据结构／系统workqueue，  调用 多次 alloc_workqueque 函数 构建 各种事件队列.
+27. rcu_init 函数， 初始化互斥访问机制.
+28. (tiny.c/tree.c)trace_init 函数,   trace printk 调用.
+29. (context_tracking.c)context_tracking_init 函数,   tracking context 在哪个cpu上运行.
+30. (radix-tree.c)radix_tree_init函数,  call  kmem_cache_create 创建 kmem_cache， 该cache 名为 radix_tree_node .  radix tree 为 基数树.
+31. (irq.c)early_irq_init 函数, 调用 arch_early_irq_init 函数, 构建 irq_domain 结构体.
+32. (irqinit.c)init_IRQ 函数,  调用  arch/x86/kernel/irqinit.c init_IRQ 函数， 初始化中断向量. 关键结构体 有 x86_init_ops .
+33. (tick-common.c)tick_init 函数, 初始化 时钟控制.
+34. rcu_init_nohz 函数.
+35. (timer.c)init_timers 函数, 初始化 定时器. 原理是： 通过 调用 open_softirq 软中断， 注册中断处理函数为 run_timer_softirq.
+36. hrtimers_init 函数， 初始化 高精度定时器.
+37. (softer_init.c)softirq_init 函数，  软中断 初始化.  调用 open_softirq 注册2个级别 TASKLET_SOFTIRQ + HI_SOFTIRQ  中断 向量， 关键对象 softirq_vec .   可以学习:  soft_irq 与 tasklet 区别。
+38. timekeeping_init : 初始化资源和普通计时器,  初始化 clocksource 和 common timekeeping values.
+39. time_init :    call  (arch/x86/kernel/time.c) x86_late_time_init 函数, 注册 结构体 x86_init_ops 对象的  timer 属性.   以及 时钟中断, 在后面的 late_time_init 函数中调用.           
+40. sched_clock_postinit :  初始化 clock_data 结构体, 更新 调度 计时器.   
+41. printk_safe_init: 调用 init_irq_work 函数 初始化中断栈, 将 pending 的 所有 message 全都print 出去.
+42. (core.c)perf_event_init:  初始化 idr 结构体, call perf_pmu_function 注册 performance monitoring unit(pmu) 各类事件，   pmu 事件类型有：perf_swevent +   perf_tracepoint + perf_cpu_clock + perf_task_clock + perf_breakpoint .
+43. (profile.c)profile_init : kernel profiling 工具 初始化.  初始化 内核调优 的代码, 与内核启动的传入参数有关.  CPU_PROFILING + SCHED_PROFILING + SLEEP_PROFILING + KVM_PROFILING .
+44.  call_function_init: 不知道做啥.
+45.  (slab.c)kmem_cache_init_late : 调.整 cpu cache大小, 并且 注册 一段 memory 用于 hotplug 回调.
+46. (tty_io.h)console_init : 初始化 console  device. 可以显示 printk 的内容.
+47. (locked.c)lockdep_info :  打印 一些 依赖 信息.
+48. (locking-selftest.c)locking_selftest : self-test  for  hard/soft-irqs.
+49. (ifdef  CONFIG_BLK_DEV_INITRD)initrd_start :  kernel启动时是否传入 initrd 参数， 传入的话 会进入 raw disk.
+50. (page_ext.c)page_ext_init : 防止高位内存出界, 出界的内存可能没有被初始化，重新初始化, 并且 设置 回调 函数.
+51. (debugobjects.c) debug_objects_mem_init :  debug 内存 是否 越界.
+52. (kmemleak.c)kmemleak_init : 内核内存 分配 泄漏 检测 逻辑 初始化.
+</code></pre><ol>
+<li>(page_alloc.c)setup_per_cpu_pageset :  为每一个 cpu 分配内存 页表 及 页表区.  在此函数调用之前, 可被使用的内存 仅为 boot memory.     <ol>
+<li>(mempolicy.c)numa_policy_init : 设置内存 numa(Non-uniform memory access, 非统一内存访问架构) 规则. 关键结构体: mempolicy</li>
+<li>(arch/x86/kernel/time.c)later_time_init : 执行 time_init 函数初始化的内容.</li>
+<li>calibrate_delay : 校准 时延.</li>
+<li>(pid.c)pidmap_init :  初始化  pid_max 值, 以及 初始化 pid_namespace 结构体.  保留 pid 为0 的位置.</li>
+<li>(rmap.c)anon_vma_init : (Anonymous Virtual Memory Access) 匿名虚拟内存区域初始化.  </li>
+<li>(drivers/acpi/bus.c)acpi_early_init:     ACPI ？？？  不知道 干什么?</li>
+<li>(efi.c)efi_enter_virtual_mode :  也不清楚 EFI 做啥？</li>
+<li>(esprit_64.c)init_espfix_bsp : 调整 进程 esp 寄存器位置, 在 non-init 进程创建之前调用.</li>
+<li>(fork.c)thread_stack_cache_init : 调用 kmem_cache_create 在内核内存区 创建 thread_stack cache.</li>
+<li>(cred.c)cred_init : 调用 kmem_cache_create 在内核内存区 创建 cred_jar  cache, 用于 存储 credentials.</li>
+<li>(fork.c)fork_init : 进程创建机制 初始化, 调用 kmem_cache_create 在内核内存区 创建 task_struct cache,  set_max_threads, 关键结构体 task_struct</li>
+<li>(fork.c)proc_caches_init : 进程创建所需的其它结构体 初始化, 调用 kmem_cache_create 在内核内存区 创建 sighand_cache/signal_cache/files_cache/fs_cache/mm_struct  cache .</li>
+<li>(fs/buffer.c)buffer_init : 调用 kmem_cache_create 在内核内存区 创建 buffer_head  cache. 将一定数量的内存区 设置为 buffer.</li>
+<li>(security/keys/key.c)key_init : 内核密钥 管理,  调用 kmem_cache_create 在内核内存区 创建 key_jar  cache .    </li>
+<li>(security.c)security_init : 内核安全框架. 比较复杂, 没看懂 ?</li>
+<li>(debug_core.c)dbg_late_init : kernel debug stuff.</li>
+<li>(fs/dcache.c)vfs_caches_init : 创建虚拟文件系统.  主要调用函数有:  dcache_init, inode_init, files_init, files_maxfiles_init, mnt_init(该函数还会调用 kernfs_init/sysfs_init/kobject_create_and_add/init_rootfs/init_mount_tree), bdev_cache_init, chrdev_init.  调用 kmem_cache_create 在内核内存区 创建 names_cache + dentry + inode_cache + filp + mnt_cache + bdev_cache   cache.  调用 alloc_large_system_hash   分配 Dentry cache + Inode-cache + Mount-cache + Mountpoint-cache     HashMap.<br>(mount.c)kernfs_init : 该函数 在内核内存区 创建 kernfs_node_cache  cache.<br>(kobject.c)kobject_create_and_add : 创建 kobject  fs 对象.<br>(mount.c)sysfs_init : 该函数 调用  register_filesystem 函数, 初始化 file_system_type 对象 sysfs .  register_filesystem 当加载fs对应module时调用该函数.<br>(do_mounts.c)init_rootfs : 该函数调用  register_filesystem 函数, 初始化 file_system_type 对象 rootfs + tmpfs/ramfs<br>(namespace.c)init_mount_tree :  设置 rootfs mount tree.<br>(block_dev.c)bdev_cache_init : 注册 block 设备,  注册对象为 file_system_type  bdev .   bd_mount 扫描磁盘, 获得 磁盘 文件系统.<br>(char_dev.c)chrdev_init :  注册 字符设备.</li>
+<li>(mm/filemap.c)pagecache_init :  该函数 主要是初始化 页写回 机制, 主要函数为 (page_writeback.c)page_writeback_init .</li>
+<li>(kernel/signal.c)signals_init :  调用 kmem_cache_create 在内核内存区 创建  sigqueue  cache 对象.  </li>
+<li>(fs/proc/root.c)proc_root_init :  proc 文件系统初始化, 主要调用  proc_init_inodecache + set_proc_pid_nlink + register_filesystem + proc_self_init + proc_thread_self_init + proc_symlink + proc_net_init + proc_mkdir + proc_create_mount_point + proc_tty_init + proc_sys_init .        <pre><code>(fs/proc/inode.c)proc_init_inodecache :  调用 kmem_cache_create 在内核内存区 创建  proc_inode_cache 对象.
+(fs/proc/base.c)set_proc_pid_nlink :  主要 调用 pid_entry_nlink 函数,  关键结构体 为 pid_entry . 初始化 2个对象:  tid_base_stuff  + tgid_base_stuff .         
+(filesystem.c)register_filesystem : 注册 proc  filesystem .  关键 函数为  proc_mount, 该函数会注册 /proc/self 文件夹.  
+(fs/proc/thread_self.c)proc_self_init + proc_thread_self_init :  初始化 /proc/self 文件夹.  
+(fs/proc/thread_self.c)proc_symlink :  创建 链接 文件 /proc/mounts  链接  /proc/self/mounts .  
+(fs/proc/proc_net.c)proc_net_init :   创建  链接 文件 /proc/net  链接  /proc/self/net .  初始化  /proc/self/net  文件夹.
+proc_mkdir : 创建 sysvipc, fs, driver, bus  文件夹 .  
+proc_create_mount_point : 创建  /proc/fs/nfsd 文件夹 .
+proc_tty_init : 创建 /proc/tty 文件夹.
+(fs/proc/proc_sysctl.c)proc_sys_init :  注册和初始化  /proc/sys (sysctl)  文件系统.   关键函数 ：  __register_sysctl_paths
+</code></pre></li>
+<li>nsfs_init : 不知道干啥 ???</li>
+</ol>
+</li>
+<li>(kernel/cpuset.c)cpuset_init :  初始化 cpuset 系统, 并且 创建 /sys/fs/cgroup/cpuset 文件夹.  <ol>
+<li>(kernel/cgroup.c)cgroup_init :  control group 初始化.  </li>
+<li>(kernel/taskstats.c)taskstats_init_early : 早期初始化，初始化 taskstats 结构体.</li>
+<li>delayacct_init() + check_bugs() + acpi_subsystem_init() + arch_post_acpi_subsys_init() + sfi_init_late()</li>
+<li>(main.c)rest_init :  完成 剩下 non-init 的 任务.    包括 :    —&gt; <a href="https://danielmaker.github.io/blog/linux/images/start_kernel_call_graph.svg" target="_blank" rel="external">https://danielmaker.github.io/blog/linux/images/start_kernel_call_graph.svg</a><pre><code>rcu_scheduler_starting :     启动 rcu_scheduler
+kernel_thread(kernel_init) :  do_fork 启动一个 进程 执行 kernel_init 函数.  PID 为 1 的进程.   —&gt;  kernel_init_freeable函数   +   run_init_process
+numa_default_policy : 内存分配  numa 策略.
+kernel_thread(kthreadd) :   执行 kthreadd 函数.  PID 为 2 的 进程.  为spawn所有其它的 thread 进程 .
+find_task_by_pid_ns
+init_idle_bootup_task
+schedule_preempt_disabled
+cpu_startup_entry            ——&gt;   do_idle  cpu 调度        idle 为 PID 为 0 的进程.
+</code></pre><img src="/images/tart_kernel_call_graph.svg" alt=""></li>
+</ol>
+</li>
+</ol>
+<p>内核代码中 调用 alloc_large_system_hash 函数的位置有不少，会构建一些 大的系统 hash table， 名称分别有：</p>
+<ol>
+<li>Dentry cache</li>
+<li>Inode-cache</li>
+<li>Mount-cache</li>
+<li>Mountpoint-cache</li>
+<li>PV qspinlock</li>
+<li>futex</li>
+<li>PID</li>
+<li>TCP established</li>
+<li>TCP bind</li>
+<li>UDP  or  UDP-Lite</li>
+</ol>
+<p>—————————————中断 宏： SAVE_ALL &amp; RESTORE_ALL    用户态和内核态 上下文切换 ————————————<br>中断向量表：    <strong>linux/arch/x86/entry/systemcalls/syscall_32.tbl</strong><br>中断结构体：    <strong>irq_desc</strong></p>
+<p>linux/arch/x86/entry/entry_32.S  : 系统调用的代码段,   入口应该是：<br><a href="http://lxr.linux.no/linux+v3.19/arch/x86/kernel/entry_32.S" target="_blank" rel="external">http://lxr.linux.no/linux+v3.19/arch/x86/kernel/entry_32.S</a>      —&gt;      ENTRY(system_call)</p>
+<p>Linux 进程 fork 关键代码：<br><a href="http://lxr.linux.no/linux+v3.19/kernel/fork.c#L1185" target="_blank" rel="external">http://lxr.linux.no/linux+v3.19/kernel/fork.c#L1185</a></p>
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      <a href="/Linux系统启动源代码分析/" class="archive-article-date">
+  	<time datetime="2017-07-19T14:45:54.000Z" itemprop="datePublished"><i class="icon-clock"></i>2017-07-19</time>
+</a>
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags"></i>
+		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Linux/">Linux</a></li></ul>
+	</div>
+
+      
+	<div class="article-category tagcloud">
+	<i class="icon-price-tags"></i>
+	<a class="article-category-link" href="/categories/Linux/">Linux</a>
+	</div>
+
+
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+
+
+
+
+
+
+
+
+
+  
+    <article id="post-Linux编译+文件IO" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/Linux编译+文件IO/">Linux编译 + 文件I/O</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="编译相关命令"><a href="#编译相关命令" class="headerlink" title="编译相关命令"></a>编译相关命令</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">1. gcc -g -Wall hello_world.c -o hello_world          生成可执行程序</div><div class="line">2. gcc -E hello_world.c &gt; hello_world.i               预处理过程的输出文件, gcc -E 预处理结束之后，编译会自动停止</div><div class="line">3. gcc -S hello_world.c -o hello_world.s               对源代码进行语法分析，产生汇编文件, gcc -S 汇编结束之后，编译会自动停止</div><div class="line">4. gcc -g -Wall -v  hello_world.c -o hello_world    -v查看中间结果输出</div><div class="line">5. readelf -a hello_world                     Linux下可执行程序格式一般为ELF格式， readelf可以读取ELF格式的文件</div><div class="line">6. strace ./hello_world                    strace可以跟踪系统调用，从而可以了解应用程序加载／运行／退出 的过程。</div></pre></td></tr></table></figure>
+<p>用户空间的程序默认是通过栈来传递参数的，但对于系统调用来说，内核态和用户态使用的是不同的栈，这使得系统调用的参数只能通过寄存器的方式进行传递。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">1. objdump -S thread_safe        可以对运行代码进行反汇编</div></pre></td></tr></table></figure></p>
+<p>阻塞的系统调用：当进行系统调用时，除非出错或被信号打断，进程将会一直陷入内核态直到调用完成。<br>非阻塞的系统调用：是指无论I/O操作成功与否，调用都会立刻返回。</p>
+<h3 id="文件I-O"><a href="#文件I-O" class="headerlink" title="文件I/O"></a>文件I/O</h3><ol>
+<li>内核中 进程对应的数据结构是task_struct， 位于内核代码的 include/linux/sched.h 文件中。</li>
+<li>内核中 文件表对应的数据结构是files_struct，位于内核代码的 include/linux/fdtable.h 文件中。</li>
+<li>数据结构 file，位于内核代码 include/linux/fs.h 文件中。</li>
+<li>Linux中的第一个进程init，位于内核代码的 include/linux/init_task.h 以及 fs/file.c 文件中。</li>
+<li>所有进程都是由init进程fork出来的，代码位于 kernel/fork.c 文件中，该文件会 调用 include/linux/fdtable.h 以及 fs/file.c 文件中的 dup_fd 函数。</li>
+<li>glibc中的open函数，调用内核中的 fs/open.c 文件的do_sys_open 函数，do_sys_open函数会使用get_unused_fd_flags函数，get_unused_fd_flags函数在include/linux/file.h是宏定义，实际调用 fs/file.c 中的alloc_fd函数。</li>
+<li>内核会通过fs/open.c文件中的fd_install函数将文件管理结构file与fd结合起来，当用户使用fd与内核交互时，内核可以通过fd得到内部管理文件的结构struct file。</li>
+<li>内核在文件close的时候，会关闭该fd，如果当前next_fd小于该fd，则将next_fd的直设置为该fd值。这是内核的文件描述符使用策略，尽可能的使用刚释放的较小的fd。</li>
+<li>内核文件include/linux/fs.h中，file_operations 结构体定义了文件操作函数, inode_operations 结构体定义了linux存储inode操作函数。</li>
+<li>文件打开但忘记close的时候，可能会出现两种情况：a. 文件描述符始终没有被释放；b. 用于文件管理的某些内存结构没有被释放。<br>a. 内核会扩展文件表，当文件表达到上限时，会报EMFILE错误。<br>b. 未超过上限时，可以申请空的内存；达到上限时，会报VFS: file-max limit reached的错误。</li>
+</ol>
+<h3 id="ELF文件"><a href="#ELF文件" class="headerlink" title="ELF文件"></a>ELF文件</h3><p>ELF = Executable and Linkable Format<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">readelf  命令 可以读 Linux 可执行文件.</div></pre></td></tr></table></figure></p>
+<h3 id="glibc调用-system-call"><a href="#glibc调用-system-call" class="headerlink" title="glibc调用 system_call"></a>glibc调用 system_call</h3><p>glibc的源码中的 <strong>sysdep.h</strong>  里面有  <strong>INLINE_SYSCALL</strong> 定义</p>
+<h3 id="Linux-创建-thread"><a href="#Linux-创建-thread" class="headerlink" title="Linux 创建 thread"></a>Linux 创建 thread</h3><p>Linux中实际上 thread 也是被当成 process 来创建, process和thread 是一样的, 区别在于系统调用时的传参.<br><img src="/images/Linux_pthread_create_1.png" alt=""></p>
+<h3 id="Linux-boot-process"><a href="#Linux-boot-process" class="headerlink" title="Linux boot process"></a>Linux boot process</h3><p>refer： <a href="http://duartes.org/gustavo/blog/post/kernel-boot-process/" target="_blank" rel="external">http://duartes.org/gustavo/blog/post/kernel-boot-process/</a></p>
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      <a href="/Linux编译+文件IO/" class="archive-article-date">
+  	<time datetime="2017-07-19T14:24:27.000Z" itemprop="datePublished"><i class="icon-clock"></i>2017-07-19</time>
+</a>
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags"></i>
+		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Linux/">Linux</a></li></ul>
+	</div>
+
+      
+	<div class="article-category tagcloud">
+	<i class="icon-price-tags"></i>
+	<a class="article-category-link" href="/categories/Linux/">Linux</a>
+	</div>
+
+
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+
+
+
+
+
+
+
+
+
+  
+    <article id="post-Linux Kickstart Install" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/Linux Kickstart Install/">Linux Kickstart Install(无人值守安装)</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="Linux-Install"><a href="#Linux-Install" class="headerlink" title="Linux Install"></a>Linux Install</h3><ul>
+<li>Linux dd：  driver disk 安装。</li>
+<li>Linux ks：  kickstart 安装，无人值守安装。</li>
+</ul>
+<p>boot:  linux  ks=nfs:192.168.0.254:/var/ftp/pub/ks.cfg</p>
+<p><strong>anaconda</strong> 是python写的系统安装工具。</p>
+<p>Linux 中有 4个主分区 ＋ 逻辑分区(需要将其中一个主分区变为扩展分区)。</p>
+<p>Installation过程中可以切换窗口，Ctrl ＋ Alt ＋ F1,2,3,4,5,6,每个窗口分别有不同的作用。</p>
+<h3 id="Linux-Kickstart-Install"><a href="#Linux-Kickstart-Install" class="headerlink" title="Linux Kickstart Install"></a>Linux Kickstart Install</h3><p><strong>anaconda-ks.cfg</strong>       kickstart安装配置文件<br>python —&gt; anaconda —&gt; install Linux<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">yum install pykickstart</div><div class="line">yum install system-config-kickstart          无人值守需要先安装rpm包</div></pre></td></tr></table></figure></p>
+<p><strong>/tftpboot/n1.cfg配置文件：</strong><br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">delay=0</div><div class="line">image=/tftpboot/osimage/rhels7.1-x86_64-install-gss1/vmlinuz</div><div class="line">   label=<span class="string">"Kickstart"</span></div><div class="line">   initrd=/tftpboot/osimage/rhels7.1-x86_64-install-gss1/initrd.img</div><div class="line">   append=<span class="string">"quiet inst.repo=http://%N:80/install/rhels7.1/x86_64 inst.ks=http://%N:80/install/autoinst/cn1 ip=eth0:dhcp  net.ifnames=0 net.ifnames=0  BOOTIF=%B"</span></div></pre></td></tr></table></figure></p>
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      <a href="/Linux Kickstart Install/" class="archive-article-date">
+  	<time datetime="2017-07-19T13:51:12.000Z" itemprop="datePublished"><i class="icon-clock"></i>2017-07-19</time>
+</a>
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags"></i>
+		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Linux/">Linux</a></li></ul>
+	</div>
+
+      
+	<div class="article-category tagcloud">
+	<i class="icon-price-tags"></i>
+	<a class="article-category-link" href="/categories/Linux/">Linux</a>
+	</div>
+
+
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+
+
+
+
+
+
+
+
+
+  
+    <article id="post-Linux奇形怪状的命令" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/Linux奇形怪状的命令/">Linux一些命令总结</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="通过Sighup信号让Linux-Daemon重新加载配置文件"><a href="#通过Sighup信号让Linux-Daemon重新加载配置文件" class="headerlink" title="通过Sighup信号让Linux Daemon重新加载配置文件"></a>通过Sighup信号让Linux Daemon重新加载配置文件</h3><p>对于守护进程而言，一般情况下守护进程都是detach from shell，所以接受不到sighup信号，这个信号经常被用作 reload configuration左右。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">kill</span>  -s   SIGHUP  <span class="variable">$pid</span></div></pre></td></tr></table></figure></p>
+<h3 id="Linux-syslog"><a href="#Linux-syslog" class="headerlink" title="Linux syslog"></a>Linux syslog</h3><p>Linux 系统中的主要log都在/var/log目录下：</p>
+<ul>
+<li>/var/log/lastlog:  用户登录系统记录日志。</li>
+<li>/var/log/secure:  与Linux中身份验证相关的日志文件，比如：ssh。</li>
+<li>/var/log/messages:  是Linux中许多应用的首选日志文件。</li>
+<li>/var/log/maillog:  邮件相关。</li>
+<li>/var/log/cron:  计划任务日志， /etc/cron.d/sysstat。</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">klogd  —dmesg               —&gt; /var/<span class="built_in">log</span>/dmesg</div><div class="line">syslogd                     —&gt; /ect/syslog.conf</div><div class="line">两个共同的配置文件 —&gt; /etc/sysconfig/syslog</div></pre></td></tr></table></figure>
+<p>redhat 中使用了   <strong>rsyslog</strong> 替代 syslog<br>/etc/rsyslog.d/*</p>
+<h3 id="Linux-tty-ttyS-pts-X-Window"><a href="#Linux-tty-ttyS-pts-X-Window" class="headerlink" title="Linux tty/ttyS/pts + X-Window"></a>Linux tty/ttyS/pts + X-Window</h3><ul>
+<li>tty：是串口的终端模拟器，模拟鼠标／键盘／显示器等设备。</li>
+<li>ttyS：Linux下的真正的串口。</li>
+<li>pts：虚拟的设备终端，由application（如：X-window，SSH）动态创建。 (X-window中的终端模拟器Teminal 也会创建相应的pts/#)</li>
+<li>X-window： 是Linux的图形界面application。</li>
+</ul>
+<p>w: 显示当前所有的登录用户</p>
+<p>多登陆端口通信：  （pts/1向pts/0发送消息）<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">__pts/1:__  <span class="built_in">echo</span>  aaaaaaaaa  &gt;  /dev/pts/0</div><div class="line">__pts/0:__  aaaaaaaaa</div></pre></td></tr></table></figure></p>
+<p>Alt＋F7: 打开第一个X-window窗口，Alt+F8 打开第二个</p>
+<p>Linux启动的时候，会首先打开6个tty串口模拟器(Alt + F1-6) +++++ 1个X-window application(Alt + F7)。</p>
+<p>startx: 启动X-window命令。   startx –:1 (打开第二个X-window)     startx –:2 (打开第三个X-window)         这个命令在pts虚拟终端中无法运行。</p>
+<p>skill -9 pts/2  让另一个控制台的人掉线。</p>
+<p>vim /etc/inittab     可以减少默认启动的tty个数！！！！</p>
+<h3 id="Linux-打包及压缩工具"><a href="#Linux-打包及压缩工具" class="headerlink" title="Linux 打包及压缩工具"></a>Linux 打包及压缩工具</h3><p><strong>compress/uncompress</strong>     最古老的Unix压缩工具<br><strong>gzip/gunzip</strong>          最广泛的压缩工具，Linux系统中标准压缩工具，对于文本文件能够达到很高压缩率<br><strong>bzip2/bunzip2</strong>     新版Linux压缩工具，比gzip拥有更高的压缩率<br>tar 打包(备份)作用，参数：<br>     -c:  将文件备份create<br>     -v:  将过程输出verbose<br>     -x:  从一个文件中解出备份extract<br>     -r:  将文件添加入已经存在的文件中<br>     -C: 解出备份指向位置<br>     -z:  gzip压缩<br>     -j:  bzip2压缩<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">tar xvf/xvf/rvf</div></pre></td></tr></table></figure></p>
+<h3 id="Linux-文件类型-7种-查询inode的命令"><a href="#Linux-文件类型-7种-查询inode的命令" class="headerlink" title="Linux 文件类型(7种) + 查询inode的命令"></a>Linux 文件类型(7种) + 查询inode的命令</h3><p>Linux 下文件类型共有7种：</p>
+<ul>
+<li>文件<br>d     文件夹<br>l     链接<br>b     block<br>c     char自负设备<br>s     socket文件<br>p     protocol网络文件</li>
+</ul>
+<p>文件分为三个部分进行存储：(目录文件中存储文件名)<br>1.存储文件名(指向inode号)   —&gt;   2.inode(指向块存储单元)   —&gt;  3.block (4k为单位)</p>
+<p>inode 存储文件的属性，  可以用 <strong>stat</strong> 命令查看文件inode的内容。</p>
+<h3 id="Linux-文件命令"><a href="#Linux-文件命令" class="headerlink" title="Linux 文件命令"></a>Linux 文件命令</h3><p>文本文件的操作命令：<br>cat： 查看文件内容<br>more： 逐屏查看文件内容<br>less： 逐行查看文件内容<br>head：显示文件开头部分内容<br>tail： 显示文件结尾部分内容<br>diff： 报告文件差异<br>uniq： 去除文件中的相邻的重复行<br>cut： 只显示文件中的某一行                         cut -d: -f1  /etc/passwd<br>sort：按序重排文本                                   sort  -t:  +2  -n  /etc/passwd<br>wc： 统计文件的行，词，字数</p>
+<p>which  ls     :   查找命令,  查找 $PATH 路径中的文件<br>whereis  ls  :   可以查找命令及相应的man文件, 查找 $PATH 和 $MANPATH 路径<br>locate  ls :      查找所有匹配ls字母的文件，  注意!!!  locate 命令从数据库中查找文件，而不是直接查找系统文件，数据库位置为/var/lib/slocate/slocate.db.        当数据库没有更新的时候，可能会查找不到。<br>          yum install mlocate     !!!<br>          updatedb 更新locate 的数据库<br>          /etc/cron.daily/mlocate 每天有定时更新数据库的任务<br>find<br>grep<br>find  .  -iname  “xxx”  -ok   file  {}  \;        交互执行file命令<br>find  .  -iname  “xxx”  -exec   file  {}  \;      直接执行file命令</p>
+<h3 id="Linux-系统启动"><a href="#Linux-系统启动" class="headerlink" title="Linux 系统启动"></a>Linux 系统启动</h3><p>系统启动顺序：<br>| /etc/inittab                    总的配置文件<br>|     /etc/rc.d/rc.sysinit                    系统初始化文件, 加载许多内容<br>          fsck.ext3   mount  -o  rw.remount   /dev/sda2  /<br>          mount  -a  /etc/fstab<br>|     /etc/rc.d/rcX.d/*                    X为系统运行级别<br>|          /etc/rc.d/rcX.d/ServiceXXX1  start               用户定义自启动的service<br>|          /etc/rc.d/rcX.d/ServiceXXX2  start<br>|     /etc/rc.d/rc.local          最后访问的文件<br>|<br>| minigetty   启动   /dev/tty1-6                                   启动tty<br>|           login    —&gt;  bash     —&gt;  /etc/profile     ~/.bash_profile<br>| gdm               监控进程是否死掉，重启进程</p>
+<p>respawn          监控tty进程是否死掉，如果死掉会重启tty进程    respawn与init进程共同死，共同活<br>chkconfig  service  on/off –level X    将service 启动/关闭 脚本 加入/删除 到/etc/rc.d/rcX.d 目录下<br>加入到rcX.d 目录之后，可以用        service  Sname   start/stop/restart      来控制service</p>
+<h3 id="Linux-一些命令"><a href="#Linux-一些命令" class="headerlink" title="Linux 一些命令"></a>Linux 一些命令</h3><p>shutdown -h now／init 0 ／ halt  -p -f ／ poweroff： 关机<br>users： 显示当前系统登录的用户<br>who： 当前登录在本机的用户及来源<br>w： 当前登录本机的用户及运行的程序<br>write： 给当前联机的用户发消息<br>wall： 给所有登录在本机的用户广播消息<br>last： 查看用户的登录日志<br>lastlog： 查看每个用户最后登录的情况<br>finger： 查看用户信息</p>
+<h3 id="Linux-网络-网络内核参数"><a href="#Linux-网络-网络内核参数" class="headerlink" title="Linux 网络 + 网络内核参数"></a>Linux 网络 + 网络内核参数</h3><p><strong>ping -s 1024  www.baidu.com</strong>          -s 可以指定测试包的大小，用于测试不同包大小的带宽。<br><strong>ab -n 1000 -c 1000  www.baidu.com</strong>         ab为 linux压力测试的命令，模拟1000个端口，进行总共1000次请求          (Apache HTTP server benchmarking tool)<br><strong>traceroute  www.baidu.com</strong>                    查询整个转发路径上的访问结点的掉包率<br><strong>mtr  www.baidu.com</strong>                    查看通路的掉包率</p>
+<p><strong>top</strong><br><strong>vmstat</strong>          (Report virtual memory statistics)<br><strong>netstat</strong>          (Print network connections, routing tables, interface statistics, masquerade connections, and multicast memberships)</p>
+<p><strong>arping</strong>  查询哪个机器网卡ip地址是多少多少</p>
+<p>ESTABLISHED特别多              <strong>CC(Challenge Collapsar)</strong> 攻击, 建立链接攻击<br>ESTABLISHED很少,LISTEN很多     <strong>DDOS</strong> 攻击  sync-flood(泛滥攻击)</p>
+<ul>
+<li>抓包工具：<br>iptraf<br>tcpdump<br>wireshark</li>
+</ul>
+<p>Linux 内核内核参数：<br>位于 /proc/sys 目录下, 修改内核参数：<br>echo 1 &gt; /proc/sys/net/ipv4/icmp_echo_ignore_all<br>sysctl  -w  net.ipv4.icmp_echo_ignore_all=1<br>sysctl  -p<br>输出内核参数：<br>sysctl  -a  &gt; /tmp/sysctl.output<br>从文件中读入内核参数：<br>sysctl  -f   /tmp/sysctl.output  -p</p>
+<h3 id="rpm包管理"><a href="#rpm包管理" class="headerlink" title="rpm包管理"></a>rpm包管理</h3><ul>
+<li><p>解压rpm包</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">rpm2cpio *.rpm | cpio -div</div></pre></td></tr></table></figure>
+</li>
+<li><p>查询rpm包里面内容</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">[root@vmenable core]<span class="comment"># rpm -qpl *.rpm</span></div><div class="line">/etc/*-release</div><div class="line">/opt/*/swidtag</div><div class="line">/opt/*/swidtag/*.swidtag</div></pre></td></tr></table></figure>
+</li>
+<li><p>查询rpm包里面的install/uninstall script</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">[root@vmenable core]<span class="comment"># rpm -qpl   *.x86_64.rpm  --scripts</span></div><div class="line">preinstall scriptlet (using /bin/sh):</div><div class="line">postinstall scriptlet (using /bin/sh):</div><div class="line">preuninstall program: /bin/sh</div><div class="line">postuninstall scriptlet (using /bin/sh):</div></pre></td></tr></table></figure>
+</li>
+</ul>
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      <a href="/Linux奇形怪状的命令/" class="archive-article-date">
+  	<time datetime="2017-07-19T13:28:39.000Z" itemprop="datePublished"><i class="icon-clock"></i>2017-07-19</time>
+</a>
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags"></i>
+		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Linux/">Linux</a></li></ul>
+	</div>
+
+      
+	<div class="article-category tagcloud">
+	<i class="icon-price-tags"></i>
+	<a class="article-category-link" href="/categories/Linux/">Linux</a>
+	</div>
+
+
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+
+
+
+
+
+
+
+
+
+  
     <article id="post-categories" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -2433,33 +2878,34 @@ PrintObjectSpecificMessage func(obj runtime.Object, out io.Writer)
 </ul>
 <h3 id="Cassandra-服务启动"><a href="#Cassandra-服务启动" class="headerlink" title="Cassandra 服务启动"></a>Cassandra 服务启动</h3><ul>
 <li><p>1.启动服务</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">./cassandra   </div><div class="line">org.apache.cassandra.service.CassandraDaemon</div></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">./cassandra   org.apache.cassandra.service.CassandraDaemon</div></pre></td></tr></table></figure>
 </li>
 <li><p>2.启动用户交互              实际启动cqlsh.py来进行交互</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">./cqlsh</div></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">./cqlsh</div></pre></td></tr></table></figure>
 </li>
 </ul>
-<p>Cassandra Shell 命令：  <a href="http://www.w3ii.com/cassandra/cassandra_shell_commands.html" target="_blank" rel="external">http://www.w3ii.com/cassandra/cassandra_shell_commands.html</a><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">cassandra -f           前台启动 cassandra</div></pre></td></tr></table></figure></p>
+<p>Cassandra Shell 命令：  <a href="http://www.w3ii.com/cassandra/cassandra_shell_commands.html" target="_blank" rel="external">http://www.w3ii.com/cassandra/cassandra_shell_commands.html</a><br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">./cassandra -f           前台启动 cassandra</div></pre></td></tr></table></figure></p>
 <ul>
-<li>3.停止服务<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">kill  pid</div></pre></td></tr></table></figure>
+<li>3.停止服务<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">kill</span>  pid</div></pre></td></tr></table></figure>
 </li>
 </ul>
-<h3 id="Cql-使用"><a href="#Cql-使用" class="headerlink" title="Cql 使用"></a>Cql 使用</h3><p><strong>创建使用Cqlsh一个密钥空间</strong><br><a href="http://www.w3ii.com/cassandra/cassandra_create_keyspace.html" target="_blank" rel="external">http://www.w3ii.com/cassandra/cassandra_create_keyspace.html</a><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">CREATE KEYSPACE tutorialspoint</div><div class="line">WITH replication = &#123;&apos;class&apos;:&apos;SimpleStrategy&apos;, &apos;replication_factor&apos; : 3&#125;;</div><div class="line">DESCRIBE keyspaces;</div></pre></td></tr></table></figure></p>
+<h3 id="Cql-使用"><a href="#Cql-使用" class="headerlink" title="Cql 使用"></a>Cql 使用</h3><p><strong>创建使用Cqlsh一个密钥空间</strong><br><a href="http://www.w3ii.com/cassandra/cassandra_create_keyspace.html" target="_blank" rel="external">http://www.w3ii.com/cassandra/cassandra_create_keyspace.html</a><br><figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">CREATE</span> KEYSPACE tutorialspoint</div><div class="line"><span class="keyword">WITH</span> <span class="keyword">replication</span> = &#123;<span class="string">'class'</span>:<span class="string">'SimpleStrategy'</span>, <span class="string">'replication_factor'</span> : <span class="number">3</span>&#125;;</div><div class="line"><span class="keyword">DESCRIBE</span> keyspaces;</div></pre></td></tr></table></figure></p>
 <p><strong>使用Java创建API密钥空间一</strong><br><a href="http://www.w3ii.com/cassandra/cassandra_create_keyspace.html" target="_blank" rel="external">http://www.w3ii.com/cassandra/cassandra_create_keyspace.html</a></p>
-<p><strong>改变使用Cqlsh KEYSPACE</strong><br><a href="http://www.w3ii.com/cassandra/cassandra_alter_keyspace.html" target="_blank" rel="external">http://www.w3ii.com/cassandra/cassandra_alter_keyspace.html</a><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">ALTER KEYSPACE “KeySpace Name”</div><div class="line">WITH replication = &#123;&apos;class&apos;: ‘Strategy name’, &apos;replication_factor&apos; : ‘No.Of  replicas’&#125;;</div><div class="line"></div><div class="line">ALTER KEYSPACE tutorialspoint</div><div class="line">WITH replication = &#123;&apos;class’:&apos;SimpleStrategy&apos;, &apos;replication_factor&apos; : 2&#125;;</div></pre></td></tr></table></figure></p>
-<p><strong>测试密钥空间的durable_writes属性</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">cqlsh&gt; SELECT * FROM system_schema.keyspaces;</div><div class="line">ALTER KEYSPACE test</div><div class="line">WITH REPLICATION = &#123;&apos;class&apos; : &apos;NetworkTopologyStrategy&apos;, &apos;datacenter1&apos; : 3&#125;</div><div class="line"></div><div class="line">AND DURABLE_WRITES = true;</div></pre></td></tr></table></figure></p>
-<p><strong>删除使用Cqlsh一个密钥空间</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">DROP KEYSPACE tutorialspoint;</div></pre></td></tr></table></figure></p>
-<p><strong>Cassandra创建表</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">USE tutorialspoint;</div><div class="line">cqlsh:tutorialspoint&gt;; CREATE TABLE emp(</div><div class="line">   emp_id int PRIMARY KEY,</div><div class="line">   emp_name text,</div><div class="line">   emp_city text,</div><div class="line">   emp_sal varint,</div><div class="line">   emp_phone varint</div><div class="line">   );</div><div class="line"></div><div class="line">cqlsh:tutorialspoint&gt; select * from emp;</div></pre></td></tr></table></figure></p>
-<p><strong>Cassandra修改表</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">cqlsh:tutorialspoint&gt; ALTER TABLE emp</div><div class="line">   ... ADD emp_email text;</div></pre></td></tr></table></figure></p>
-<p><strong>Cassandra删除表</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">cqlsh:tutorialspoint&gt; DROP TABLE emp;</div><div class="line"></div><div class="line">cqlsh:tutorialspoint&gt; DESCRIBE COLUMNFAMILIES;</div></pre></td></tr></table></figure></p>
-<p><strong>Cassandra截断表</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">cqlsh:tp&gt; TRUNCATE student;</div></pre></td></tr></table></figure></p>
-<p><strong>Cassandra创建索引</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">cqlsh:tutorialspoint&gt; CREATE INDEX name ON emp1 (emp_name);</div><div class="line"></div><div class="line">Cassandra DROP INDEX</div><div class="line">cqlsh:tp&gt; drop index name;</div></pre></td></tr></table></figure></p>
-<p><strong>Cassandra批量</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">cqlsh:tutorialspoint&gt; BEGIN BATCH</div><div class="line">     INSERT INTO emp (emp_id, emp_city, emp_name, emp_phone, emp_sal) values(  4,&apos;Pune&apos;,&apos;rajeev&apos;,9848022331, 30000);</div><div class="line">     UPDATE emp SET emp_sal = 50000 WHERE emp_id =3;</div><div class="line">     DELETE emp_city FROM emp WHERE emp_id = 2;</div><div class="line">     APPLY BATCH;</div></pre></td></tr></table></figure></p>
-<p><strong>Cassandra创建数据</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">cqlsh:tutorialspoint&gt; INSERT INTO emp (emp_id, emp_name, emp_city,</div><div class="line">   emp_phone, emp_sal) VALUES(1,&apos;ram&apos;, &apos;Hyderabad&apos;, 9848022338, 50000);</div><div class="line"></div><div class="line">cqlsh:tutorialspoint&gt; INSERT INTO emp (emp_id, emp_name, emp_city,</div><div class="line">   emp_phone, emp_sal) VALUES(2,&apos;robin&apos;, &apos;Hyderabad&apos;, 9848022339, 40000);</div><div class="line"></div><div class="line">cqlsh:tutorialspoint&gt; INSERT INTO emp (emp_id, emp_name, emp_city,</div><div class="line">   emp_phone, emp_sal) VALUES(3,&apos;rahman&apos;, &apos;Chennai&apos;, 9848022330, 45000);</div></pre></td></tr></table></figure></p>
-<p><strong>Cassandra更新数据</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">cqlsh:tutorialspoint&gt; UPDATE emp SET emp_city=&apos;Delhi&apos;,emp_sal=50000</div><div class="line">   WHERE emp_id=2;</div></pre></td></tr></table></figure></p>
-<p><strong>Cassandra删除数据</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">cqlsh:tutorialspoint&gt; DELETE emp_sal FROM emp WHERE emp_id=3;</div></pre></td></tr></table></figure></p>
-<p><strong>Cassandra CQL集合</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line">cqlsh:tutorialspoint&gt; CREATE TABLE data(name text PRIMARY KEY, email list&lt;text&gt;);</div><div class="line"></div><div class="line">cqlsh:tutorialspoint&gt; INSERT INTO data(name, email) VALUES (&apos;ramu&apos;,</div><div class="line">[&apos;abc@gmail.com&apos;,&apos;cba@yahoo.com&apos;])</div><div class="line"></div><div class="line">cqlsh:tutorialspoint&gt; UPDATE data</div><div class="line">... SET email = email +[&apos;xyz@w3ii.com&apos;]</div><div class="line">... where name = &apos;ramu&apos;;</div><div class="line"></div><div class="line">cqlsh:tutorialspoint&gt; CREATE TABLE data2 (name text PRIMARY KEY, phone set&lt;varint&gt;);</div><div class="line"></div><div class="line">cqlsh:tutorialspoint&gt; INSERT INTO data2(name, phone)VALUES (&apos;rahman&apos;,    &#123;9848022338,9848022339&#125;);</div><div class="line"></div><div class="line">cqlsh:tutorialspoint&gt; UPDATE data2</div><div class="line">  ... SET phone = phone + &#123;9848022330&#125;</div><div class="line">  ... where name = &apos;rahman&apos;;</div><div class="line"></div><div class="line">cqlsh:tutorialspoint&gt; CREATE TABLE data3 (name text PRIMARY KEY, address map&lt;timestamp, text&gt;);</div><div class="line"></div><div class="line">cqlsh:tutorialspoint&gt; INSERT INTO data3 (name, address)</div><div class="line">   VALUES (&apos;robin&apos;, &#123;&apos;home&apos; : &apos;hyderabad&apos; , &apos;office&apos; : &apos;Delhi&apos; &#125; );</div><div class="line"></div><div class="line">cqlsh:tutorialspoint&gt; UPDATE data3</div><div class="line">   ... SET address = address+&#123;&apos;office&apos;:&apos;mumbai&apos;&#125;</div><div class="line">   ... WHERE name = &apos;robin&apos;;</div></pre></td></tr></table></figure></p>
-<h3 id="Cassandra-安装-及-源代码分析"><a href="#Cassandra-安装-及-源代码分析" class="headerlink" title="Cassandra 安装 及 源代码分析"></a>Cassandra 安装 及 源代码分析</h3><p><strong>service 启动入口函数：</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">org.apache.cassandra.service.CassandraDaemon</div></pre></td></tr></table></figure></p>
+<p><strong>改变使用Cqlsh KEYSPACE</strong><br><a href="http://www.w3ii.com/cassandra/cassandra_alter_keyspace.html" target="_blank" rel="external">http://www.w3ii.com/cassandra/cassandra_alter_keyspace.html</a><br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">ALTER KEYSPACE <span class="string">"KeySpace Name"</span> WITH replication = &#123;<span class="string">'class'</span>: <span class="string">'Strategy name'</span>, <span class="string">'replication_factor'</span> : <span class="string">'No.Of  replicas'</span>&#125;;</div><div class="line">ALTER KEYSPACE tutorialspoint WITH replication = &#123;<span class="string">'class'</span>:<span class="string">'SimpleStrategy'</span>, <span class="string">'replication_factor'</span> : 2&#125;;</div></pre></td></tr></table></figure></p>
+<p><strong>测试密钥空间的durable_writes属性</strong><br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">cqlsh&gt; SELECT * FROM system_schema.keyspaces;</div><div class="line">ALTER KEYSPACE <span class="built_in">test</span></div><div class="line">WITH REPLICATION = &#123;<span class="string">'class'</span> : <span class="string">'NetworkTopologyStrategy'</span>, <span class="string">'datacenter1'</span> : 3&#125;</div><div class="line">AND DURABLE_WRITES = <span class="literal">true</span>;</div></pre></td></tr></table></figure></p>
+<p><strong>删除使用Cqlsh一个密钥空间</strong><br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">DROP KEYSPACE tutorialspoint;</div></pre></td></tr></table></figure></p>
+<p><strong>Cassandra创建表</strong><br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">USE tutorialspoint;</div><div class="line">cqlsh:tutorialspoint&gt;; CREATE TABLE emp(</div><div class="line">   emp_id int PRIMARY KEY,</div><div class="line">   emp_name text,</div><div class="line">   emp_city text,</div><div class="line">   emp_sal varint,</div><div class="line">   emp_phone varint</div><div class="line">   );</div><div class="line">cqlsh:tutorialspoint&gt; select * from emp;</div></pre></td></tr></table></figure></p>
+<p><strong>Cassandra修改表</strong><br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">cqlsh:tutorialspoint&gt; ALTER TABLE emp</div><div class="line">   ... ADD emp_email text;</div></pre></td></tr></table></figure></p>
+<p><strong>Cassandra删除表</strong><br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">cqlsh:tutorialspoint&gt; DROP TABLE emp;</div><div class="line">cqlsh:tutorialspoint&gt; DESCRIBE COLUMNFAMILIES;</div></pre></td></tr></table></figure></p>
+<p><strong>Cassandra截断表</strong><br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">cqlsh:tp&gt; TRUNCATE student;</div></pre></td></tr></table></figure></p>
+<p><strong>Cassandra创建索引</strong><br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">cqlsh:tutorialspoint&gt; CREATE INDEX name ON emp1 (emp_name);</div></pre></td></tr></table></figure></p>
+<p>Cassandra DROP INDEX<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">cqlsh:tp&gt; drop index name;</div></pre></td></tr></table></figure></p>
+<p><strong>Cassandra批量</strong><br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">cqlsh:tutorialspoint&gt; BEGIN BATCH</div><div class="line">     INSERT INTO emp (emp_id, emp_city, emp_name, emp_phone, emp_sal) values(  4,<span class="string">'Pune'</span>,<span class="string">'rajeev'</span>,9848022331, 30000);</div><div class="line">     UPDATE emp SET emp_sal = 50000 WHERE emp_id =3;</div><div class="line">     DELETE emp_city FROM emp WHERE emp_id = 2;</div><div class="line">     APPLY BATCH;</div></pre></td></tr></table></figure></p>
+<p><strong>Cassandra创建数据</strong><br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">cqlsh:tutorialspoint&gt; INSERT INTO emp (emp_id, emp_name, emp_city,</div><div class="line">   emp_phone, emp_sal) VALUES(1,<span class="string">'ram'</span>, <span class="string">'Hyderabad'</span>, 9848022338, 50000);</div><div class="line">cqlsh:tutorialspoint&gt; INSERT INTO emp (emp_id, emp_name, emp_city,</div><div class="line">   emp_phone, emp_sal) VALUES(2,<span class="string">'robin'</span>, <span class="string">'Hyderabad'</span>, 9848022339, 40000);</div><div class="line">cqlsh:tutorialspoint&gt; INSERT INTO emp (emp_id, emp_name, emp_city,</div><div class="line">   emp_phone, emp_sal) VALUES(3,<span class="string">'rahman'</span>, <span class="string">'Chennai'</span>, 9848022330, 45000);</div></pre></td></tr></table></figure></p>
+<p><strong>Cassandra更新数据</strong><br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">cqlsh:tutorialspoint&gt; UPDATE emp SET emp_city=<span class="string">'Delhi'</span>,emp_sal=50000</div><div class="line">   WHERE emp_id=2;</div></pre></td></tr></table></figure></p>
+<p><strong>Cassandra删除数据</strong><br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">cqlsh:tutorialspoint&gt; DELETE emp_sal FROM emp WHERE emp_id=3;</div></pre></td></tr></table></figure></p>
+<p><strong>Cassandra CQL集合</strong><br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">cqlsh:tutorialspoint&gt; CREATE TABLE data(name text PRIMARY KEY, email list&lt;text&gt;);</div><div class="line">cqlsh:tutorialspoint&gt; INSERT INTO data(name, email) VALUES (<span class="string">'ramu'</span>, [<span class="string">'abc@gmail.com'</span>,<span class="string">'cba@yahoo.com'</span>])</div><div class="line">cqlsh:tutorialspoint&gt; UPDATE data SET email = email +[<span class="string">'xyz@w3ii.com'</span>] <span class="built_in">where</span> name = <span class="string">'ramu'</span>;</div><div class="line"></div><div class="line">cqlsh:tutorialspoint&gt; CREATE TABLE data2 (name text PRIMARY KEY, phone <span class="built_in">set</span>&lt;varint&gt;);</div><div class="line"></div><div class="line">cqlsh:tutorialspoint&gt; INSERT INTO data2(name, phone)VALUES (<span class="string">'rahman'</span>,    &#123;9848022338,9848022339&#125;);</div><div class="line"></div><div class="line">cqlsh:tutorialspoint&gt; UPDATE data2 SET phone = phone + &#123;9848022330&#125; <span class="built_in">where</span> name = <span class="string">'rahman'</span>;</div><div class="line"></div><div class="line">cqlsh:tutorialspoint&gt; CREATE TABLE data3 (name text PRIMARY KEY, address map&lt;timestamp, text&gt;);</div><div class="line"></div><div class="line">cqlsh:tutorialspoint&gt; INSERT INTO data3 (name, address) VALUES (<span class="string">'robin'</span>, &#123;<span class="string">'home'</span> : <span class="string">'hyderabad'</span> , <span class="string">'office'</span> : <span class="string">'Delhi'</span> &#125; );</div><div class="line"></div><div class="line">cqlsh:tutorialspoint&gt; UPDATE data3 SET address = address+&#123;<span class="string">'office'</span>:<span class="string">'mumbai'</span>&#125; WHERE name = <span class="string">'robin'</span>;</div></pre></td></tr></table></figure></p>
+<h3 id="Cassandra-安装-及-源代码分析"><a href="#Cassandra-安装-及-源代码分析" class="headerlink" title="Cassandra 安装 及 源代码分析"></a>Cassandra 安装 及 源代码分析</h3><p><strong>service 启动入口函数：</strong><br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">org.apache.cassandra.service.CassandraDaemon</div></pre></td></tr></table></figure></p>
 <p><strong>installation:</strong><br><a href="http://cassandra.apache.org/doc/latest/getting_started/installing.html" target="_blank" rel="external">http://cassandra.apache.org/doc/latest/getting_started/installing.html</a></p>
 <p><strong>import源代码进Eclipse：</strong></p>
 <ul>
@@ -3820,7 +4266,7 @@ MathJax.Hub.Queue(function() {
     
     	<section class="tools-section tools-section-tag">
     			<div class="widget tagcloud" id="js-tagcloud">
-    				<a href="/tags/Cassandra/" style="font-size: 10px;">Cassandra</a> <a href="/tags/Hadoop/" style="font-size: 20px;">Hadoop</a> <a href="/tags/Kafka/" style="font-size: 12.5px;">Kafka</a> <a href="/tags/NoSQL/" style="font-size: 10px;">NoSQL</a> <a href="/tags/Spark/" style="font-size: 15px;">Spark</a> <a href="/tags/ZooKeeper/" style="font-size: 12.5px;">ZooKeeper</a> <a href="/tags/etcd/" style="font-size: 10px;">etcd</a> <a href="/tags/介绍/" style="font-size: 10px;">介绍</a> <a href="/tags/分布式协同/" style="font-size: 10px;">分布式协同</a> <a href="/tags/大数据/" style="font-size: 17.5px;">大数据</a>
+    				<a href="/tags/Cassandra/" style="font-size: 10px;">Cassandra</a> <a href="/tags/Hadoop/" style="font-size: 20px;">Hadoop</a> <a href="/tags/Kafka/" style="font-size: 12px;">Kafka</a> <a href="/tags/Linux/" style="font-size: 14px;">Linux</a> <a href="/tags/NoSQL/" style="font-size: 10px;">NoSQL</a> <a href="/tags/Spark/" style="font-size: 16px;">Spark</a> <a href="/tags/ZooKeeper/" style="font-size: 12px;">ZooKeeper</a> <a href="/tags/etcd/" style="font-size: 10px;">etcd</a> <a href="/tags/介绍/" style="font-size: 10px;">介绍</a> <a href="/tags/分布式协同/" style="font-size: 10px;">分布式协同</a> <a href="/tags/大数据/" style="font-size: 18px;">大数据</a>
     			</div>
     	</section>
     
