@@ -8,13 +8,13 @@
   <link rel="dns-prefetch" href="http://yoursite.com">
   <title>Hadoop MapReduce | SStar1314</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="Hadoop MapReduce 流程图图中1：表示待处理数据，比如日志，比如单词计数.图中2：表示map阶段，对他们split，然后送到不同分区.图中3：表示reduce阶段，对这些数据整合处理.图中4：表示二次mapreduce,这个是mapreduce的链式.   在hadoop中，map-&amp;gt;combine-&amp;gt;partition-&amp;gt;shuffle-&amp;gt;reduce，五个">
-<meta name="keywords" content="大数据">
+  <meta name="description" content="Hadoop MapReduce 流程图   在hadoop中，map-&amp;gt;combine-&amp;gt;partition-&amp;gt;shuffle-&amp;gt;reduce，五个步骤的作用分别是什么？  combine和partition都是函数，中间的步骤应该只有shuffle！ combine分为map端和reduce端，作用是把同一个key的键值对合并在一起，可以自定义的。 combine函数把">
+<meta name="keywords" content="Hadoop">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Hadoop MapReduce">
 <meta property="og:url" content="http://yoursite.com/Hadoop MapReduce/index.html">
 <meta property="og:site_name" content="SStar1314">
-<meta property="og:description" content="Hadoop MapReduce 流程图图中1：表示待处理数据，比如日志，比如单词计数.图中2：表示map阶段，对他们split，然后送到不同分区.图中3：表示reduce阶段，对这些数据整合处理.图中4：表示二次mapreduce,这个是mapreduce的链式.   在hadoop中，map-&amp;gt;combine-&amp;gt;partition-&amp;gt;shuffle-&amp;gt;reduce，五个">
+<meta property="og:description" content="Hadoop MapReduce 流程图   在hadoop中，map-&amp;gt;combine-&amp;gt;partition-&amp;gt;shuffle-&amp;gt;reduce，五个步骤的作用分别是什么？  combine和partition都是函数，中间的步骤应该只有shuffle！ combine分为map端和reduce端，作用是把同一个key的键值对合并在一起，可以自定义的。 combine函数把">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="http://yoursite.com/images/Hadoop_MapReduce.png">
 <meta property="og:image" content="http://yoursite.com/images/Hadoop_MapReduce_1.png">
@@ -25,10 +25,10 @@
 <meta property="og:image" content="http://yoursite.com/images/Hadoop_Map_Reduce_1.png">
 <meta property="og:image" content="http://yoursite.com/images/Hadoop_Map_Reduce_2.png">
 <meta property="og:image" content="http://yoursite.com/images/Hadoop_Map_Reduce_Example.png">
-<meta property="og:updated_time" content="2016-11-08T08:49:57.000Z">
+<meta property="og:updated_time" content="2017-07-19T06:44:29.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Hadoop MapReduce">
-<meta name="twitter:description" content="Hadoop MapReduce 流程图图中1：表示待处理数据，比如日志，比如单词计数.图中2：表示map阶段，对他们split，然后送到不同分区.图中3：表示reduce阶段，对这些数据整合处理.图中4：表示二次mapreduce,这个是mapreduce的链式.   在hadoop中，map-&amp;gt;combine-&amp;gt;partition-&amp;gt;shuffle-&amp;gt;reduce，五个">
+<meta name="twitter:description" content="Hadoop MapReduce 流程图   在hadoop中，map-&amp;gt;combine-&amp;gt;partition-&amp;gt;shuffle-&amp;gt;reduce，五个步骤的作用分别是什么？  combine和partition都是函数，中间的步骤应该只有shuffle！ combine分为map端和reduce端，作用是把同一个key的键值对合并在一起，可以自定义的。 combine函数把">
 <meta name="twitter:image" content="http://yoursite.com/images/Hadoop_MapReduce.png">
   
     <link rel="alternative" href="/atom.xml" title="SStar1314" type="application/atom+xml">
@@ -170,7 +170,7 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h2 id="Hadoop-MapReduce-流程图"><a href="#Hadoop-MapReduce-流程图" class="headerlink" title="Hadoop MapReduce 流程图"></a>Hadoop MapReduce 流程图</h2><p><img src="/images/Hadoop_MapReduce.png" alt=""><br>图中1：表示待处理数据，比如日志，比如单词计数.<br>图中2：表示map阶段，对他们split，然后送到不同分区.<br>图中3：表示reduce阶段，对这些数据整合处理.<br>图中4：表示二次mapreduce,这个是mapreduce的链式.</p>
+        <h2 id="Hadoop-MapReduce-流程图"><a href="#Hadoop-MapReduce-流程图" class="headerlink" title="Hadoop MapReduce 流程图"></a>Hadoop MapReduce 流程图</h2><p><img src="/images/Hadoop_MapReduce.png" alt=""></p>
 <p><img src="/images/Hadoop_MapReduce_1.png" alt=""></p>
 <p><img src="/images/Hadoop_Map_Reduce.jpg" alt=""></p>
 <p><strong>在hadoop中，map-&gt;combine-&gt;partition-&gt;shuffle-&gt;reduce，五个步骤的作用分别是什么？</strong></p>
@@ -244,7 +244,7 @@
       
 	<div class="article-tag tagcloud">
 		<i class="icon-price-tags"></i>
-		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/大数据/">大数据</a></li></ul>
+		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Hadoop/">Hadoop</a></li></ul>
 	</div>
 
       
@@ -272,8 +272,8 @@
     </a>
   
   
-    <a href="/Hadoop HDFS command/" id="article-nav-older" class="article-nav-link-wrap">
-      <div class="article-nav-title">Hadoop HDFS FS Command</div>
+    <a href="/HDFS Command/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">HDFS Command</div>
       <i class="icon-circle-right"></i>
     </a>
   
@@ -382,7 +382,7 @@ MathJax.Hub.Queue(function() {
     
     	<section class="tools-section tools-section-tag">
     			<div class="widget tagcloud" id="js-tagcloud">
-    				<a href="/tags/Cassandra/" style="font-size: 10px;">Cassandra</a> <a href="/tags/Kafka/" style="font-size: 13.33px;">Kafka</a> <a href="/tags/NoSQL/" style="font-size: 10px;">NoSQL</a> <a href="/tags/Spark/" style="font-size: 16.67px;">Spark</a> <a href="/tags/ZooKeeper/" style="font-size: 13.33px;">ZooKeeper</a> <a href="/tags/etcd/" style="font-size: 10px;">etcd</a> <a href="/tags/介绍/" style="font-size: 10px;">介绍</a> <a href="/tags/分布式协同/" style="font-size: 10px;">分布式协同</a> <a href="/tags/大数据/" style="font-size: 20px;">大数据</a>
+    				<a href="/tags/Cassandra/" style="font-size: 10px;">Cassandra</a> <a href="/tags/Hadoop/" style="font-size: 20px;">Hadoop</a> <a href="/tags/Kafka/" style="font-size: 12.5px;">Kafka</a> <a href="/tags/NoSQL/" style="font-size: 10px;">NoSQL</a> <a href="/tags/Spark/" style="font-size: 15px;">Spark</a> <a href="/tags/ZooKeeper/" style="font-size: 12.5px;">ZooKeeper</a> <a href="/tags/etcd/" style="font-size: 10px;">etcd</a> <a href="/tags/介绍/" style="font-size: 10px;">介绍</a> <a href="/tags/分布式协同/" style="font-size: 10px;">分布式协同</a> <a href="/tags/大数据/" style="font-size: 17.5px;">大数据</a>
     			</div>
     	</section>
     
