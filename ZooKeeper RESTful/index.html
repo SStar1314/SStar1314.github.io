@@ -6,20 +6,20 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://yoursite.com">
-  <title>Spark Cluster 三种模式 | SStar1314</title>
+  <title>ZooKeeper RESTful | SStar1314</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="Spark Cluster 三种模式 Standalone – a simple cluster manager included with Spark that makes it easy to set up a cluster. Apache Mesos – a general cluster manager that can also run Hadoop MapReduce and ser">
-<meta name="keywords" content="Spark">
+  <meta name="description" content="Enable ZooKeeper RESTful service：12345vim  rest.propertiescd   /root/zookeeper-3.4.8/src/contrib/restnohup ant run &amp;amp;    curl -H&apos;Accept: application/json&apos; http://localhost:9998/znodes/v1/">
+<meta name="keywords" content="ZooKeeper">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Spark Cluster 三种模式">
-<meta property="og:url" content="http://yoursite.com/Spark Cluster三种模式/index.html">
+<meta property="og:title" content="ZooKeeper RESTful">
+<meta property="og:url" content="http://yoursite.com/ZooKeeper RESTful/index.html">
 <meta property="og:site_name" content="SStar1314">
-<meta property="og:description" content="Spark Cluster 三种模式 Standalone – a simple cluster manager included with Spark that makes it easy to set up a cluster. Apache Mesos – a general cluster manager that can also run Hadoop MapReduce and ser">
+<meta property="og:description" content="Enable ZooKeeper RESTful service：12345vim  rest.propertiescd   /root/zookeeper-3.4.8/src/contrib/restnohup ant run &amp;amp;    curl -H&apos;Accept: application/json&apos; http://localhost:9998/znodes/v1/">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2016-11-09T02:31:12.000Z">
+<meta property="og:updated_time" content="2017-07-19T03:07:43.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Spark Cluster 三种模式">
-<meta name="twitter:description" content="Spark Cluster 三种模式 Standalone – a simple cluster manager included with Spark that makes it easy to set up a cluster. Apache Mesos – a general cluster manager that can also run Hadoop MapReduce and ser">
+<meta name="twitter:title" content="ZooKeeper RESTful">
+<meta name="twitter:description" content="Enable ZooKeeper RESTful service：12345vim  rest.propertiescd   /root/zookeeper-3.4.8/src/contrib/restnohup ant run &amp;amp;    curl -H&apos;Accept: application/json&apos; http://localhost:9998/znodes/v1/">
   
     <link rel="alternative" href="/atom.xml" title="SStar1314" type="application/atom+xml">
   
@@ -142,7 +142,7 @@
 </nav>
 
       <div class="body-wrap">
-        <article id="post-Spark Cluster三种模式" class="article article-type-post" itemscope itemprop="blogPost">
+        <article id="post-ZooKeeper RESTful" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-inner">
     
       <input type="hidden" class="isFancy" />
@@ -152,7 +152,7 @@
         
   
     <h1 class="article-title" itemprop="name">
-      Spark Cluster 三种模式
+      ZooKeeper RESTful
     </h1>
   
 
@@ -160,53 +160,38 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h2 id="Spark-Cluster-三种模式"><a href="#Spark-Cluster-三种模式" class="headerlink" title="Spark Cluster 三种模式"></a>Spark Cluster 三种模式</h2><ul>
-<li><strong>Standalone</strong> – a simple cluster manager included with Spark that makes it easy to set up a cluster.</li>
-<li><strong>Apache Mesos</strong> – a general cluster manager that can also run Hadoop MapReduce and service applications.</li>
-<li><strong>Hadoop YARN</strong> – the resource manager in Hadoop 2.</li>
-</ul>
-<h3 id="Standalone-模式："><a href="#Standalone-模式：" class="headerlink" title="Standalone 模式："></a>Standalone 模式：</h3><p>start Master:<br><code>./sbin/start-master.sh</code><br>start Slave:<br><code>./sbin/start-slave.sh &lt;master-spark-URL&gt;</code></p>
-<ul>
-<li>sbin/start-master.sh - Starts a master instance on the machine the script is executed on.</li>
-<li>sbin/start-slaves.sh - Starts a slave instance on each machine specified in the conf/slaves file.</li>
-<li>sbin/start-slave.sh - Starts a slave instance on the machine the script is executed on.</li>
-<li>sbin/start-all.sh - Starts both a master and a number of slaves as described above.</li>
-<li>sbin/stop-master.sh - Stops the master that was started via the bin/start-master.sh script.</li>
-<li>sbin/stop-slaves.sh - Stops all slave instances on the machines specified in the conf/slaves file.</li>
-<li>sbin/stop-all.sh - Stops both the master and the slaves as described above.</li>
-</ul>
-<p>Connecting an Application to the Cluster:<br><code>./bin/spark-shell --master spark://IP:PORT</code><br>Launching Spark Applications:<br><code>./bin/spark-class org.apache.spark.deploy.Client kill &lt;master url&gt; &lt;driver ID&gt;</code><br>Resource Scheduling:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">val conf = new SparkConf()</div><div class="line">             .setMaster(...)</div><div class="line">             .setAppName(...)</div><div class="line">             .set(&quot;spark.cores.max&quot;, &quot;10&quot;)</div><div class="line">val sc = new SparkContext(conf)</div></pre></td></tr></table></figure></p>
-<h3 id="Running-Spark-on-Mesos-模式："><a href="#Running-Spark-on-Mesos-模式：" class="headerlink" title="Running Spark on Mesos 模式："></a>Running Spark on Mesos 模式：</h3><p>参考： <a href="http://spark.apache.org/docs/latest/running-on-mesos.html" target="_blank" rel="external">http://spark.apache.org/docs/latest/running-on-mesos.html</a></p>
-<p><strong>Installing Mesos:</strong></p>
-<ul>
-<li>Spark 2.0.1 is designed for use with Mesos 0.21.0. <a href="http://mesos.apache.org/gettingstarted/" target="_blank" rel="external">http://mesos.apache.org/gettingstarted/</a><br><strong>Connecting  Spark  to  Mesos:</strong></li>
-<li>To use Mesos from Spark, you need a Spark binary package available in a place accessible by Mesos, and a Spark driver program configured to connect to Mesos.<br><strong>Uploading  Spark Package:</strong></li>
-<li>Download a Spark binary package from the Spark download page</li>
-<li>Upload to hdfs/http/s3<br><strong>To host on HDFS, use the Hadoop fs put command:</strong><br><code>hadoop fs -put spark-2.0.1.tar.gz /path/to/spark-2.0.1.tar.gz</code><br><strong>Using a  Mesos Master URL:</strong></li>
-<li>The Master URLs for Mesos are in the form <code>mesos://host:5050</code> for a single-master Mesos cluster, or <code>mesos://zk://host1:2181,host2:2181,host3:2181/mesos</code> for a multi-master Mesos cluster using ZooKeeper.<br><strong>Client Mode:</strong><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">val conf = new SparkConf()</div><div class="line">       .setMaster(&quot;mesos://HOST:5050&quot;)</div><div class="line">       .setAppName(&quot;My app&quot;)</div><div class="line">       .set(&quot;spark.executor.uri&quot;, &quot;&lt;path to spark-2.0.1.tar.gz uploaded above&gt;&quot;)</div><div class="line">val sc = new SparkContext(conf)</div><div class="line">     ./bin/spark-shell --master mesos://host:5050</div></pre></td></tr></table></figure>
-</li>
-</ul>
-<p><strong>Cluster Mode:</strong><br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">./bin/spark-submit \</div><div class="line">       --class org.apache.spark.examples.SparkPi \</div><div class="line">       --master mesos://207.184.161.138:7077 \</div><div class="line">       --deploy-mode cluster \</div><div class="line">       --supervise \</div><div class="line">       --executor-memory 20G \</div><div class="line">       --total-executor-cores 100 \</div><div class="line">       http://path/to/examples.jar \</div><div class="line">       1000 \</div></pre></td></tr></table></figure></p>
-<h3 id="Running-Spark-on-YARN-模式："><a href="#Running-Spark-on-YARN-模式：" class="headerlink" title="Running Spark on YARN 模式："></a>Running Spark on YARN 模式：</h3><p><strong>Cluster mode:</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">$ ./bin/spark-submit --class path.to.your.Class --master yarn --deploy-mode cluster [options] &lt;app jar&gt; [app options]</div><div class="line"></div><div class="line">$ ./bin/spark-submit --class org.apache.spark.examples.SparkPi \</div><div class="line">    --master yarn \</div><div class="line">    --deploy-mode cluster \</div><div class="line">    --driver-memory 4g \</div><div class="line">    --executor-memory 2g \</div><div class="line">    --executor-cores 1 \</div><div class="line">    --queue thequeue \</div><div class="line">    lib/spark-examples*.jar \</div><div class="line">    10</div></pre></td></tr></table></figure></p>
-<p><strong>Client mode:</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ ./bin/spark-shell --master yarn --deploy-mode client</div></pre></td></tr></table></figure></p>
+        <h3 id="Enable-ZooKeeper-RESTful-service："><a href="#Enable-ZooKeeper-RESTful-service：" class="headerlink" title="Enable ZooKeeper RESTful service："></a>Enable ZooKeeper RESTful service：</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">vim  rest.properties</div><div class="line"><span class="built_in">cd</span>   /root/zookeeper-3.4.8/src/contrib/rest</div><div class="line">nohup ant run &amp;    </div><div class="line">curl -H<span class="string">'Accept: application/json'</span> http://localhost:9998/znodes/v1/                    json</div><div class="line">curl -H<span class="string">'Accept: application/xml'</span> http://localhost:9998/znodes/v1/                    xml</div></pre></td></tr></table></figure>
+<h3 id="RESTful-用法："><a href="#RESTful-用法：" class="headerlink" title="RESTful 用法："></a>RESTful 用法：</h3><p>#get children of the root node<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">curl http://localhost:9998/znodes/v1/?view=children</div></pre></td></tr></table></figure></p>
+<p>#get “/cluster1/leader” as xml (default is json)<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">curl -H<span class="string">'Accept: application/xml'</span> http://localhost:9998/znodes/v1/cluster1/leader</div></pre></td></tr></table></figure></p>
+<p>#get the data as text<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">curl -w <span class="string">"\n%&#123;http_code&#125;\n"</span> <span class="string">"http://localhost:9998/znodes/v1/cluster1/leader?dataformat=utf8"</span></div></pre></td></tr></table></figure></p>
+<p>#set a node (data.txt contains the ascii text you want to set on the node)<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">curl -T data.txt -w <span class="string">"\n%&#123;http_code&#125;\n"</span> <span class="string">"http://localhost:9998/znodes/v1/cluster1/leader?dataformat=utf8"</span></div></pre></td></tr></table></figure></p>
+<p>#create a node<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">curl -d <span class="string">"data1"</span> -H<span class="string">'Content-Type: application/octet-stream'</span> -w <span class="string">"\n%&#123;http_code&#125;\n"</span> <span class="string">"http://localhost:9998/znodes/v1/?op=create&amp;name=cluster2&amp;dataformat=utf8"</span></div></pre></td></tr></table></figure></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">curl -d <span class="string">"data2"</span> -H<span class="string">'Content-Type: application/octet-stream'</span> -w <span class="string">"\n%&#123;http_code&#125;\n"</span> <span class="string">"http://localhost:9998/znodes/v1/cluster2?op=create&amp;name=leader&amp;dataformat=utf8"</span></div></pre></td></tr></table></figure>
+<p>#create a new session<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">curl -d <span class="string">""</span> -H<span class="string">'Content-Type: application/octet-stream'</span> -w <span class="string">"\n%&#123;http_code&#125;\n"</span> <span class="string">"http://localhost:9998/sessions/v1/?op=create&amp;expire=10"</span></div></pre></td></tr></table></figure></p>
+<p>#session heartbeat<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">curl -X <span class="string">"PUT"</span> -H<span class="string">'Content-Type: application/octet-stream'</span> -w <span class="string">"\n%&#123;http_code&#125;\n"</span> <span class="string">"http://localhost:9998/sessions/v1/02dfdcc8-8667-4e53-a6f8-ca5c2b495a72"</span></div></pre></td></tr></table></figure></p>
+<p>#delete a session<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">curl -X <span class="string">"DELETE"</span> -H<span class="string">'Content-Type: application/octet-stream'</span> -w <span class="string">"\n%&#123;http_code&#125;\n"</span> <span class="string">"http://localhost:9998/sessions/v1/02dfdcc8-8667-4e53-a6f8-ca5c2b495a72"</span></div></pre></td></tr></table></figure></p>
+<h2 id="service-启动命令"><a href="#service-启动命令" class="headerlink" title="service 启动命令"></a>service 启动命令</h2><p><strong>RestAPI源码入门：</strong><br>RestAPI 入口main函数所在文件： <strong>org.apache.zookeeper.server.jersey.RestMain</strong></p>
+<p><strong>ZooKeeper Source Code 解析：</strong><br>1.zkServer 脚本启动命令：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">ZOOMAIN=<span class="string">"-Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.local.only=<span class="variable">$JMXLOCALONLY</span> org.apache.zookeeper.server.quorum.QuorumPeerMain"</span></div><div class="line"></div><div class="line">nohup <span class="string">"<span class="variable">$JAVA</span>"</span> <span class="string">"-Dzookeeper.log.dir=<span class="variable">$&#123;ZOO_LOG_DIR&#125;</span>"</span> <span class="string">"-Dzookeeper.root.logger=<span class="variable">$&#123;ZOO_LOG4J_PROP&#125;</span>"</span> \</div><div class="line">        -agentlib:jdwp=transport=dt_socket,server=y,<span class="built_in">suspend</span>=y,address=7778 \                         </div><div class="line">        -cp <span class="string">"<span class="variable">$CLASSPATH</span>"</span> <span class="variable">$JVMFLAGS</span> <span class="variable">$ZOOMAIN</span> <span class="string">"<span class="variable">$ZOOCFG</span>"</span> &gt; <span class="string">"<span class="variable">$_ZOO_DAEMON_OUT</span>"</span> 2&gt;&amp;1 &lt; /dev/null &amp;</div></pre></td></tr></table></figure></p>
+<p>2.zkCli 脚本启动命令：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="string">"<span class="variable">$JAVA</span>"</span> <span class="string">"-Dzookeeper.log.dir=<span class="variable">$&#123;ZOO_LOG_DIR&#125;</span>"</span> <span class="string">"-Dzookeeper.root.logger=<span class="variable">$&#123;ZOO_LOG4J_PROP&#125;</span>"</span> \</div><div class="line">     -cp <span class="string">"<span class="variable">$CLASSPATH</span>"</span> <span class="variable">$CLIENT_JVMFLAGS</span> <span class="variable">$JVMFLAGS</span> \</div><div class="line">     org.apache.zookeeper.ZooKeeperMain <span class="string">"<span class="variable">$@</span>"</span></div></pre></td></tr></table></figure></p>
+<p>由上可知， ZooKeeper的server启动入口函数为 <strong>QuorumPeerMain</strong> ，而client的启动入口函数为 <strong>ZooKeeperMain</strong>。</p>
 
       
     </div>
     <div class="article-info article-info-index">
       
-      <a href="/Spark Cluster三种模式/" class="archive-article-date">
-  	<time datetime="2016-11-09T02:11:16.000Z" itemprop="datePublished"><i class="icon-clock"></i>2016-11-09</time>
+      <a href="/ZooKeeper RESTful/" class="archive-article-date">
+  	<time datetime="2017-07-19T02:45:39.000Z" itemprop="datePublished"><i class="icon-clock"></i>2017-07-19</time>
 </a>
       
 	<div class="article-tag tagcloud">
 		<i class="icon-price-tags"></i>
-		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Spark/">Spark</a></li></ul>
+		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ZooKeeper/">ZooKeeper</a></li></ul>
 	</div>
 
       
 	<div class="article-category tagcloud">
 	<i class="icon-price-tags"></i>
-	<a class="article-category-link" href="/categories/bigdata/">bigdata</a>
+	<a class="article-category-link" href="/categories/分布式协同/">分布式协同</a>
 	</div>
 
 
@@ -218,18 +203,9 @@
   
 <nav id="article-nav">
   
-    <a href="/Spark Quick Start/" id="article-nav-newer" class="article-nav-link-wrap">
-      <i class="icon-circle-left"></i>
-      <div class="article-nav-title">
-        
-          Spark Quick Start
-        
-      </div>
-    </a>
   
-  
-    <a href="/Spark介绍/" id="article-nav-older" class="article-nav-link-wrap">
-      <div class="article-nav-title">Spark介绍</div>
+    <a href="/分布式协同/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">分布式协同技术</div>
       <i class="icon-circle-right"></i>
     </a>
   

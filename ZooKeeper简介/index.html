@@ -6,15 +6,23 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://yoursite.com">
-  <title>Archives: 2017 | SStar1314</title>
+  <title>ZooKeeper简介 | SStar1314</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta property="og:type" content="website">
-<meta property="og:title" content="SStar1314">
-<meta property="og:url" content="http://yoursite.com/archives/2017/index.html">
+  <meta name="description" content="ZooKeeper导图ZooKeeper 服务: ZooKeeper 名字空间: 推荐一本书《ZooKeeper分布式过程协同技术详解》 基于 Paxos 算法wiki: https://en.wikipedia.org/wiki/Paxos_(computer_science) ZooKeeper 支持的apiZooKeeper API:1.create /path data2.delete /">
+<meta name="keywords" content="ZooKeeper">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ZooKeeper简介">
+<meta property="og:url" content="http://yoursite.com/ZooKeeper简介/index.html">
 <meta property="og:site_name" content="SStar1314">
+<meta property="og:description" content="ZooKeeper导图ZooKeeper 服务: ZooKeeper 名字空间: 推荐一本书《ZooKeeper分布式过程协同技术详解》 基于 Paxos 算法wiki: https://en.wikipedia.org/wiki/Paxos_(computer_science) ZooKeeper 支持的apiZooKeeper API:1.create /path data2.delete /">
 <meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://yoursite.com/images/ZooKeeper_1.png">
+<meta property="og:image" content="http://yoursite.com/images/ZooKeeper_2.png">
+<meta property="og:updated_time" content="2017-07-19T02:30:49.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="SStar1314">
+<meta name="twitter:title" content="ZooKeeper简介">
+<meta name="twitter:description" content="ZooKeeper导图ZooKeeper 服务: ZooKeeper 名字空间: 推荐一本书《ZooKeeper分布式过程协同技术详解》 基于 Paxos 算法wiki: https://en.wikipedia.org/wiki/Paxos_(computer_science) ZooKeeper 支持的apiZooKeeper API:1.create /path data2.delete /">
+<meta name="twitter:image" content="http://yoursite.com/images/ZooKeeper_1.png">
   
     <link rel="alternative" href="/atom.xml" title="SStar1314" type="application/atom+xml">
   
@@ -137,96 +145,111 @@
 </nav>
 
       <div class="body-wrap">
+        <article id="post-ZooKeeper简介" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
         
   
-  
-    
-    
-      
-      
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2017" class="archive-year">2017</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/ZooKeeper RESTful/" class="archive-article-date">
-  	<time datetime="2017-07-19T02:45:39.000Z" itemprop="datePublished"><i class="icon-clock"></i>2017-07-19</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/ZooKeeper RESTful/">ZooKeeper RESTful</a>
+    <h1 class="article-title" itemprop="name">
+      ZooKeeper简介
     </h1>
   
 
-        <div class="article-info info-on-right">
-          
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="ZooKeeper导图"><a href="#ZooKeeper导图" class="headerlink" title="ZooKeeper导图"></a>ZooKeeper导图</h2><p><strong>ZooKeeper 服务:</strong><br><img src="/images/ZooKeeper_1.png" alt=""></p>
+<p><strong>ZooKeeper 名字空间:</strong><br><img src="/images/ZooKeeper_2.png" alt=""></p>
+<h2 id="推荐一本书"><a href="#推荐一本书" class="headerlink" title="推荐一本书"></a>推荐一本书</h2><p>《ZooKeeper分布式过程协同技术详解》</p>
+<h2 id="基于-Paxos-算法"><a href="#基于-Paxos-算法" class="headerlink" title="基于 Paxos 算法"></a>基于 Paxos 算法</h2><p>wiki: <a href="https://en.wikipedia.org/wiki/Paxos_(computer_science" target="_blank" rel="external">https://en.wikipedia.org/wiki/Paxos_(computer_science</a>)</p>
+<h2 id="ZooKeeper-支持的api"><a href="#ZooKeeper-支持的api" class="headerlink" title="ZooKeeper 支持的api"></a>ZooKeeper 支持的api</h2><p><strong>ZooKeeper API:</strong><br>1.create /path data<br>2.delete /path<br>3.exists /path<br>4.setData /path data<br>5.getData /path<br>6.getChildren /path</p>
+<h2 id="单点ZooKeeper-与-ZooKeeper集群"><a href="#单点ZooKeeper-与-ZooKeeper集群" class="headerlink" title="单点ZooKeeper 与 ZooKeeper集群"></a>单点ZooKeeper 与 ZooKeeper集群</h2><p><strong>ZooKeeper服务器的两种工作模式： 独立模式(standalone)和仲裁模式(quorum)</strong><br><strong>独立模式(standalone)</strong>: 单独的ZooKeeper服务器。<br><strong>仲裁模式(quorum)</strong>: ZooKeeper集合(ZooKeeper ensemble)。 仲裁模式中，为减少ZooKeeper Server数据同步的延迟，法定人数 的概念被使用，法定人数的大小设置非常重要。</p>
+<p><strong>仲裁模式试验：</strong><br><strong>configure 文件：</strong><br><em>z1.cfg</em><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">tickTime=2000</div><div class="line">initLimit=10</div><div class="line">syncLimit=5</div><div class="line">dataDir=/root/zookeeper-3.4.8/conf/z1/data</div><div class="line">clientPort=2181</div><div class="line">server.1=127.0.0.1:2222:2223</div><div class="line">server.2=127.0.0.1:3333:3334</div><div class="line">server.3=127.0.0.1:4444:4445</div></pre></td></tr></table></figure></p>
+<p><em>z2.cfg</em><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">tickTime=2000</div><div class="line">initLimit=10</div><div class="line">syncLimit=5</div><div class="line">dataDir=/root/zookeeper-3.4.8/conf/z2/data</div><div class="line">clientPort=2182</div><div class="line">server.1=127.0.0.1:2222:2223</div><div class="line">server.2=127.0.0.1:3333:3334</div><div class="line">server.3=127.0.0.1:4444:4445</div></pre></td></tr></table></figure></p>
+<p><em>z3.cfg</em><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">tickTime=2000</div><div class="line">initLimit=10</div><div class="line">syncLimit=5</div><div class="line">dataDir=/root/zookeeper-3.4.8/conf/z3/data</div><div class="line">clientPort=2183</div><div class="line">server.1=127.0.0.1:2222:2223</div><div class="line">server.2=127.0.0.1:3333:3334</div><div class="line">server.3=127.0.0.1:4444:4445</div></pre></td></tr></table></figure></p>
+<p><em>启动3个节点命令：</em><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">/root/zookeeper-3.4.8/bin/zkServer.sh  start  z1/z1.cfg</div><div class="line">/root/zookeeper-3.4.8/bin/zkServer.sh  start  z2/z2.cfg</div><div class="line">/root/zookeeper-3.4.8/bin/zkServer.sh  start  z3/z3.cfg</div></pre></td></tr></table></figure></p>
+<p><em>连接集群：</em><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">/bin/zkCli.sh -server 127.0.0.1:2181,127.0.0.1:2182,127.0.0.1:2183</div></pre></td></tr></table></figure></p>
+<p>创建 <strong>ephemeral</strong> 节点：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">create -e /master &quot;master.example.com&quot;</div></pre></td></tr></table></figure></p>
+<p>创建 <strong>sequential</strong> 节点：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">create -s /master/task-  “cmd&quot;</div></pre></td></tr></table></figure></p>
+<p><strong>WatchedEvent</strong> 数据结构包含以下信息：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">ZooKeeper会话状态(KeeperState)：Disconnected, SyncConnected, AuthFailed, ConnectedReadOnly, SaslAuthenticated, Expired.</div><div class="line">事件类型(EventType)：NodeCreated, NodeDeleted, NodeDataChanged, NodeChildrenChanged, None.</div><div class="line">如果事件类型不是None时，返回一个znode路径.</div><div class="line">Watch监视点设置：</div><div class="line">NodeCreated：通过exists调用设置监视点。</div><div class="line">NodeDeleted：通过exists或getData调用设置监视点。</div><div class="line">NodeDataChanged：通过exists或getData调用设置监视点。</div><div class="line">NodeChildrenChanged：通过getChildren调用设置监视点。</div></pre></td></tr></table></figure></p>
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      <a href="/ZooKeeper简介/" class="archive-article-date">
+  	<time datetime="2016-11-09T03:08:50.000Z" itemprop="datePublished"><i class="icon-clock"></i>2016-11-09</time>
+</a>
+      
 	<div class="article-tag tagcloud">
 		<i class="icon-price-tags"></i>
 		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ZooKeeper/">ZooKeeper</a></li></ul>
 	</div>
 
-          
+      
 	<div class="article-category tagcloud">
 	<i class="icon-price-tags"></i>
 	<a class="article-category-link" href="/categories/分布式协同/">分布式协同</a>
 	</div>
 
 
-        </div>
-        <div class="clearfix"></div>
-    </header>
+      <div class="clearfix"></div>
+    </div>
   </div>
 </article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/分布式协同/" class="archive-article-date">
-  	<time datetime="2017-07-19T01:36:10.000Z" itemprop="datePublished"><i class="icon-clock"></i>2017-07-19</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/分布式协同/">分布式协同技术</a>
-    </h1>
-  
 
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags"></i>
-		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/分布式协同/">分布式协同</a></li></ul>
+  
+<nav id="article-nav">
+  
+    <a href="/ZooKeeper源码/" id="article-nav-newer" class="article-nav-link-wrap">
+      <i class="icon-circle-left"></i>
+      <div class="article-nav-title">
+        
+          ZooKeeper源码
+        
+      </div>
+    </a>
+  
+  
+    <a href="/Spark Streaming SQL MLlib GraphX/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">Spark Streaming/SQL/MLlib/GraphX</div>
+      <i class="icon-circle-right"></i>
+    </a>
+  
+</nav>
+
+
+
+
+<div class="share_jia">
+	<!-- JiaThis Button BEGIN -->
+	<div class="jiathis_style">
+		<span class="jiathis_txt">Share to: &nbsp; </span>
+		<a class="jiathis_button_facebook"></a> 
+	    <a class="jiathis_button_twitter"></a>
+	    <a class="jiathis_button_plus"></a> 
+	    <a class="jiathis_button_tsina"></a>
+		<a class="jiathis_button_cqq"></a>
+		<a class="jiathis_button_douban"></a>
+		<a class="jiathis_button_weixin"></a>
+		<a class="jiathis_button_tumblr"></a>
+    <a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jtico jtico_jiathis" target="_blank"></a>
 	</div>
-
-          
-	<div class="article-category tagcloud">
-	<i class="icon-price-tags"></i>
-	<a class="article-category-link" href="/categories/分布式协同/">分布式协同</a>
-	</div>
+	<script type="text/javascript" src="//v3.jiathis.com/code/jia.js?uid=1405949716054953" charset="utf-8"></script>
+	<!-- JiaThis Button END -->
+</div>
 
 
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-  
-    </div></section>
-  
 
-    
+
+
+
+
 
 
       </div>
@@ -249,8 +272,8 @@
 		mathjax: true,
 		animate: true,
 		isHome: false,
-		isPost: false,
-		isArchive: true,
+		isPost: true,
+		isArchive: false,
 		isTag: false,
 		isCategory: false,
 		open_in_new: false,
