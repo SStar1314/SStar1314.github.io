@@ -16,7 +16,7 @@
 <meta property="og:site_name" content="SStar1314">
 <meta property="og:description" content="通过Sighup信号让Linux Daemon重新加载配置文件对于守护进程而言，一般情况下守护进程都是detach from shell，所以接受不到sighup信号，这个信号经常被用作 reload configuration左右。1kill  -s   SIGHUP  $pid Linux syslogLinux 系统中的主要log都在/var/log目录下：  /var/log/lastlo">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2017-07-20T02:48:40.000Z">
+<meta property="og:updated_time" content="2017-07-20T03:09:07.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Linux一些命令总结">
 <meta name="twitter:description" content="通过Sighup信号让Linux Daemon重新加载配置文件对于守护进程而言，一般情况下守护进程都是detach from shell，所以接受不到sighup信号，这个信号经常被用作 reload configuration左右。1kill  -s   SIGHUP  $pid Linux syslogLinux 系统中的主要log都在/var/log目录下：  /var/log/lastlo">
@@ -224,8 +224,15 @@
 <li><p>which  ls     :   查找命令,  查找 $PATH 路径中的文件</p>
 </li>
 <li>whereis  ls  :   可以查找命令及相应的man文件, 查找 $PATH 和 $MANPATH 路径</li>
-<li>locate  ls :      查找所有匹配ls字母的文件，  注意!!!  locate 命令从数据库中查找文件，而不是直接查找系统文件，数据库位置为/var/lib/slocate/slocate.db.        当数据库没有更新的时候，可能会查找不到。<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">          yum install mlocate     !!!                   </div><div class="line">          updatedb 更新locate 的数据库                   </div><div class="line">          /etc/cron.daily/mlocate 每天有定时更新数据库的任务</div><div class="line">```          </div><div class="line">- find</div><div class="line">- grep</div><div class="line">```bash</div><div class="line">find  .  -iname  “xxx”  -ok   file  &#123;&#125;  \;        交互执行file命令</div><div class="line">find  .  -iname  “xxx”  -<span class="built_in">exec</span>   file  &#123;&#125;  \;      直接执行file命令</div></pre></td></tr></table></figure>
+<li><p>locate  ls :      查找所有匹配ls字母的文件，  注意!!!  locate 命令从数据库中查找文件，而不是直接查找系统文件，数据库位置为/var/lib/slocate/slocate.db.        当数据库没有更新的时候，可能会查找不到。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">yum install mlocate     !!!                   </div><div class="line">updatedb 更新locate 的数据库                   </div><div class="line">/etc/cron.daily/mlocate 每天有定时更新数据库的任务</div></pre></td></tr></table></figure>
 </li>
+<li><p>find</p>
+</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">find  .  -iname  “xxx”  -ok   file  &#123;&#125;  \;        交互执行file命令</div><div class="line">find  .  -iname  “xxx”  -<span class="built_in">exec</span>   file  &#123;&#125;  \;      直接执行file命令</div></pre></td></tr></table></figure>
+<ul>
+<li>grep</li>
 </ul>
 <h3 id="Linux-系统服务启动-readhat6-x的init程序-readhat7之后的systemd之后的并非如此"><a href="#Linux-系统服务启动-readhat6-x的init程序-readhat7之后的systemd之后的并非如此" class="headerlink" title="Linux 系统服务启动(readhat6.x的init程序, readhat7之后的systemd之后的并非如此)"></a>Linux 系统服务启动(readhat6.x的init程序, readhat7之后的systemd之后的并非如此)</h3><p>系统服务启动顺序：<br>|-/etc/inittab                    总的配置文件<br>|—–/etc/rc.d/rc.sysinit                    系统初始化文件, 加载许多内容<br>————fsck.ext3   mount  -o  rw.remount   /dev/sda2  /<br>————mount  -a  /etc/fstab<br>|—–/etc/rc.d/rcX.d/*                    X为系统运行级别<br>|———-/etc/rc.d/rcX.d/ServiceXXX1  start               用户定义自启动的service<br>|———-/etc/rc.d/rcX.d/ServiceXXX2  start<br>|—–/etc/rc.d/rc.local          最后访问的文件<br>|<br>|-minigetty   启动   /dev/tty1-6                                   启动tty<br>|———-login    —&gt;  bash     —&gt;  /etc/profile     ~/.bash_profile<br>|-gdm               监控进程是否死掉，重启进程</p>
 <ul>
@@ -295,8 +302,8 @@
     </a>
   
   
-    <a href="/categories/" id="article-nav-older" class="article-nav-link-wrap">
-      <div class="article-nav-title">目录</div>
+    <a href="/tags/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">标签</div>
       <i class="icon-circle-right"></i>
     </a>
   
@@ -405,7 +412,7 @@ MathJax.Hub.Queue(function() {
     
     	<section class="tools-section tools-section-tag">
     			<div class="widget tagcloud" id="js-tagcloud">
-    				<a href="/tags/Cassandra/" style="font-size: 10px;">Cassandra</a> <a href="/tags/Hadoop/" style="font-size: 20px;">Hadoop</a> <a href="/tags/Kafka/" style="font-size: 12px;">Kafka</a> <a href="/tags/Linux/" style="font-size: 14px;">Linux</a> <a href="/tags/NoSQL/" style="font-size: 10px;">NoSQL</a> <a href="/tags/Spark/" style="font-size: 16px;">Spark</a> <a href="/tags/ZooKeeper/" style="font-size: 12px;">ZooKeeper</a> <a href="/tags/etcd/" style="font-size: 10px;">etcd</a> <a href="/tags/介绍/" style="font-size: 10px;">介绍</a> <a href="/tags/分布式协同/" style="font-size: 10px;">分布式协同</a> <a href="/tags/大数据/" style="font-size: 18px;">大数据</a>
+    				<a href="/tags/Cassandra/" style="font-size: 10px;">Cassandra</a> <a href="/tags/Hadoop/" style="font-size: 20px;">Hadoop</a> <a href="/tags/JVM/" style="font-size: 10px;">JVM</a> <a href="/tags/Kafka/" style="font-size: 12.5px;">Kafka</a> <a href="/tags/Linux/" style="font-size: 12.5px;">Linux</a> <a href="/tags/Linux-Networking-Internals/" style="font-size: 15px;">Linux Networking Internals</a> <a href="/tags/Linux-Source-Code/" style="font-size: 10px;">Linux Source Code</a> <a href="/tags/Linux-Special-File-System/" style="font-size: 10px;">Linux Special File System</a> <a href="/tags/Maven/" style="font-size: 10px;">Maven</a> <a href="/tags/NoSQL/" style="font-size: 10px;">NoSQL</a> <a href="/tags/Spark/" style="font-size: 15px;">Spark</a> <a href="/tags/ZooKeeper/" style="font-size: 12.5px;">ZooKeeper</a> <a href="/tags/etcd/" style="font-size: 10px;">etcd</a> <a href="/tags/介绍/" style="font-size: 10px;">介绍</a> <a href="/tags/分布式协同/" style="font-size: 10px;">分布式协同</a> <a href="/tags/大数据/" style="font-size: 17.5px;">大数据</a>
     			</div>
     	</section>
     
