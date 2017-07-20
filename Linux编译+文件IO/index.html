@@ -6,20 +6,20 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://yoursite.com">
-  <title>Linux编译 + 文件I/O | SStar1314</title>
+  <title>Linux编译知识 + 文件操作 | SStar1314</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   <meta name="description" content="编译相关命令1234561. gcc -g -Wall hello_world.c -o hello_world          生成可执行程序2. gcc -E hello_world.c &amp;gt; hello_world.i               预处理过程的输出文件, gcc -E 预处理结束之后，编译会自动停止3. gcc -S hello_world.c -o hello_wor">
 <meta name="keywords" content="Linux">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Linux编译 + 文件I&#x2F;O">
+<meta property="og:title" content="Linux编译知识 + 文件操作">
 <meta property="og:url" content="http://yoursite.com/Linux编译+文件IO/index.html">
 <meta property="og:site_name" content="SStar1314">
 <meta property="og:description" content="编译相关命令1234561. gcc -g -Wall hello_world.c -o hello_world          生成可执行程序2. gcc -E hello_world.c &amp;gt; hello_world.i               预处理过程的输出文件, gcc -E 预处理结束之后，编译会自动停止3. gcc -S hello_world.c -o hello_wor">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="http://yoursite.com/images/Linux_pthread_create_1.png">
-<meta property="og:updated_time" content="2017-07-19T14:42:11.000Z">
+<meta property="og:updated_time" content="2017-07-20T02:52:15.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Linux编译 + 文件I&#x2F;O">
+<meta name="twitter:title" content="Linux编译知识 + 文件操作">
 <meta name="twitter:description" content="编译相关命令1234561. gcc -g -Wall hello_world.c -o hello_world          生成可执行程序2. gcc -E hello_world.c &amp;gt; hello_world.i               预处理过程的输出文件, gcc -E 预处理结束之后，编译会自动停止3. gcc -S hello_world.c -o hello_wor">
 <meta name="twitter:image" content="http://yoursite.com/images/Linux_pthread_create_1.png">
   
@@ -162,7 +162,7 @@
         
   
     <h1 class="article-title" itemprop="name">
-      Linux编译 + 文件I/O
+      Linux编译知识 + 文件操作
     </h1>
   
 
@@ -172,7 +172,10 @@
       
         <h3 id="编译相关命令"><a href="#编译相关命令" class="headerlink" title="编译相关命令"></a>编译相关命令</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">1. gcc -g -Wall hello_world.c -o hello_world          生成可执行程序</div><div class="line">2. gcc -E hello_world.c &gt; hello_world.i               预处理过程的输出文件, gcc -E 预处理结束之后，编译会自动停止</div><div class="line">3. gcc -S hello_world.c -o hello_world.s               对源代码进行语法分析，产生汇编文件, gcc -S 汇编结束之后，编译会自动停止</div><div class="line">4. gcc -g -Wall -v  hello_world.c -o hello_world    -v查看中间结果输出</div><div class="line">5. readelf -a hello_world                     Linux下可执行程序格式一般为ELF格式， readelf可以读取ELF格式的文件</div><div class="line">6. strace ./hello_world                    strace可以跟踪系统调用，从而可以了解应用程序加载／运行／退出 的过程。</div></pre></td></tr></table></figure>
 <p>用户空间的程序默认是通过栈来传递参数的，但对于系统调用来说，内核态和用户态使用的是不同的栈，这使得系统调用的参数只能通过寄存器的方式进行传递。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">1. objdump -S thread_safe        可以对运行代码进行反汇编</div></pre></td></tr></table></figure></p>
-<p>阻塞的系统调用：当进行系统调用时，除非出错或被信号打断，进程将会一直陷入内核态直到调用完成。<br>非阻塞的系统调用：是指无论I/O操作成功与否，调用都会立刻返回。</p>
+<ul>
+<li>阻塞的系统调用：当进行系统调用时，除非出错或被信号打断，进程将会一直陷入内核态直到调用完成。</li>
+<li>非阻塞的系统调用：是指无论I/O操作成功与否，调用都会立刻返回。</li>
+</ul>
 <h3 id="文件I-O"><a href="#文件I-O" class="headerlink" title="文件I/O"></a>文件I/O</h3><ol>
 <li>内核中 进程对应的数据结构是task_struct， 位于内核代码的 include/linux/sched.h 文件中。</li>
 <li>内核中 文件表对应的数据结构是files_struct，位于内核代码的 include/linux/fdtable.h 文件中。</li>
@@ -186,7 +189,7 @@
 <li>文件打开但忘记close的时候，可能会出现两种情况：a. 文件描述符始终没有被释放；b. 用于文件管理的某些内存结构没有被释放。<br>a. 内核会扩展文件表，当文件表达到上限时，会报EMFILE错误。<br>b. 未超过上限时，可以申请空的内存；达到上限时，会报VFS: file-max limit reached的错误。</li>
 </ol>
 <h3 id="ELF文件"><a href="#ELF文件" class="headerlink" title="ELF文件"></a>ELF文件</h3><p>ELF = Executable and Linkable Format<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">readelf  命令 可以读 Linux 可执行文件.</div></pre></td></tr></table></figure></p>
-<h3 id="glibc调用-system-call"><a href="#glibc调用-system-call" class="headerlink" title="glibc调用 system_call"></a>glibc调用 system_call</h3><p>glibc的源码中的 <strong>sysdep.h</strong>  里面有  <strong>INLINE_SYSCALL</strong> 定义</p>
+<h3 id="glibc调用-system-call"><a href="#glibc调用-system-call" class="headerlink" title="glibc调用 system_call"></a>glibc调用 system_call</h3><p>一般Linux程序编写都会使用到glibc库, 而最终glibc也只是帮助用户进行系统调用而已, 至于glibc如何进行系统调用的？<br>通过阅读源码发现, 所有的函数都会最终调用glibc的源码中的 <strong>sysdep.h</strong> ,  里面有  <strong>INLINE_SYSCALL</strong> 定义</p>
 <h3 id="Linux-创建-thread"><a href="#Linux-创建-thread" class="headerlink" title="Linux 创建 thread"></a>Linux 创建 thread</h3><p>Linux中实际上 thread 也是被当成 process 来创建, process和thread 是一样的, 区别在于系统调用时的传参.<br><img src="/images/Linux_pthread_create_1.png" alt=""></p>
 <h3 id="Linux-boot-process"><a href="#Linux-boot-process" class="headerlink" title="Linux boot process"></a>Linux boot process</h3><p>refer： <a href="http://duartes.org/gustavo/blog/post/kernel-boot-process/" target="_blank" rel="external">http://duartes.org/gustavo/blog/post/kernel-boot-process/</a></p>
 

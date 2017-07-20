@@ -16,7 +16,7 @@
 <meta property="og:site_name" content="SStar1314">
 <meta property="og:description" content="通过Sighup信号让Linux Daemon重新加载配置文件对于守护进程而言，一般情况下守护进程都是detach from shell，所以接受不到sighup信号，这个信号经常被用作 reload configuration左右。1kill  -s   SIGHUP  $pid Linux syslogLinux 系统中的主要log都在/var/log目录下：  /var/log/lastlo">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2017-07-19T14:23:39.000Z">
+<meta property="og:updated_time" content="2017-07-20T02:48:40.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Linux一些命令总结">
 <meta name="twitter:description" content="通过Sighup信号让Linux Daemon重新加载配置文件对于守护进程而言，一般情况下守护进程都是detach from shell，所以接受不到sighup信号，这个信号经常被用作 reload configuration左右。1kill  -s   SIGHUP  $pid Linux syslogLinux 系统中的主要log都在/var/log目录下：  /var/log/lastlo">
@@ -178,7 +178,7 @@
 <li>/var/log/cron:  计划任务日志， /etc/cron.d/sysstat。</li>
 </ul>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">klogd  —dmesg               —&gt; /var/<span class="built_in">log</span>/dmesg</div><div class="line">syslogd                     —&gt; /ect/syslog.conf</div><div class="line">两个共同的配置文件 —&gt; /etc/sysconfig/syslog</div></pre></td></tr></table></figure>
-<p>redhat 中使用了   <strong>rsyslog</strong> 替代 syslog<br>/etc/rsyslog.d/*</p>
+<p>redhat 中使用了   <strong>rsyslog</strong> 替代 syslog<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">/etc/rsyslog.d/*</div></pre></td></tr></table></figure></p>
 <h3 id="Linux-tty-ttyS-pts-X-Window"><a href="#Linux-tty-ttyS-pts-X-Window" class="headerlink" title="Linux tty/ttyS/pts + X-Window"></a>Linux tty/ttyS/pts + X-Window</h3><ul>
 <li>tty：是串口的终端模拟器，模拟鼠标／键盘／显示器等设备。</li>
 <li>ttyS：Linux下的真正的串口。</li>
@@ -187,31 +187,64 @@
 </ul>
 <p>w: 显示当前所有的登录用户</p>
 <p>多登陆端口通信：  （pts/1向pts/0发送消息）<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">__pts/1:__  <span class="built_in">echo</span>  aaaaaaaaa  &gt;  /dev/pts/0</div><div class="line">__pts/0:__  aaaaaaaaa</div></pre></td></tr></table></figure></p>
-<p>Alt＋F7: 打开第一个X-window窗口，Alt+F8 打开第二个</p>
-<p>Linux启动的时候，会首先打开6个tty串口模拟器(Alt + F1-6) +++++ 1个X-window application(Alt + F7)。</p>
-<p>startx: 启动X-window命令。   startx –:1 (打开第二个X-window)     startx –:2 (打开第三个X-window)         这个命令在pts虚拟终端中无法运行。</p>
-<p>skill -9 pts/2  让另一个控制台的人掉线。</p>
-<p>vim /etc/inittab     可以减少默认启动的tty个数！！！！</p>
-<h3 id="Linux-打包及压缩工具"><a href="#Linux-打包及压缩工具" class="headerlink" title="Linux 打包及压缩工具"></a>Linux 打包及压缩工具</h3><p><strong>compress/uncompress</strong>     最古老的Unix压缩工具<br><strong>gzip/gunzip</strong>          最广泛的压缩工具，Linux系统中标准压缩工具，对于文本文件能够达到很高压缩率<br><strong>bzip2/bunzip2</strong>     新版Linux压缩工具，比gzip拥有更高的压缩率<br>tar 打包(备份)作用，参数：<br>     -c:  将文件备份create<br>     -v:  将过程输出verbose<br>     -x:  从一个文件中解出备份extract<br>     -r:  将文件添加入已经存在的文件中<br>     -C: 解出备份指向位置<br>     -z:  gzip压缩<br>     -j:  bzip2压缩<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">tar xvf/xvf/rvf</div></pre></td></tr></table></figure></p>
-<h3 id="Linux-文件类型-7种-查询inode的命令"><a href="#Linux-文件类型-7种-查询inode的命令" class="headerlink" title="Linux 文件类型(7种) + 查询inode的命令"></a>Linux 文件类型(7种) + 查询inode的命令</h3><p>Linux 下文件类型共有7种：</p>
 <ul>
-<li>文件<br>d     文件夹<br>l     链接<br>b     block<br>c     char自负设备<br>s     socket文件<br>p     protocol网络文件</li>
+<li>Alt＋F7: 打开第一个X-window窗口，Alt+F8 打开第二个</li>
+<li>Linux启动的时候，会首先打开6个tty串口模拟器(Alt + F1-6) +++++ 1个X-window application(Alt + F7)。</li>
+<li>startx: 启动X-window命令。   startx –:1 (打开第二个X-window)     startx –:2 (打开第三个X-window)         这个命令在pts虚拟终端中无法运行。</li>
+<li>skill -9 pts/2  让另一个控制台的人掉线。</li>
 </ul>
+<p>vim /etc/inittab     可以减少默认启动的tty个数！！！！</p>
+<h3 id="Linux-打包及压缩工具"><a href="#Linux-打包及压缩工具" class="headerlink" title="Linux 打包及压缩工具"></a>Linux 打包及压缩工具</h3><p><strong>compress/uncompress</strong>     最古老的Unix压缩工具<br><strong>gzip/gunzip</strong>          最广泛的压缩工具，Linux系统中标准压缩工具，对于文本文件能够达到很高压缩率<br><strong>bzip2/bunzip2</strong>     新版Linux压缩工具，比gzip拥有更高的压缩率<br><strong>tar</strong> 打包(备份)作用，参数：</p>
+<ul>
+<li>-c:  将文件备份create</li>
+<li>-v:  将过程输出verbose</li>
+<li>-x:  从一个文件中解出备份extract</li>
+<li>-r:  将文件添加入已经存在的文件中</li>
+<li>-C: 解出备份指向位置</li>
+<li>-z:  gzip压缩</li>
+<li>-j:  bzip2压缩<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">tar xvf/xvf/rvf</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<h3 id="Linux-文件类型-7种-查询inode的命令"><a href="#Linux-文件类型-7种-查询inode的命令" class="headerlink" title="Linux 文件类型(7种) + 查询inode的命令"></a>Linux 文件类型(7种) + 查询inode的命令</h3><p>Linux 下文件类型共有7种：<br>“-“     文件<br>d     文件夹<br>l     链接<br>b     block<br>c     char字符设备<br>s     socket文件<br>p     protocol网络文件</p>
 <p>文件分为三个部分进行存储：(目录文件中存储文件名)<br>1.存储文件名(指向inode号)   —&gt;   2.inode(指向块存储单元)   —&gt;  3.block (4k为单位)</p>
 <p>inode 存储文件的属性，  可以用 <strong>stat</strong> 命令查看文件inode的内容。</p>
-<h3 id="Linux-文件命令"><a href="#Linux-文件命令" class="headerlink" title="Linux 文件命令"></a>Linux 文件命令</h3><p>文本文件的操作命令：<br>cat： 查看文件内容<br>more： 逐屏查看文件内容<br>less： 逐行查看文件内容<br>head：显示文件开头部分内容<br>tail： 显示文件结尾部分内容<br>diff： 报告文件差异<br>uniq： 去除文件中的相邻的重复行<br>cut： 只显示文件中的某一行                         cut -d: -f1  /etc/passwd<br>sort：按序重排文本                                   sort  -t:  +2  -n  /etc/passwd<br>wc： 统计文件的行，词，字数</p>
-<p>which  ls     :   查找命令,  查找 $PATH 路径中的文件<br>whereis  ls  :   可以查找命令及相应的man文件, 查找 $PATH 和 $MANPATH 路径<br>locate  ls :      查找所有匹配ls字母的文件，  注意!!!  locate 命令从数据库中查找文件，而不是直接查找系统文件，数据库位置为/var/lib/slocate/slocate.db.        当数据库没有更新的时候，可能会查找不到。<br>          yum install mlocate     !!!<br>          updatedb 更新locate 的数据库<br>          /etc/cron.daily/mlocate 每天有定时更新数据库的任务<br>find<br>grep<br>find  .  -iname  “xxx”  -ok   file  {}  \;        交互执行file命令<br>find  .  -iname  “xxx”  -exec   file  {}  \;      直接执行file命令</p>
-<h3 id="Linux-系统启动"><a href="#Linux-系统启动" class="headerlink" title="Linux 系统启动"></a>Linux 系统启动</h3><p>系统启动顺序：<br>| /etc/inittab                    总的配置文件<br>|     /etc/rc.d/rc.sysinit                    系统初始化文件, 加载许多内容<br>          fsck.ext3   mount  -o  rw.remount   /dev/sda2  /<br>          mount  -a  /etc/fstab<br>|     /etc/rc.d/rcX.d/*                    X为系统运行级别<br>|          /etc/rc.d/rcX.d/ServiceXXX1  start               用户定义自启动的service<br>|          /etc/rc.d/rcX.d/ServiceXXX2  start<br>|     /etc/rc.d/rc.local          最后访问的文件<br>|<br>| minigetty   启动   /dev/tty1-6                                   启动tty<br>|           login    —&gt;  bash     —&gt;  /etc/profile     ~/.bash_profile<br>| gdm               监控进程是否死掉，重启进程</p>
-<p>respawn          监控tty进程是否死掉，如果死掉会重启tty进程    respawn与init进程共同死，共同活<br>chkconfig  service  on/off –level X    将service 启动/关闭 脚本 加入/删除 到/etc/rc.d/rcX.d 目录下<br>加入到rcX.d 目录之后，可以用        service  Sname   start/stop/restart      来控制service</p>
-<h3 id="Linux-一些命令"><a href="#Linux-一些命令" class="headerlink" title="Linux 一些命令"></a>Linux 一些命令</h3><p>shutdown -h now／init 0 ／ halt  -p -f ／ poweroff： 关机<br>users： 显示当前系统登录的用户<br>who： 当前登录在本机的用户及来源<br>w： 当前登录本机的用户及运行的程序<br>write： 给当前联机的用户发消息<br>wall： 给所有登录在本机的用户广播消息<br>last： 查看用户的登录日志<br>lastlog： 查看每个用户最后登录的情况<br>finger： 查看用户信息</p>
-<h3 id="Linux-网络-网络内核参数"><a href="#Linux-网络-网络内核参数" class="headerlink" title="Linux 网络 + 网络内核参数"></a>Linux 网络 + 网络内核参数</h3><p><strong>ping -s 1024  www.baidu.com</strong>          -s 可以指定测试包的大小，用于测试不同包大小的带宽。<br><strong>ab -n 1000 -c 1000  www.baidu.com</strong>         ab为 linux压力测试的命令，模拟1000个端口，进行总共1000次请求          (Apache HTTP server benchmarking tool)<br><strong>traceroute  www.baidu.com</strong>                    查询整个转发路径上的访问结点的掉包率<br><strong>mtr  www.baidu.com</strong>                    查看通路的掉包率</p>
-<p><strong>top</strong><br><strong>vmstat</strong>          (Report virtual memory statistics)<br><strong>netstat</strong>          (Print network connections, routing tables, interface statistics, masquerade connections, and multicast memberships)</p>
-<p><strong>arping</strong>  查询哪个机器网卡ip地址是多少多少</p>
-<p>ESTABLISHED特别多              <strong>CC(Challenge Collapsar)</strong> 攻击, 建立链接攻击<br>ESTABLISHED很少,LISTEN很多     <strong>DDOS</strong> 攻击  sync-flood(泛滥攻击)</p>
+<h3 id="Linux-文件命令"><a href="#Linux-文件命令" class="headerlink" title="Linux 文件命令"></a>Linux 文件命令</h3><p>文本文件的操作命令：</p>
 <ul>
-<li>抓包工具：<br>iptraf<br>tcpdump<br>wireshark</li>
+<li>cat： 查看文件内容</li>
+<li>more： 逐屏查看文件内容</li>
+<li>less： 逐行查看文件内容</li>
+<li>head：显示文件开头部分内容</li>
+<li>tail： 显示文件结尾部分内容</li>
+<li>diff： 报告文件差异</li>
+<li>uniq： 去除文件中的相邻的重复行</li>
+<li>cut： 只显示文件中的某一行                         cut -d: -f1  /etc/passwd</li>
+<li>sort：按序重排文本                                sort  -t:  +2  -n  /etc/passwd</li>
+<li><p>wc： 统计文件的行，词，字数</p>
+</li>
+<li><p>which  ls     :   查找命令,  查找 $PATH 路径中的文件</p>
+</li>
+<li>whereis  ls  :   可以查找命令及相应的man文件, 查找 $PATH 和 $MANPATH 路径</li>
+<li>locate  ls :      查找所有匹配ls字母的文件，  注意!!!  locate 命令从数据库中查找文件，而不是直接查找系统文件，数据库位置为/var/lib/slocate/slocate.db.        当数据库没有更新的时候，可能会查找不到。<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">          yum install mlocate     !!!                   </div><div class="line">          updatedb 更新locate 的数据库                   </div><div class="line">          /etc/cron.daily/mlocate 每天有定时更新数据库的任务</div><div class="line">```          </div><div class="line">- find</div><div class="line">- grep</div><div class="line">```bash</div><div class="line">find  .  -iname  “xxx”  -ok   file  &#123;&#125;  \;        交互执行file命令</div><div class="line">find  .  -iname  “xxx”  -<span class="built_in">exec</span>   file  &#123;&#125;  \;      直接执行file命令</div></pre></td></tr></table></figure>
+</li>
 </ul>
-<p>Linux 内核内核参数：<br>位于 /proc/sys 目录下, 修改内核参数：<br>echo 1 &gt; /proc/sys/net/ipv4/icmp_echo_ignore_all<br>sysctl  -w  net.ipv4.icmp_echo_ignore_all=1<br>sysctl  -p<br>输出内核参数：<br>sysctl  -a  &gt; /tmp/sysctl.output<br>从文件中读入内核参数：<br>sysctl  -f   /tmp/sysctl.output  -p</p>
+<h3 id="Linux-系统服务启动-readhat6-x的init程序-readhat7之后的systemd之后的并非如此"><a href="#Linux-系统服务启动-readhat6-x的init程序-readhat7之后的systemd之后的并非如此" class="headerlink" title="Linux 系统服务启动(readhat6.x的init程序, readhat7之后的systemd之后的并非如此)"></a>Linux 系统服务启动(readhat6.x的init程序, readhat7之后的systemd之后的并非如此)</h3><p>系统服务启动顺序：<br>|-/etc/inittab                    总的配置文件<br>|—–/etc/rc.d/rc.sysinit                    系统初始化文件, 加载许多内容<br>————fsck.ext3   mount  -o  rw.remount   /dev/sda2  /<br>————mount  -a  /etc/fstab<br>|—–/etc/rc.d/rcX.d/*                    X为系统运行级别<br>|———-/etc/rc.d/rcX.d/ServiceXXX1  start               用户定义自启动的service<br>|———-/etc/rc.d/rcX.d/ServiceXXX2  start<br>|—–/etc/rc.d/rc.local          最后访问的文件<br>|<br>|-minigetty   启动   /dev/tty1-6                                   启动tty<br>|———-login    —&gt;  bash     —&gt;  /etc/profile     ~/.bash_profile<br>|-gdm               监控进程是否死掉，重启进程</p>
+<ul>
+<li>respawn          监控tty进程是否死掉，如果死掉会重启tty进程    respawn与init进程共同死，共同活</li>
+<li>chkconfig  service  on/off –level X    将service 启动/关闭 脚本 加入/删除 到/etc/rc.d/rcX.d 目录下</li>
+<li>加入到rcX.d 目录之后，可以用        service  Sname   start/stop/restart      来控制service</li>
+</ul>
+<h3 id="Linux-一些命令"><a href="#Linux-一些命令" class="headerlink" title="Linux 一些命令"></a>Linux 一些命令</h3><p>shutdown -h now／init 0 ／ halt  -p -f ／ poweroff： 关机<br>users： 显示当前系统登录的用户<br>who： 当前登录在本机的用户及来源<br>w： 当前登录本机的用户及运行的程序<br>write： 给当前联机的用户发消息<br>wall： 给所有登录在本机的用户广播消息<br>last： 查看用户的登录日志<br>lastlog： 查看每个用户最后登录的情况<br>finger： 查看用户信息</p>
+<h3 id="Linux-网络"><a href="#Linux-网络" class="headerlink" title="Linux 网络"></a>Linux 网络</h3><p><strong>ping -s 1024  www.baidu.com</strong>          -s 可以指定测试包的大小，用于测试不同包大小的带宽。<br><strong>ab -n 1000 -c 1000  www.baidu.com</strong>         ab为 linux压力测试的命令，模拟1000个端口，进行总共1000次请求          (Apache HTTP server benchmarking tool)<br><strong>traceroute  www.baidu.com</strong>                    查询整个转发路径上的访问结点的掉包率<br><strong>mtr  www.baidu.com</strong>                    查看通路的掉包率<br><strong>arping</strong>  查询哪个机器网卡ip地址是多少</p>
+<p><strong>top</strong><br><strong>vmstat</strong>          (Report virtual memory statistics)<br><strong>netstat</strong>          (Print network connections, routing tables, interface statistics, masquerade connections, and multicast memberships)<br><strong>netstat</strong> 查看tcp连接时, 如果<br>ESTABLISHED特别多              <strong>CC(Challenge Collapsar)</strong> 攻击, 建立链接攻击<br>ESTABLISHED很少,LISTEN很多     <strong>DDOS</strong> 攻击  sync-flood(泛滥攻击)</p>
+<p>抓包工具：</p>
+<ul>
+<li>iptraf</li>
+<li>tcpdump</li>
+<li>wireshark</li>
+</ul>
+<h3 id="Linux-网络内核参数修改"><a href="#Linux-网络内核参数修改" class="headerlink" title="Linux 网络内核参数修改"></a>Linux 网络内核参数修改</h3><p>Linux 内核内核参数：<br>位于 /proc/sys 目录下, 修改内核参数：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">echo</span> 1 &gt; /proc/sys/net/ipv4/icmp_echo_ignore_all</div><div class="line">sysctl  -w  net.ipv4.icmp_echo_ignore_all=1</div><div class="line">sysctl  -p  <span class="variable">$file</span>     load config from file</div></pre></td></tr></table></figure></p>
+<p>输出内核参数：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">sysctl  -a  &gt; /tmp/sysctl.output</div></pre></td></tr></table></figure></p>
+<p>从文件中读入内核参数：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">sysctl  -f   /tmp/sysctl.output  -p</div></pre></td></tr></table></figure></p>
 <h3 id="rpm包管理"><a href="#rpm包管理" class="headerlink" title="rpm包管理"></a>rpm包管理</h3><ul>
 <li><p>解压rpm包</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">rpm2cpio *.rpm | cpio -div</div></pre></td></tr></table></figure>
