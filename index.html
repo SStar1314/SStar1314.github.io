@@ -147,6 +147,165 @@
       <div class="body-wrap">
         
   
+    <article id="post-mesos_installation" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/mesos_installation/">Mesos</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="Mesos-Installation"><a href="#Mesos-Installation" class="headerlink" title="Mesos Installation"></a>Mesos Installation</h2><p>获取Mesos源码或者tar包：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">$ wget http://www.apache.org/dist/mesos/0.28.2/mesos-0.28.2.tar.gz</div><div class="line">$ tar -zxf mesos-0.28.2.tar.gz</div><div class="line">$ git <span class="built_in">clone</span> https://git-wip-us.apache.org/repos/asf/mesos.git</div></pre></td></tr></table></figure></p>
+<p>Mesos 安装（Ubuntu14.04）：</p>
+<h4 id="Update-the-packages"><a href="#Update-the-packages" class="headerlink" title="Update the packages."></a>Update the packages.</h4><p>$ sudo apt-get update</p>
+<h4 id="Install-a-few-utility-tools"><a href="#Install-a-few-utility-tools" class="headerlink" title="Install a few utility tools."></a>Install a few utility tools.</h4><p>$ sudo apt-get install -y tar wget git</p>
+<h4 id="Install-the-latest-OpenJDK"><a href="#Install-the-latest-OpenJDK" class="headerlink" title="Install the latest OpenJDK."></a>Install the latest OpenJDK.</h4><p>$ sudo apt-get install -y openjdk-7-jdk</p>
+<h4 id="Install-autotools-Only-necessary-if-building-from-git-repository"><a href="#Install-autotools-Only-necessary-if-building-from-git-repository" class="headerlink" title="Install autotools (Only necessary if building from git repository)."></a>Install autotools (Only necessary if building from git repository).</h4><p>$ sudo apt-get install -y autoconf libtool</p>
+<h4 id="Install-other-Mesos-dependencies"><a href="#Install-other-Mesos-dependencies" class="headerlink" title="Install other Mesos dependencies."></a>Install other Mesos dependencies.</h4><p>$ sudo apt-get -y install build-essential python-dev libcurl4-nss-dev libsasl2-dev libsasl2-modules maven libapr1-dev libsvn-dev</p>
+<p>Building Mesos(如果下载了tar.gz的Mesos包，此步可以被跳过)：</p>
+<h4 id="Change-working-directory"><a href="#Change-working-directory" class="headerlink" title="Change working directory."></a>Change working directory.</h4><p>$ cd mesos</p>
+<h4 id="Bootstrap-Only-required-if-building-from-git-repository"><a href="#Bootstrap-Only-required-if-building-from-git-repository" class="headerlink" title="Bootstrap (Only required if building from git repository)."></a>Bootstrap (Only required if building from git repository).</h4><p>$ ./bootstrap</p>
+<h4 id="Configure-and-build"><a href="#Configure-and-build" class="headerlink" title="Configure and build."></a>Configure and build.</h4><p>$ mkdir build<br>$ cd build<br>$ ../configure<br>$ make</p>
+<h4 id="Run-test-suite"><a href="#Run-test-suite" class="headerlink" title="Run test suite."></a>Run test suite.</h4><p>$ make check</p>
+<h4 id="Install-Optional"><a href="#Install-Optional" class="headerlink" title="Install (Optional)."></a>Install (Optional).</h4><p>$ make install</p>
+<h3 id="搭建Mesos-Cluster命令："><a href="#搭建Mesos-Cluster命令：" class="headerlink" title="搭建Mesos Cluster命令："></a>搭建Mesos Cluster命令：</h3><h4 id="Change-into-build-directory"><a href="#Change-into-build-directory" class="headerlink" title="Change into build directory."></a>Change into build directory.</h4><p>$ cd build</p>
+<h4 id="Start-mesos-master-Ensure-work-directory-exists-and-has-proper-permissions"><a href="#Start-mesos-master-Ensure-work-directory-exists-and-has-proper-permissions" class="headerlink" title="Start mesos master (Ensure work directory exists and has proper permissions)."></a>Start mesos master (Ensure work directory exists and has proper permissions).</h4><p>$ ./bin/mesos-master.sh —ip=$(ip) –work_dir=/var/lib/mesos</p>
+<h4 id="Start-mesos-agent"><a href="#Start-mesos-agent" class="headerlink" title="Start mesos agent."></a>Start mesos agent.</h4><p>$ ./bin/mesos-agent.sh —master=$(master_ip):5050 –work_dir=/var/lib/mesos</p>
+<h4 id="Visit-the-mesos-web-page"><a href="#Visit-the-mesos-web-page" class="headerlink" title="Visit the mesos web page."></a>Visit the mesos web page.</h4><p>$ <a href="http://$(master_ip):5050" target="_blank" rel="external">http://$(master_ip):5050</a></p>
+<h4 id="Run-C-framework-Exits-after-successfully-running-some-tasks"><a href="#Run-C-framework-Exits-after-successfully-running-some-tasks" class="headerlink" title="Run C++ framework (Exits after successfully running some tasks.)."></a>Run C++ framework (Exits after successfully running some tasks.).</h4><p>$ ./src/test-framework –master=$(master_ip):5050</p>
+<h4 id="Run-Java-framework-Exits-after-successfully-running-some-tasks"><a href="#Run-Java-framework-Exits-after-successfully-running-some-tasks" class="headerlink" title="Run Java framework (Exits after successfully running some tasks.)."></a>Run Java framework (Exits after successfully running some tasks.).</h4><p>$ ./src/examples/java/test-framework $(master_ip):5050</p>
+<h4 id="Run-Python-framework-Exits-after-successfully-running-some-tasks"><a href="#Run-Python-framework-Exits-after-successfully-running-some-tasks" class="headerlink" title="Run Python framework (Exits after successfully running some tasks.)."></a>Run Python framework (Exits after successfully running some tasks.).</h4><p>$ ./src/examples/python/test-framework $(master_ip):5050</p>
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      <a href="/mesos_installation/" class="archive-article-date">
+  	<time datetime="2017-07-22T13:30:47.000Z" itemprop="datePublished"><i class="icon-clock"></i>2017-07-22</time>
+</a>
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags"></i>
+		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Mesos/">Mesos</a></li></ul>
+	</div>
+
+      
+	<div class="article-category tagcloud">
+	<i class="icon-price-tags"></i>
+	<a class="article-category-link" href="/categories/Mesos/">Mesos</a>
+	</div>
+
+
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+
+
+
+
+
+
+
+
+
+  
+    <article id="post-kubernetes_1" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/kubernetes_1/">kubernetes</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="Kubernetes"><a href="#Kubernetes" class="headerlink" title="Kubernetes"></a>Kubernetes</h2><h3 id="Kubernetes组件功能介绍："><a href="#Kubernetes组件功能介绍：" class="headerlink" title="Kubernetes组件功能介绍："></a>Kubernetes组件功能介绍：</h3><ul>
+<li>kube-apiserver：作为kubernetes系统的入口，封装了核心对象的增删改查操作，以RESTFul接口方式提供给外部客户和内部组件调用。它维护的REST对象将持久化到etcd（一个分布式强一致性的key/value存储）。</li>
+<li>kube-scheduler：负责集群的资源调度，为新建的pod分配机器。这部分工作分出来变成一个组件，意味着可以很方便地替换成其他的调度器。</li>
+<li><p>kube-controller-manager：负责执行各种控制器，目前有两类：</p>
+<ul>
+<li>endpoint-controller：定期关联service和pod(关联信息由endpoint对象维护)，保证service到pod的映射总是最新的。</li>
+<li>replication-controller：定期关联replicationController和pod，保证replicationController定义的复制数量与实际运行pod的数量总是一致的。</li>
+</ul>
+</li>
+<li>kube-proxy：负责为pod提供代理。它会定期从etcd获取所有的service，并根据service信息创建代理。当某个客户pod要访问其他pod时，访问请求会经过本机proxy做转发。</li>
+<li>kubelet：负责管控docker容器，如启动/停止、监控运行状态等。它会定期从etcd获取分配到本机的pod，并根据pod信息启动或停止相应的容器。同时，它也会接收apiserver的HTTP请求，汇报pod的运行状态。</li>
+</ul>
+<h3 id="Kubernetes安装过程中注意事项："><a href="#Kubernetes安装过程中注意事项：" class="headerlink" title="Kubernetes安装过程中注意事项："></a>Kubernetes安装过程中注意事项：</h3><p>1.Kubernetes解压之后，进入kubernetes/server目录下，再次解压kubernetes-server-linux-amd64.tar.gz文件，再进入kubernetes/server/kubernetes/server/bin目录下，才能发现kubernetes对应的很多命令。<br>2.命令list：<br>Master：<br>./etcd &gt; /var/log/etcd.log 2&gt;&amp;1 &amp;<br>./kube-apiserver  –insecure-bind-address=9.21.62.27 –insecure-port=8080 –service-cluster-ip-range=172.17.0.0/16 –etcd_servers=<a href="http://127.0.0.1:4001" target="_blank" rel="external">http://127.0.0.1:4001</a> –logtostderr=true –v=0 –log_dir=/home/kubernetes/logs/kube</p>
+<p>./kube-controller-manager –v=0 –logtostderr=false –log_dir=/var/log/kube  –master=9.21.62.27:8080<br>./kube-scheduler  –master=’9.21.62.27:8080’   –v=0    –log_dir=/var/log/kube<br>Slave:<br>./kube-proxy  –logtostderr=false    –v=0     –master=<a href="http://9.21.62.27:8080" target="_blank" rel="external">http://9.21.62.27:8080</a><br>./kubelet  –logtostderr=false –v=0 –allow-privileged=false  –log_dir=/var/log/kube  –address=0.0.0.0  –port=10250 –hostname_override=172.30.13.0  –api_servers=<a href="http://9.21.62.27:8080" target="_blank" rel="external">http://9.21.62.27:8080</a><br>Test: ./kubectl -s <a href="http://9.21.62.27:8080" target="_blank" rel="external">http://9.21.62.27:8080</a> get services</p>
+<p>创建kubernetes Dashboard：./kubectl -s <a href="http://9.21.62.27:8080" target="_blank" rel="external">http://9.21.62.27:8080</a> create -f ../../../../cluster/addons/dashboard/dashboard-service.yaml  –namespace=kube-system<br>访问地址为： <a href="http://9.21.62.27:8080/api/v1/proxy/namespaces/kube-system/services/kubernetes-dashboard/#/dashboard/" target="_blank" rel="external">http://9.21.62.27:8080/api/v1/proxy/namespaces/kube-system/services/kubernetes-dashboard/#/dashboard/</a></p>
+<p>基于influxdb,grafana,heapster创建日志分析性能监控：  ./kubectl -s <a href="http://9.21.62.27:8080" target="_blank" rel="external">http://9.21.62.27:8080</a> create -f ../../../../../kubernetes/cluster/addons/cluster-monitoring/influxdb/</p>
+<p>显示cluster-info信息：<br>./kubectl -s <a href="http://9.21.62.27:8080" target="_blank" rel="external">http://9.21.62.27:8080</a> –namespace=”kube-system”   cluster-info<br>Kubernetes master is running at <a href="http://9.21.62.27:8080" target="_blank" rel="external">http://9.21.62.27:8080</a><br>Heapster is running at <a href="http://9.21.62.27:8080/api/v1/proxy/namespaces/kube-system/services/heapster" target="_blank" rel="external">http://9.21.62.27:8080/api/v1/proxy/namespaces/kube-system/services/heapster</a><br>Grafana is running at <a href="http://9.21.62.27:8080/api/v1/proxy/namespaces/kube-system/services/monitoring-grafana" target="_blank" rel="external">http://9.21.62.27:8080/api/v1/proxy/namespaces/kube-system/services/monitoring-grafana</a><br>InfluxDB is running at <a href="http://9.21.62.27:8080/api/v1/proxy/namespaces/kube-system/services/monitoring-influxdb" target="_blank" rel="external">http://9.21.62.27:8080/api/v1/proxy/namespaces/kube-system/services/monitoring-influxdb</a></p>
+<h2 id="Kubernetes安装："><a href="#Kubernetes安装：" class="headerlink" title="Kubernetes安装："></a>Kubernetes安装：</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">cmd/kube-dns</div><div class="line">cmd/kube-proxy</div><div class="line">cmd/kube-apiserver</div><div class="line">cmd/kube-controller-manager</div><div class="line">cmd/kubelet</div><div class="line">cmd/kubeadm</div><div class="line">cmd/hyperkube</div><div class="line">cmd/kube-discovery</div><div class="line">plugin/cmd/kube-scheduler</div></pre></td></tr></table></figure>
+<h3 id="方式一：-通过Docker在本地来安装Kubernetes-Single-node-Kubernetes-cluster-using-Docker"><a href="#方式一：-通过Docker在本地来安装Kubernetes-Single-node-Kubernetes-cluster-using-Docker" class="headerlink" title="方式一：  通过Docker在本地来安装Kubernetes, Single node Kubernetes cluster using Docker."></a>方式一：  通过Docker在本地来安装Kubernetes, Single node Kubernetes cluster using Docker.</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">export</span> K8S_VERSION=$(curl -sS https://storage.googleapis.com/kubernetes-release/release/stable.txt)</div><div class="line"><span class="built_in">export</span> ARCH=amd64</div><div class="line">docker run -d \</div><div class="line">    --volume=/:/rootfs:ro \</div><div class="line">    --volume=/sys:/sys:rw \</div><div class="line">    --volume=/var/lib/docker/:/var/lib/docker:rw \</div><div class="line">    --volume=/var/lib/kubelet/:/var/lib/kubelet:rw \</div><div class="line">    --volume=/var/run:/var/run:rw \</div><div class="line">    --net=host \</div><div class="line">    --pid=host \</div><div class="line">    --privileged \</div><div class="line">    gcr.io/google_containers/hyperkube-<span class="variable">$&#123;ARCH&#125;</span>:<span class="variable">$&#123;K8S_VERSION&#125;</span> \</div><div class="line">    /hyperkube kubelet \</div><div class="line">        --containerized \</div><div class="line">        --hostname-override=127.0.0.1 \</div><div class="line">        --api-servers=http://localhost:8080 \</div><div class="line">        --config=/etc/kubernetes/manifests \</div><div class="line">        --allow-privileged --v=2</div></pre></td></tr></table></figure>
+<p>安装kubectl：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">curl -sSL <span class="string">"http://storage.googleapis.com/kubernetes-release/release/v1.2.0/bin/linux/amd64/kubectl"</span> &gt; /usr/bin/kubectl</div><div class="line">chmod +x /usr/bin/kubectl</div></pre></td></tr></table></figure></p>
+<p>通过kubectl来配置本地kubernetes cluster：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">kubectl config <span class="built_in">set</span>-cluster <span class="built_in">test</span>-doc --server=http://localhost:8080</div><div class="line">kubectl config <span class="built_in">set</span>-context <span class="built_in">test</span>-doc --cluster=<span class="built_in">test</span>-doc</div><div class="line">kubectl config use-context <span class="built_in">test</span>-doc</div></pre></td></tr></table></figure></p>
+<p>Test本地Cluster：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">kubectl get nodes</div><div class="line">Run an application：</div><div class="line">kubectl run nginx --image=nginx --port=80</div></pre></td></tr></table></figure></p>
+<h3 id="方式二：通过Minikube在本地创建Kubernetes-Cluster"><a href="#方式二：通过Minikube在本地创建Kubernetes-Cluster" class="headerlink" title="方式二：通过Minikube在本地创建Kubernetes Cluster"></a>方式二：通过Minikube在本地创建Kubernetes Cluster</h3><ol>
+<li>机器必须支持虚拟化：<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">cat /proc/cpuinfo | grep <span class="string">'vmx\|svm'</span></div></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>2.需要安装VirtualBox环境：<br>ubuntu14.04:   wget <a href="http://download.virtualbox.org/virtualbox/5.0.22/virtualbox-5.0_5.0.22-108108~Ubuntu~trusty_amd64.deb" target="_blank" rel="external">http://download.virtualbox.org/virtualbox/5.0.22/virtualbox-5.0_5.0.22-108108~Ubuntu~trusty_amd64.deb</a><br>Redhat 7.1: wget <a href="http://download.virtualbox.org/virtualbox/5.0.22/VirtualBox-5.0-5.0.22_108108_el7-1.x86_64.rpm" target="_blank" rel="external">http://download.virtualbox.org/virtualbox/5.0.22/VirtualBox-5.0-5.0.22_108108_el7-1.x86_64.rpm</a><br>3.本地利用virtualbox搭建Kubernetes Cluster：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">minikube start</div><div class="line">kubectl get pods --all-namespaces</div><div class="line">minikube dashboard</div></pre></td></tr></table></figure></p>
+<p>4.Test 搭建的环境：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">kubectl get nodes</div></pre></td></tr></table></figure></p>
+<h3 id="方式三：Installation-Kubernetes-Locally-with-No-VM："><a href="#方式三：Installation-Kubernetes-Locally-with-No-VM：" class="headerlink" title="方式三：Installation Kubernetes Locally with No VM："></a>方式三：Installation Kubernetes Locally with No VM：</h3><p>Requirements:<br>Docker 1.8.3+ : <a href="https://docs.docker.com/engine/installation/#installation" target="_blank" rel="external">https://docs.docker.com/engine/installation/#installation</a><br>etcd : <a href="https://github.com/coreos/etcd/releases" target="_blank" rel="external">https://github.com/coreos/etcd/releases</a><br>go : <a href="https://golang.org/doc/install" target="_blank" rel="external">https://golang.org/doc/install</a></p>
+<p>etcd安装与Test：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">curl -L  https://github.com/coreos/etcd/releases/download/v2.3.7/etcd-v2.3.7-linux-amd64.tar.gz -o etcd-v2.3.7-linux-amd64.tar.gz</div><div class="line">tar xzvf etcd-v2.3.7-linux-amd64.tar.gz</div><div class="line"><span class="built_in">cd</span> etcd-v2.3.7-linux-amd64</div><div class="line">./etcd</div></pre></td></tr></table></figure></p>
+<p>Open another terminal:<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">./etcdctl <span class="built_in">set</span> mykey <span class="string">"this is awesome"</span></div><div class="line">./etcdctl get mykey</div><div class="line"></div><div class="line">docker run --name etcd quay.io/coreos/etcd:v2.3.7</div><div class="line">docker <span class="built_in">exec</span> etcd /etcdctl <span class="built_in">set</span> foo bar</div><div class="line"></div><div class="line">rkt run --volume data-dir,kind=host,<span class="built_in">source</span>=/tmp --mds-register=<span class="literal">false</span> coreos.com/etcd:v2.3.7</div></pre></td></tr></table></figure></p>
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      <a href="/kubernetes_1/" class="archive-article-date">
+  	<time datetime="2017-07-22T09:27:18.000Z" itemprop="datePublished"><i class="icon-clock"></i>2017-07-22</time>
+</a>
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags"></i>
+		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/kubernetes/">kubernetes</a></li></ul>
+	</div>
+
+      
+	<div class="article-category tagcloud">
+	<i class="icon-price-tags"></i>
+	<a class="article-category-link" href="/categories/容器技术/">容器技术</a>
+	</div>
+
+
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+
+
+
+
+
+
+
+
+
+  
     <article id="post-docker_1" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -165,7 +324,22 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h3 id="Docker"><a href="#Docker" class="headerlink" title="Docker"></a>Docker</h3>
+        <h2 id="Docker"><a href="#Docker" class="headerlink" title="Docker"></a>Docker</h2><h3 id="Docker-内核特性"><a href="#Docker-内核特性" class="headerlink" title="Docker 内核特性"></a>Docker 内核特性</h3><p>容器 ＝ Cgroup ＋ Namespace ＋ rootfs ＋ 容器引擎</p>
+<p><strong>Docker 内核特性：</strong></p>
+<ol>
+<li>Namespace：访问隔离。</li>
+<li>Cgroup：资源控制。</li>
+<li>rootfs：文件系统隔离。</li>
+<li>容器引擎：生命周期控制。</li>
+</ol>
+<h4 id="Cgroup-实现子系统："><a href="#Cgroup-实现子系统：" class="headerlink" title="Cgroup 实现子系统："></a>Cgroup 实现子系统：</h4><p>1.devices：设备权限控制。<br>2.cpuset：分配制定的CPU和内存节点。<br>3.cpu：控制CPU占用率。<br>4.cpuacct：统计CPU使用情况。<br>5.memory：限制内存的使用上限。<br>6.freezer：冻结（暂停）Cgroup中的进程。<br>7.net_cls：配合tc（traffic controller）限制网络带宽。<br>8.net_prio：设置进程的网络流量优先级。<br>9.huge_tlb：限制HugeTLB的使用。<br>10.perf_event：运行Perf工具基于Cgroup分组做性能检测。</p>
+<h4 id="Linux内核中的6种Namespace："><a href="#Linux内核中的6种Namespace：" class="headerlink" title="Linux内核中的6种Namespace："></a>Linux内核中的6种Namespace：</h4><p>1.IPC：隔离System V IPC和POSIX消息队列。<br>2.Network：隔离网络资源。<br>3.Mount：隔离文件系统挂载点。<br>4.PID：隔离进程ID。<br>5.UTS：隔离主机名和域名。<br>6.User：隔离用户ID和组ID。</p>
+<h3 id="Docker-镜像命令"><a href="#Docker-镜像命令" class="headerlink" title="Docker 镜像命令"></a>Docker 镜像命令</h3><p>Docker镜像：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">docker images</div><div class="line">docker images --<span class="built_in">help</span>, docker images --filter</div><div class="line">docker search image-name</div><div class="line">dockviz images -t    需要先调用：<span class="built_in">alias</span> dockviz=<span class="string">"docker run --rm -v /var/run/docker.sock:/var/run/docker.sock nate/dockviz"</span></div><div class="line">docker pull image-name     下载镜像</div><div class="line">docker save -o image-name.tar image-name   导出镜像</div><div class="line">docker load -i image-name.tar      导入镜像</div><div class="line">docker inspect image-name          查看容器和镜像详细信息</div><div class="line">docker commit           增量式的生产镜像</div><div class="line">docker <span class="built_in">history</span> image-name           查看image layer纪录</div><div class="line">docker push           上传镜像   （docker push localhost:5000/official/ubuntu:14.04）</div></pre></td></tr></table></figure></p>
+<p>从image repositories中查看所有images信息： cat /var/lib/docker/image/aufs/repositories.json  | python -m json.tool<br>启动Docker daemon，测试image layer之间的关系：docker daemon -D -s overlay -g /var/lib/docker/</p>
+<h3 id="部署docker私有仓库："><a href="#部署docker私有仓库：" class="headerlink" title="部署docker私有仓库："></a>部署docker私有仓库：</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">docker run -d --hostname localhost --name registry-v2 -v /opt/data/distribution:/var/lib/registry/docker/registry/v2 -p 5000:5000 registry:2.0</div></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div></pre></td><td class="code"><pre><div class="line">向私有仓库push image：</div><div class="line">docker tag [OPTIONS] IMAGE[:TAG] [REGISTRYHOST/][USERNAME/]NAME[:TAG]</div><div class="line">docker push NAME[:TAG]</div><div class="line">docker tag 8dbd9e392a96 localhost.localdomain:5000/ubuntu</div><div class="line">docker push localhost.localdomain:5000/ubuntu</div><div class="line">docker pull localhost:5000/ubuntu</div><div class="line">docker stop registry &amp;&amp; docker rm -v registry</div><div class="line">验证私有仓库：curl -X GET http://localhost:5000/v2/</div><div class="line">查找镜像： curl -X GET http://localhost:5000/v2/foo/bar/tags/list  </div><div class="line">     例如：  curl -X GET http://localhost:5000/v2/busybox/tags/list</div><div class="line">            &#123;<span class="string">"name"</span>:<span class="string">"busybox"</span>,<span class="string">"tags"</span>:[<span class="string">"latest"</span>]&#125;</div><div class="line">     通过tags查找manifest： curl -X GET http://localhost:5000/v2/busybox/manifests/latest</div><div class="line">创建带Auth的私有仓库：</div><div class="line">docker run -d -p 5000:5000 --restart=always --name registry</div><div class="line">     \ -v `<span class="built_in">pwd</span>`/auth:/auth</div><div class="line">     \-e<span class="string">"REGISTRY_AUTH=htpasswd"</span></div><div class="line">     \-e<span class="string">"REGISTRY_AUTH_HTPASSWD_REALM=Registry Realm"</span></div><div class="line">     \-eREGISTRY_AUTH_HTPASSWD_PATH=/auth/htpasswd</div><div class="line">     \ -v `<span class="built_in">pwd</span>`/certs:/certs</div><div class="line">     \-eREGISTRY_HTTP_TLS_CERTIFICATE=/certs/domain.crt</div><div class="line">     \-eREGISTRY_HTTP_TLS_KEY=/certs/domain.key</div><div class="line">     \ registry:2</div><div class="line">登录registry：docker login myregistrydomain.com:5000</div><div class="line">registry yml文件内容：</div><div class="line">registry:</div><div class="line">     restart:always</div><div class="line">     image:registry:2</div><div class="line">     ports:</div><div class="line">          -5000:5000</div><div class="line">     environment:</div><div class="line">          REGISTRY_HTTP_TLS_CERTIFICATE:/certs/domain.crt</div><div class="line">          REGISTRY_HTTP_TLS_KEY:/certs/domain.key</div><div class="line">          REGISTRY_AUTH:htpasswd</div><div class="line">          REGISTRY_AUTH_HTPASSWD_PATH:/auth/htpasswd</div><div class="line">          REGISTRY_AUTH_HTPASSWD_REALM:Registry Realm</div><div class="line">     volumes:</div><div class="line">          -/path/data:/var/lib/registry</div><div class="line">          -/path/certs:/certs</div><div class="line">          -/path/auth:/auth</div><div class="line">docker-compose up -d</div></pre></td></tr></table></figure>
+<h3 id="Build-my-own-Docker-image"><a href="#Build-my-own-Docker-image" class="headerlink" title="Build my own Docker image:"></a>Build my own Docker image:</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">1.Write a Dockerfile:</div><div class="line">FROM docker/whalesay:latest</div><div class="line">RUN apt-get -y update &amp;&amp; apt-get install -y fortunes</div><div class="line">CMD /usr/games/fortune -a | cowsay</div><div class="line">2.Build an image from my Dockerfile:</div><div class="line">docker build -t docker-whale .</div><div class="line">3.Run new docker-whale:</div><div class="line">docker images</div><div class="line">docker run docker-whale</div></pre></td></tr></table></figure>
+
       
     </div>
     <div class="article-info article-info-index">
@@ -1460,50 +1634,6 @@ memset(dev-&gt;broadcast,0xFF, ETH_ALEN);
 
 
   
-    <article id="post-tags" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <input type="hidden" class="isFancy" />
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/tags/">标签</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h4 id="Cassandra"><a href="#Cassandra" class="headerlink" title="Cassandra"></a><a href="https://sstar1314.github.io/tags/Cassandra/" target="_blank" rel="external">Cassandra</a></h4><h4 id="Hadoop"><a href="#Hadoop" class="headerlink" title="Hadoop"></a><a href="https://sstar1314.github.io/tags/Hadoop/" target="_blank" rel="external">Hadoop</a></h4><h4 id="Kafka"><a href="#Kafka" class="headerlink" title="Kafka"></a><a href="https://sstar1314.github.io/tags/Kafka/" target="_blank" rel="external">Kafka</a></h4><h4 id="NoSQL"><a href="#NoSQL" class="headerlink" title="NoSQL"></a><a href="https://sstar1314.github.io/tags/NoSQL/" target="_blank" rel="external">NoSQL</a></h4><h4 id="Spark"><a href="#Spark" class="headerlink" title="Spark"></a><a href="https://sstar1314.github.io/tags/Spark/" target="_blank" rel="external">Spark</a></h4><h4 id="ZooKeeper"><a href="#ZooKeeper" class="headerlink" title="ZooKeeper"></a><a href="https://sstar1314.github.io/tags/ZooKeeper/" target="_blank" rel="external">ZooKeeper</a></h4><h4 id="etcd"><a href="#etcd" class="headerlink" title="etcd"></a><a href="https://sstar1314.github.io/tags/etcd/" target="_blank" rel="external">etcd</a></h4>
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      <a href="/tags/" class="archive-article-date">
-  	<time datetime="2017-07-19T09:45:04.000Z" itemprop="datePublished"><i class="icon-clock"></i>2017-07-19</time>
-</a>
-      
-      
-
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-
-
-
-
-
-
-
-
-
-  
     <article id="post-categories" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -1528,6 +1658,50 @@ memset(dev-&gt;broadcast,0xFF, ETH_ALEN);
     <div class="article-info article-info-index">
       
       <a href="/categories/" class="archive-article-date">
+  	<time datetime="2017-07-19T09:45:04.000Z" itemprop="datePublished"><i class="icon-clock"></i>2017-07-19</time>
+</a>
+      
+      
+
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+
+
+
+
+
+
+
+
+
+  
+    <article id="post-tags" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/tags/">标签</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h4 id="Cassandra"><a href="#Cassandra" class="headerlink" title="Cassandra"></a><a href="https://sstar1314.github.io/tags/Cassandra/" target="_blank" rel="external">Cassandra</a></h4><h4 id="Hadoop"><a href="#Hadoop" class="headerlink" title="Hadoop"></a><a href="https://sstar1314.github.io/tags/Hadoop/" target="_blank" rel="external">Hadoop</a></h4><h4 id="Kafka"><a href="#Kafka" class="headerlink" title="Kafka"></a><a href="https://sstar1314.github.io/tags/Kafka/" target="_blank" rel="external">Kafka</a></h4><h4 id="NoSQL"><a href="#NoSQL" class="headerlink" title="NoSQL"></a><a href="https://sstar1314.github.io/tags/NoSQL/" target="_blank" rel="external">NoSQL</a></h4><h4 id="Spark"><a href="#Spark" class="headerlink" title="Spark"></a><a href="https://sstar1314.github.io/tags/Spark/" target="_blank" rel="external">Spark</a></h4><h4 id="ZooKeeper"><a href="#ZooKeeper" class="headerlink" title="ZooKeeper"></a><a href="https://sstar1314.github.io/tags/ZooKeeper/" target="_blank" rel="external">ZooKeeper</a></h4><h4 id="etcd"><a href="#etcd" class="headerlink" title="etcd"></a><a href="https://sstar1314.github.io/tags/etcd/" target="_blank" rel="external">etcd</a></h4>
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      <a href="/tags/" class="archive-article-date">
   	<time datetime="2017-07-19T09:45:04.000Z" itemprop="datePublished"><i class="icon-clock"></i>2017-07-19</time>
 </a>
       
@@ -3879,207 +4053,6 @@ PrintObjectSpecificMessage func(obj runtime.Object, out io.Writer)
 
 
   
-    <article id="post-Storm介绍" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <input type="hidden" class="isFancy" />
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/Storm介绍/">Storm(流计算)介绍</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h2 id="Storm-简介"><a href="#Storm-简介" class="headerlink" title="Storm 简介"></a>Storm 简介</h2><p>参考： <a href="http://storm.apache.org/releases/0.10.2/index.html" target="_blank" rel="external">http://storm.apache.org/releases/0.10.2/index.html</a><br>Storm是一个分布式计算框架，主要由Clojure编程语言编写。最初是由Nathan Marz[1]及其团队创建于BackType，[2]该项目在被Twitter取得后开源。[3]它使用用户创建的“管（spouts）”和“螺栓（bolts）”来定义信息源和操作来允许批量、分布式处理流式数据。</p>
-<h3 id="Storm-源代码导入-Eclipse"><a href="#Storm-源代码导入-Eclipse" class="headerlink" title="Storm 源代码导入 Eclipse"></a>Storm 源代码导入 Eclipse</h3><p>下载源代码并导入Eclipse： （可参考网页：<a href="http://ylzhj02.iteye.com/blog/2162197）" target="_blank" rel="external">http://ylzhj02.iteye.com/blog/2162197）</a></p>
-<ul>
-<li>1.git clone git://github.com/apache/storm.git</li>
-<li>2.mvn clean package install -DskipTests=true</li>
-<li>3.mvn eclipse:eclipse</li>
-</ul>
-<h3 id="Storm-Topology-架构"><a href="#Storm-Topology-架构" class="headerlink" title="Storm Topology 架构"></a>Storm Topology 架构</h3><p><img src="/images/Storm_Topology.png" alt=""></p>
-<ul>
-<li>Topology：storm中运行的一个实时应用程序，因为各个组件间的消息流动形成逻辑上的一个拓扑结构。</li>
-<li>Spout：在一个topology中产生源数据流的组件。通常情况下spout会从外部数据源中读取数据，然后转换为topology内部的源数据。Spout是一个主动的角色，其接口中有个nextTuple()函数，storm框架会不停地调用此函数，用户只要在其中生成源数据即可。</li>
-<li>Bolt：在一个topology中接受数据然后执行处理的组件。Bolt可以执行过滤、函数操作、合并、写数据库等任何操作。Bolt是一个被动的角色，其接口中有个execute(Tuple input)函数,在接受到消息后会调用此函数，用户可以在其中执行自己想要的操作。</li>
-<li>Tuple：一次消息传递的基本单元。本来应该是一个key-value的map，但是由于各个组件间传递的tuple的字段名称已经事先定义好，所以tuple中只要按序填入各个value就行了，所以就是一个value list.</li>
-<li>Stream：源源不断传递的tuple就组成了stream。</li>
-</ul>
-<h3 id="Storm-Detail"><a href="#Storm-Detail" class="headerlink" title="Storm Detail"></a>Storm Detail</h3><p>在Storm的集群里面有两种节点： 控制节点(master node)和工作节点(worker node)。控制节点上面运行一个叫Nimbus后台程序，它的作用类似Hadoop里面的JobTracker。Nimbus负责在集群里面分发代码，分配计算任务给机器，并且监控状态。<br>每一个工作节点上面运行一个叫做Supervisor的节点。Supervisor会监听分配给它那台机器的工作，根据需要启动/关闭工作进程。每一个工作进程执行一个topology的一个子集；一个运行的topology由运行在很多机器上的很多工作进程组成。<br><img src="/images/Storm1.png" alt="">  <img src="/images/Storm2.jpg" alt="">  <img src="/images/Storm3.png" alt=""></p>
-<ul>
-<li>Storm提供的最基本的处理stream的原语是spout和bolt。你可以实现spout和bolt提供的接口来处理你的业务逻辑。</li>
-<li>消息源spout是Storm里面一个topology里面的消息生产者。一般来说消息源会从一个外部源读取数据并且向topology里面发出消息：tuple。Spout可以是可靠的也可以是不可靠的。如果这个tuple没有被storm成功处理，可靠的消息源spouts可以重新发射一个tuple， 但是不可靠的消息源spouts一旦发出一个tuple就不能重发了。</li>
-<li>消息源可以发射多条消息流stream。使用OutputFieldsDeclarer.declareStream来定义多个stream，然后使用SpoutOutputCollector来发射指定的stream。</li>
-<li>Spout类里面最重要的方法是nextTuple。要么发射一个新的tuple到topology里面或者简单的返回如果已经没有新的tuple。要注意的是nextTuple方法不能阻塞，因为storm在同一个线程上面调用所有消息源spout的方法。</li>
-<li>另外两个比较重要的spout方法是ack和fail。storm在检测到一个tuple被整个topology成功处理的时候调用ack，否则调用fail。storm只对可靠的spout调用ack和fail。</li>
-<li>所有的消息处理逻辑被封装在bolts里面。Bolts可以做很多事情：过滤，聚合，查询数据库等等。</li>
-<li>Bolts可以简单的做消息流的传递。复杂的消息流处理往往需要很多步骤，从而也就需要经过很多bolts。比如算出一堆图片里面被转发最多的图片就至少需要两步：第一步算出每个图片的转发数量。第二步找出转发最多的前10个图片。(如果要把这个过程做得更具有扩展性那么可能需要更多的步骤)。</li>
-<li>Bolts可以发射多条消息流， 使用OutputFieldsDeclarer.declareStream定义stream，使用OutputCollector.emit来选择要发射的stream。</li>
-<li>Bolts的主要方法是execute, 它以一个tuple作为输入，bolts使用OutputCollector来发射tuple，bolts必须要为它处理的每一个tuple调用OutputCollector的ack方法，以通知Storm这个tuple被处理完成了，从而通知这个tuple的发射者spouts。 一般的流程是： bolts处理一个输入tuple, 发射0个或者多个tuple, 然后调用ack通知storm自己已经处理过这个tuple了。storm提供了一个IBasicBolt会自动调用ack。</li>
-<li>定义一个topology的其中一步是定义每个bolt接收什么样的流作为输入。stream grouping就是用来定义一个stream应该如果分配数据给bolts上面的多个tasks。</li>
-</ul>
-<h3 id="Storm里面有7种类型的stream-grouping"><a href="#Storm里面有7种类型的stream-grouping" class="headerlink" title="Storm里面有7种类型的stream grouping"></a>Storm里面有7种类型的stream grouping</h3><ul>
-<li>　　Shuffle Grouping: 随机分组， 随机派发stream里面的tuple，保证每个bolt接收到的tuple数目大致相同。</li>
-<li>　　Fields Grouping：按字段分组， 比如按userid来分组， 具有同样userid的tuple会被分到相同的Bolts里的一个task， 而不同的userid则会被分配到不同的bolts里的task。</li>
-<li>　　All Grouping：广播发送，对于每一个tuple，所有的bolts都会收到。</li>
-<li>　　Global Grouping：全局分组， 这个tuple被分配到storm中的一个bolt的其中一个task。再具体一点就是分配给id值最低的那个task。</li>
-<li>　　Non Grouping：不分组，这个分组的意思是说stream不关心到底谁会收到它的tuple。目前这种分组和Shuffle grouping是一样的效果， 有一点不同的是storm会把这个bolt放到这个bolt的订阅者同一个线程里面去执行。</li>
-<li>　　Direct Grouping： 直接分组， 这是一种比较特别的分组方法，用这种分组意味着消息的发送者指定由消息接收者的哪个task处理这个消息。 只有被声明为Direct Stream的消息流可以声明这种分组方法。而且这种消息tuple必须使用emitDirect方法来发射。消息处理者可以通过TopologyContext来获取处理它的消息的task的id (OutputCollector.emit方法也会返回task的id)。</li>
-<li>　　Local or shuffle grouping：如果目标bolt有一个或者多个task在同一个工作进程中，tuple将会被随机发生给这些tasks。否则，和普通的Shuffle Grouping行为一致。</li>
-</ul>
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      <a href="/Storm介绍/" class="archive-article-date">
-  	<time datetime="2016-11-08T12:27:38.000Z" itemprop="datePublished"><i class="icon-clock"></i>2016-11-08</time>
-</a>
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags"></i>
-		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/大数据/">大数据</a></li></ul>
-	</div>
-
-      
-	<div class="article-category tagcloud">
-	<i class="icon-price-tags"></i>
-	<a class="article-category-link" href="/categories/bigdata/">bigdata</a>
-	</div>
-
-
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-
-
-
-
-
-
-
-
-
-  
-    <article id="post-Hive" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <input type="hidden" class="isFancy" />
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/Hive/">Hive(数据仓库)</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h2 id="Hive-简介"><a href="#Hive-简介" class="headerlink" title="Hive 简介"></a>Hive 简介</h2><p>参考： <a href="https://cwiki.apache.org/confluence/display/Hive/Home" target="_blank" rel="external">https://cwiki.apache.org/confluence/display/Hive/Home</a><br>Apache Hive是一个建立在Hadoop架构之上的数据仓库。它能够提供数据的精炼，查询和分析。Apache Hive起初由Facebook开发。</p>
-<p>hive是基于Hadoop的一个数据仓库工具，可以将结构化的数据文件映射为一张数据库表，并提供简单的SQL查询功能，可以将SQL语句转换为MapReduce任务进行运行。其优点是学习成本低，可以通过类SQL语句快速实现简单的MapReduce统计，不必开发专门的MapReduce应用，十分适合数据仓库的统计分析。</p>
-<ul>
-<li>1.hive是一个数据仓库</li>
-<li>2.hive基于hadoop。</li>
-</ul>
-<h3 id="Hive-安装"><a href="#Hive-安装" class="headerlink" title="Hive 安装"></a>Hive 安装</h3><p>参考： <a href="http://doctuts.readthedocs.io/en/latest/hive.html" target="_blank" rel="external">http://doctuts.readthedocs.io/en/latest/hive.html</a></p>
-<ul>
-<li><p>1.安装hadoop</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">export HADOOP_HOME=/root/hadoop-2.7.3</div><div class="line">export HIVE_HOME=/root/apache-hive-2.1.0-bin</div><div class="line">export PATH=$PATH:$HIVE_HOME/bin</div></pre></td></tr></table></figure>
-</li>
-<li><p>2.启动hadoop hdfs文件系统</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">bin/hdfs   namenode   -format</div><div class="line">sbin/start-all.sh    或者   start-dfs.sh and start-yarn.sh</div></pre></td></tr></table></figure>
-</li>
-<li><p>3.创建文件夹</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">bin/hadoop fs -mkdir /usr/hive/warehouse</div><div class="line">bin/hadoop fs -chmod g+w /usr/hive/warehouse</div></pre></td></tr></table></figure>
-</li>
-<li><p>4.第一次运行hive之前，需要设置schema</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">schematool -initSchema -dbType derby</div></pre></td></tr></table></figure>
-</li>
-</ul>
-<p>如果已经尝试运行hive出错之后，再去设置schema也会出错，需要做：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">mv  metastore_db  metastore_db.tmp</div></pre></td></tr></table></figure></p>
-<ul>
-<li>5.运行hive<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">hive</div></pre></td></tr></table></figure>
-</li>
-</ul>
-<h3 id="Hive-启动源代码入口："><a href="#Hive-启动源代码入口：" class="headerlink" title="Hive 启动源代码入口："></a>Hive 启动源代码入口：</h3><p>bin/hive  —&gt;  hive script中会执行  bin/ext/*.sh, 以及 bin/ext/util/*.sh 命令<br>SERVICE_LIST 变量 在bin/ext/*.sh 中增加value；<br>SERVICE 变量在启动命令时 赋值； 默认   SERVICE=”cli”</p>
-<p><img src="/images/Hive_Code_1.png" alt=""> <img src="/images/Hive_Code_2.png" alt=""></p>
-<p>—&gt;   execHiveCmd 启动 java 源代码的入口               org.apache.hive.beeline.cli.HiveCli   或者   org.apache.hadoop.hive.cli.CliDriver</p>
-<h3 id="Hive-vs-HBase"><a href="#Hive-vs-HBase" class="headerlink" title="Hive vs HBase"></a>Hive vs HBase</h3><p>共同点：</p>
-<ul>
-<li>1.hbase与hive都是架构在hadoop之上的。都是用hadoop作为底层存储</li>
-</ul>
-<p>区别：</p>
-<ul>
-<li>1.Hive是建立在Hadoop之上为了减少MapReduce jobs编写工作的批处理系统，HBase是为了支持弥补Hadoop对实时操作的缺陷的项目 。</li>
-<li>2.想象你在操作RMDB数据库，如果是全表扫描，就用Hive+Hadoop,如果是索引访问，就用HBase+Hadoop 。</li>
-<li>3.Hive query就是MapReduce jobs可以从5分钟到数小时不止，HBase是非常高效的，肯定比Hive高效的多。</li>
-<li>4.Hive本身不存储和计算数据，它完全依赖于HDFS和MapReduce，Hive中的表纯逻辑。</li>
-<li>5.hive借用hadoop的MapReduce来完成一些hive中的命令的执行</li>
-<li>6.hbase是物理表，不是逻辑表，提供一个超大的内存hash表，搜索引擎通过它来存储索引，方便查询操作。</li>
-<li>7.hbase是列存储。</li>
-<li>8.hdfs作为底层存储，hdfs是存放文件的系统，而Hbase负责组织文件。</li>
-<li>9.hive需要用到hdfs存储文件，需要用到MapReduce计算框架。</li>
-</ul>
-<h3 id="improt-Hive源代码到Eclipse里面："><a href="#improt-Hive源代码到Eclipse里面：" class="headerlink" title="improt Hive源代码到Eclipse里面："></a>improt Hive源代码到Eclipse里面：</h3><ul>
-<li><ol>
-<li>mvn clean install -DskipTests</li>
-</ol>
-</li>
-<li><ol>
-<li>mvn eclipse:eclipse -DdownloadSources -DdownloadJavadocs</li>
-</ol>
-</li>
-</ul>
-<h3 id="Hive-知识范围"><a href="#Hive-知识范围" class="headerlink" title="Hive 知识范围"></a>Hive 知识范围</h3><p><img src="/images/Hive_Related.png" alt=""></p>
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      <a href="/Hive/" class="archive-article-date">
-  	<time datetime="2016-11-08T09:51:43.000Z" itemprop="datePublished"><i class="icon-clock"></i>2016-11-08</time>
-</a>
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags"></i>
-		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/大数据/">大数据</a></li></ul>
-	</div>
-
-      
-	<div class="article-category tagcloud">
-	<i class="icon-price-tags"></i>
-	<a class="article-category-link" href="/categories/bigdata/">bigdata</a>
-	</div>
-
-
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-
-
-
-
-
-
-
-
-
-  
   
     <nav id="page-nav">
       <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="extend next" rel="next" href="/page/2/">Next &raquo;</a>
@@ -4161,7 +4134,7 @@ MathJax.Hub.Queue(function() {
     
     	<section class="tools-section tools-section-tag">
     			<div class="widget tagcloud" id="js-tagcloud">
-    				<a href="/tags/Cassandra/" style="font-size: 10px;">Cassandra</a> <a href="/tags/Docker/" style="font-size: 10px;">Docker</a> <a href="/tags/Hadoop/" style="font-size: 20px;">Hadoop</a> <a href="/tags/JVM/" style="font-size: 10px;">JVM</a> <a href="/tags/Kafka/" style="font-size: 12.5px;">Kafka</a> <a href="/tags/Libvirt/" style="font-size: 10px;">Libvirt</a> <a href="/tags/Linux/" style="font-size: 12.5px;">Linux</a> <a href="/tags/Linux-Networking-Internals/" style="font-size: 15px;">Linux Networking Internals</a> <a href="/tags/Linux-Source-Code/" style="font-size: 10px;">Linux Source Code</a> <a href="/tags/Linux-Special-File-System/" style="font-size: 10px;">Linux Special File System</a> <a href="/tags/Maven/" style="font-size: 10px;">Maven</a> <a href="/tags/NoSQL/" style="font-size: 10px;">NoSQL</a> <a href="/tags/QEMU/" style="font-size: 10px;">QEMU</a> <a href="/tags/Spark/" style="font-size: 15px;">Spark</a> <a href="/tags/ZooKeeper/" style="font-size: 12.5px;">ZooKeeper</a> <a href="/tags/etcd/" style="font-size: 10px;">etcd</a> <a href="/tags/lxc/" style="font-size: 10px;">lxc</a> <a href="/tags/lxcfs/" style="font-size: 10px;">lxcfs</a> <a href="/tags/介绍/" style="font-size: 10px;">介绍</a> <a href="/tags/分布式协同/" style="font-size: 10px;">分布式协同</a> <a href="/tags/大数据/" style="font-size: 17.5px;">大数据</a>
+    				<a href="/tags/Cassandra/" style="font-size: 10px;">Cassandra</a> <a href="/tags/Docker/" style="font-size: 10px;">Docker</a> <a href="/tags/Hadoop/" style="font-size: 20px;">Hadoop</a> <a href="/tags/JVM/" style="font-size: 10px;">JVM</a> <a href="/tags/Kafka/" style="font-size: 12.5px;">Kafka</a> <a href="/tags/Libvirt/" style="font-size: 10px;">Libvirt</a> <a href="/tags/Linux/" style="font-size: 12.5px;">Linux</a> <a href="/tags/Linux-Networking-Internals/" style="font-size: 15px;">Linux Networking Internals</a> <a href="/tags/Linux-Source-Code/" style="font-size: 10px;">Linux Source Code</a> <a href="/tags/Linux-Special-File-System/" style="font-size: 10px;">Linux Special File System</a> <a href="/tags/Maven/" style="font-size: 10px;">Maven</a> <a href="/tags/Mesos/" style="font-size: 10px;">Mesos</a> <a href="/tags/NoSQL/" style="font-size: 10px;">NoSQL</a> <a href="/tags/QEMU/" style="font-size: 10px;">QEMU</a> <a href="/tags/Spark/" style="font-size: 15px;">Spark</a> <a href="/tags/ZooKeeper/" style="font-size: 12.5px;">ZooKeeper</a> <a href="/tags/etcd/" style="font-size: 10px;">etcd</a> <a href="/tags/kubernetes/" style="font-size: 10px;">kubernetes</a> <a href="/tags/lxc/" style="font-size: 10px;">lxc</a> <a href="/tags/lxcfs/" style="font-size: 10px;">lxcfs</a> <a href="/tags/介绍/" style="font-size: 10px;">介绍</a> <a href="/tags/分布式协同/" style="font-size: 10px;">分布式协同</a> <a href="/tags/大数据/" style="font-size: 17.5px;">大数据</a>
     			</div>
     	</section>
     

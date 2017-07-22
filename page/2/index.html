@@ -147,6 +147,207 @@
       <div class="body-wrap">
         
   
+    <article id="post-Storm介绍" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/Storm介绍/">Storm(流计算)介绍</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="Storm-简介"><a href="#Storm-简介" class="headerlink" title="Storm 简介"></a>Storm 简介</h2><p>参考： <a href="http://storm.apache.org/releases/0.10.2/index.html" target="_blank" rel="external">http://storm.apache.org/releases/0.10.2/index.html</a><br>Storm是一个分布式计算框架，主要由Clojure编程语言编写。最初是由Nathan Marz[1]及其团队创建于BackType，[2]该项目在被Twitter取得后开源。[3]它使用用户创建的“管（spouts）”和“螺栓（bolts）”来定义信息源和操作来允许批量、分布式处理流式数据。</p>
+<h3 id="Storm-源代码导入-Eclipse"><a href="#Storm-源代码导入-Eclipse" class="headerlink" title="Storm 源代码导入 Eclipse"></a>Storm 源代码导入 Eclipse</h3><p>下载源代码并导入Eclipse： （可参考网页：<a href="http://ylzhj02.iteye.com/blog/2162197）" target="_blank" rel="external">http://ylzhj02.iteye.com/blog/2162197）</a></p>
+<ul>
+<li>1.git clone git://github.com/apache/storm.git</li>
+<li>2.mvn clean package install -DskipTests=true</li>
+<li>3.mvn eclipse:eclipse</li>
+</ul>
+<h3 id="Storm-Topology-架构"><a href="#Storm-Topology-架构" class="headerlink" title="Storm Topology 架构"></a>Storm Topology 架构</h3><p><img src="/images/Storm_Topology.png" alt=""></p>
+<ul>
+<li>Topology：storm中运行的一个实时应用程序，因为各个组件间的消息流动形成逻辑上的一个拓扑结构。</li>
+<li>Spout：在一个topology中产生源数据流的组件。通常情况下spout会从外部数据源中读取数据，然后转换为topology内部的源数据。Spout是一个主动的角色，其接口中有个nextTuple()函数，storm框架会不停地调用此函数，用户只要在其中生成源数据即可。</li>
+<li>Bolt：在一个topology中接受数据然后执行处理的组件。Bolt可以执行过滤、函数操作、合并、写数据库等任何操作。Bolt是一个被动的角色，其接口中有个execute(Tuple input)函数,在接受到消息后会调用此函数，用户可以在其中执行自己想要的操作。</li>
+<li>Tuple：一次消息传递的基本单元。本来应该是一个key-value的map，但是由于各个组件间传递的tuple的字段名称已经事先定义好，所以tuple中只要按序填入各个value就行了，所以就是一个value list.</li>
+<li>Stream：源源不断传递的tuple就组成了stream。</li>
+</ul>
+<h3 id="Storm-Detail"><a href="#Storm-Detail" class="headerlink" title="Storm Detail"></a>Storm Detail</h3><p>在Storm的集群里面有两种节点： 控制节点(master node)和工作节点(worker node)。控制节点上面运行一个叫Nimbus后台程序，它的作用类似Hadoop里面的JobTracker。Nimbus负责在集群里面分发代码，分配计算任务给机器，并且监控状态。<br>每一个工作节点上面运行一个叫做Supervisor的节点。Supervisor会监听分配给它那台机器的工作，根据需要启动/关闭工作进程。每一个工作进程执行一个topology的一个子集；一个运行的topology由运行在很多机器上的很多工作进程组成。<br><img src="/images/Storm1.png" alt="">  <img src="/images/Storm2.jpg" alt="">  <img src="/images/Storm3.png" alt=""></p>
+<ul>
+<li>Storm提供的最基本的处理stream的原语是spout和bolt。你可以实现spout和bolt提供的接口来处理你的业务逻辑。</li>
+<li>消息源spout是Storm里面一个topology里面的消息生产者。一般来说消息源会从一个外部源读取数据并且向topology里面发出消息：tuple。Spout可以是可靠的也可以是不可靠的。如果这个tuple没有被storm成功处理，可靠的消息源spouts可以重新发射一个tuple， 但是不可靠的消息源spouts一旦发出一个tuple就不能重发了。</li>
+<li>消息源可以发射多条消息流stream。使用OutputFieldsDeclarer.declareStream来定义多个stream，然后使用SpoutOutputCollector来发射指定的stream。</li>
+<li>Spout类里面最重要的方法是nextTuple。要么发射一个新的tuple到topology里面或者简单的返回如果已经没有新的tuple。要注意的是nextTuple方法不能阻塞，因为storm在同一个线程上面调用所有消息源spout的方法。</li>
+<li>另外两个比较重要的spout方法是ack和fail。storm在检测到一个tuple被整个topology成功处理的时候调用ack，否则调用fail。storm只对可靠的spout调用ack和fail。</li>
+<li>所有的消息处理逻辑被封装在bolts里面。Bolts可以做很多事情：过滤，聚合，查询数据库等等。</li>
+<li>Bolts可以简单的做消息流的传递。复杂的消息流处理往往需要很多步骤，从而也就需要经过很多bolts。比如算出一堆图片里面被转发最多的图片就至少需要两步：第一步算出每个图片的转发数量。第二步找出转发最多的前10个图片。(如果要把这个过程做得更具有扩展性那么可能需要更多的步骤)。</li>
+<li>Bolts可以发射多条消息流， 使用OutputFieldsDeclarer.declareStream定义stream，使用OutputCollector.emit来选择要发射的stream。</li>
+<li>Bolts的主要方法是execute, 它以一个tuple作为输入，bolts使用OutputCollector来发射tuple，bolts必须要为它处理的每一个tuple调用OutputCollector的ack方法，以通知Storm这个tuple被处理完成了，从而通知这个tuple的发射者spouts。 一般的流程是： bolts处理一个输入tuple, 发射0个或者多个tuple, 然后调用ack通知storm自己已经处理过这个tuple了。storm提供了一个IBasicBolt会自动调用ack。</li>
+<li>定义一个topology的其中一步是定义每个bolt接收什么样的流作为输入。stream grouping就是用来定义一个stream应该如果分配数据给bolts上面的多个tasks。</li>
+</ul>
+<h3 id="Storm里面有7种类型的stream-grouping"><a href="#Storm里面有7种类型的stream-grouping" class="headerlink" title="Storm里面有7种类型的stream grouping"></a>Storm里面有7种类型的stream grouping</h3><ul>
+<li>　　Shuffle Grouping: 随机分组， 随机派发stream里面的tuple，保证每个bolt接收到的tuple数目大致相同。</li>
+<li>　　Fields Grouping：按字段分组， 比如按userid来分组， 具有同样userid的tuple会被分到相同的Bolts里的一个task， 而不同的userid则会被分配到不同的bolts里的task。</li>
+<li>　　All Grouping：广播发送，对于每一个tuple，所有的bolts都会收到。</li>
+<li>　　Global Grouping：全局分组， 这个tuple被分配到storm中的一个bolt的其中一个task。再具体一点就是分配给id值最低的那个task。</li>
+<li>　　Non Grouping：不分组，这个分组的意思是说stream不关心到底谁会收到它的tuple。目前这种分组和Shuffle grouping是一样的效果， 有一点不同的是storm会把这个bolt放到这个bolt的订阅者同一个线程里面去执行。</li>
+<li>　　Direct Grouping： 直接分组， 这是一种比较特别的分组方法，用这种分组意味着消息的发送者指定由消息接收者的哪个task处理这个消息。 只有被声明为Direct Stream的消息流可以声明这种分组方法。而且这种消息tuple必须使用emitDirect方法来发射。消息处理者可以通过TopologyContext来获取处理它的消息的task的id (OutputCollector.emit方法也会返回task的id)。</li>
+<li>　　Local or shuffle grouping：如果目标bolt有一个或者多个task在同一个工作进程中，tuple将会被随机发生给这些tasks。否则，和普通的Shuffle Grouping行为一致。</li>
+</ul>
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      <a href="/Storm介绍/" class="archive-article-date">
+  	<time datetime="2016-11-08T12:27:38.000Z" itemprop="datePublished"><i class="icon-clock"></i>2016-11-08</time>
+</a>
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags"></i>
+		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/大数据/">大数据</a></li></ul>
+	</div>
+
+      
+	<div class="article-category tagcloud">
+	<i class="icon-price-tags"></i>
+	<a class="article-category-link" href="/categories/bigdata/">bigdata</a>
+	</div>
+
+
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+
+
+
+
+
+
+
+
+
+  
+    <article id="post-Hive" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/Hive/">Hive(数据仓库)</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="Hive-简介"><a href="#Hive-简介" class="headerlink" title="Hive 简介"></a>Hive 简介</h2><p>参考： <a href="https://cwiki.apache.org/confluence/display/Hive/Home" target="_blank" rel="external">https://cwiki.apache.org/confluence/display/Hive/Home</a><br>Apache Hive是一个建立在Hadoop架构之上的数据仓库。它能够提供数据的精炼，查询和分析。Apache Hive起初由Facebook开发。</p>
+<p>hive是基于Hadoop的一个数据仓库工具，可以将结构化的数据文件映射为一张数据库表，并提供简单的SQL查询功能，可以将SQL语句转换为MapReduce任务进行运行。其优点是学习成本低，可以通过类SQL语句快速实现简单的MapReduce统计，不必开发专门的MapReduce应用，十分适合数据仓库的统计分析。</p>
+<ul>
+<li>1.hive是一个数据仓库</li>
+<li>2.hive基于hadoop。</li>
+</ul>
+<h3 id="Hive-安装"><a href="#Hive-安装" class="headerlink" title="Hive 安装"></a>Hive 安装</h3><p>参考： <a href="http://doctuts.readthedocs.io/en/latest/hive.html" target="_blank" rel="external">http://doctuts.readthedocs.io/en/latest/hive.html</a></p>
+<ul>
+<li><p>1.安装hadoop</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">export HADOOP_HOME=/root/hadoop-2.7.3</div><div class="line">export HIVE_HOME=/root/apache-hive-2.1.0-bin</div><div class="line">export PATH=$PATH:$HIVE_HOME/bin</div></pre></td></tr></table></figure>
+</li>
+<li><p>2.启动hadoop hdfs文件系统</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">bin/hdfs   namenode   -format</div><div class="line">sbin/start-all.sh    或者   start-dfs.sh and start-yarn.sh</div></pre></td></tr></table></figure>
+</li>
+<li><p>3.创建文件夹</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">bin/hadoop fs -mkdir /usr/hive/warehouse</div><div class="line">bin/hadoop fs -chmod g+w /usr/hive/warehouse</div></pre></td></tr></table></figure>
+</li>
+<li><p>4.第一次运行hive之前，需要设置schema</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">schematool -initSchema -dbType derby</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>如果已经尝试运行hive出错之后，再去设置schema也会出错，需要做：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">mv  metastore_db  metastore_db.tmp</div></pre></td></tr></table></figure></p>
+<ul>
+<li>5.运行hive<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">hive</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<h3 id="Hive-启动源代码入口："><a href="#Hive-启动源代码入口：" class="headerlink" title="Hive 启动源代码入口："></a>Hive 启动源代码入口：</h3><p>bin/hive  —&gt;  hive script中会执行  bin/ext/*.sh, 以及 bin/ext/util/*.sh 命令<br>SERVICE_LIST 变量 在bin/ext/*.sh 中增加value；<br>SERVICE 变量在启动命令时 赋值； 默认   SERVICE=”cli”</p>
+<p><img src="/images/Hive_Code_1.png" alt=""> <img src="/images/Hive_Code_2.png" alt=""></p>
+<p>—&gt;   execHiveCmd 启动 java 源代码的入口               org.apache.hive.beeline.cli.HiveCli   或者   org.apache.hadoop.hive.cli.CliDriver</p>
+<h3 id="Hive-vs-HBase"><a href="#Hive-vs-HBase" class="headerlink" title="Hive vs HBase"></a>Hive vs HBase</h3><p>共同点：</p>
+<ul>
+<li>1.hbase与hive都是架构在hadoop之上的。都是用hadoop作为底层存储</li>
+</ul>
+<p>区别：</p>
+<ul>
+<li>1.Hive是建立在Hadoop之上为了减少MapReduce jobs编写工作的批处理系统，HBase是为了支持弥补Hadoop对实时操作的缺陷的项目 。</li>
+<li>2.想象你在操作RMDB数据库，如果是全表扫描，就用Hive+Hadoop,如果是索引访问，就用HBase+Hadoop 。</li>
+<li>3.Hive query就是MapReduce jobs可以从5分钟到数小时不止，HBase是非常高效的，肯定比Hive高效的多。</li>
+<li>4.Hive本身不存储和计算数据，它完全依赖于HDFS和MapReduce，Hive中的表纯逻辑。</li>
+<li>5.hive借用hadoop的MapReduce来完成一些hive中的命令的执行</li>
+<li>6.hbase是物理表，不是逻辑表，提供一个超大的内存hash表，搜索引擎通过它来存储索引，方便查询操作。</li>
+<li>7.hbase是列存储。</li>
+<li>8.hdfs作为底层存储，hdfs是存放文件的系统，而Hbase负责组织文件。</li>
+<li>9.hive需要用到hdfs存储文件，需要用到MapReduce计算框架。</li>
+</ul>
+<h3 id="improt-Hive源代码到Eclipse里面："><a href="#improt-Hive源代码到Eclipse里面：" class="headerlink" title="improt Hive源代码到Eclipse里面："></a>improt Hive源代码到Eclipse里面：</h3><ul>
+<li><ol>
+<li>mvn clean install -DskipTests</li>
+</ol>
+</li>
+<li><ol>
+<li>mvn eclipse:eclipse -DdownloadSources -DdownloadJavadocs</li>
+</ol>
+</li>
+</ul>
+<h3 id="Hive-知识范围"><a href="#Hive-知识范围" class="headerlink" title="Hive 知识范围"></a>Hive 知识范围</h3><p><img src="/images/Hive_Related.png" alt=""></p>
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      <a href="/Hive/" class="archive-article-date">
+  	<time datetime="2016-11-08T09:51:43.000Z" itemprop="datePublished"><i class="icon-clock"></i>2016-11-08</time>
+</a>
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags"></i>
+		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/大数据/">大数据</a></li></ul>
+	</div>
+
+      
+	<div class="article-category tagcloud">
+	<i class="icon-price-tags"></i>
+	<a class="article-category-link" href="/categories/bigdata/">bigdata</a>
+	</div>
+
+
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+
+
+
+
+
+
+
+
+
+  
     <article id="post-HBase" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -1006,6 +1207,63 @@
 
 
   
+    <article id="post-personal-profile" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/personal-profile/">介绍</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>欢迎浏览 <a href="https://sstar1314.github.io/" target="_blank" rel="external">SStar1314</a>! 我的个人博客. 以及 <a href="https://github.com/SStar1314/" target="_blank" rel="external">SStar1314</a>，我的github主页. 我的主页开通于2016年11月，一直想写点什么，两年多的时间，在Evernote上记录很多自己研究的东西，一直想开通一个博客，把Evernote上的东西搬上来，顺道梳理一下以前的知识点.</p>
+<h3 id="个人关心的方向或技术"><a href="#个人关心的方向或技术" class="headerlink" title="个人关心的方向或技术"></a>个人关心的方向或技术</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">OpenStack云计算框架: Keystone／Nova／Neutron／Glance／Cinder／Swift／Ironic</div><div class="line">	Keystone: RabbitMQ,Qpid,AMQP(Producer+Consumer+Exchange+Queue)</div><div class="line">	Nova: nova-scheduler,nova-compute,虚拟化</div><div class="line">	Neutron: OVS,Linux Bridge,vlan,vxlan,gre.</div><div class="line">		Provider network ---- Self-defined network</div><div class="line">虚拟化: KVM／Xen</div><div class="line">大数据: Headoop／Spark</div><div class="line">	Headoop: MapReduce,HDFS,Yarn,Hbase,Hive,Storm. Hadoop1.x vs 2.x</div><div class="line">	Spark: RDD,Spark-shell,Spark SQL,Spark Streaming,MLlib,GraphX</div><div class="line">NoSQL: HBase, Cassandra, MongoDB, Redis</div><div class="line">容器化: Docker, Kubernetes, rkt, CoreOS</div><div class="line">数据中心操作系统: DCOS, Mesos, Marathon, Chronos</div><div class="line">分布式协同: ZooKeeper, etcd</div><div class="line">其它: Kafka, Elastic Search, Logstash</div></pre></td></tr></table></figure>
+<p>More info: <a href="https://github.com/SStar1314/" target="_blank" rel="external">我的github主页</a></p>
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      <a href="/personal-profile/" class="archive-article-date">
+  	<time datetime="2016-11-07T02:31:11.000Z" itemprop="datePublished"><i class="icon-clock"></i>2016-11-07</time>
+</a>
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags"></i>
+		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/介绍/">介绍</a></li></ul>
+	</div>
+
+      
+	<div class="article-category tagcloud">
+	<i class="icon-price-tags"></i>
+	<a class="article-category-link" href="/categories/介绍/">介绍</a>
+	</div>
+
+
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+
+
+
+
+
+
+
+
+
+  
     <article id="post-大数据" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -1049,63 +1307,6 @@
 	<div class="article-category tagcloud">
 	<i class="icon-price-tags"></i>
 	<a class="article-category-link" href="/categories/bigdata/">bigdata</a>
-	</div>
-
-
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-
-
-
-
-
-
-
-
-
-  
-    <article id="post-personal-profile" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <input type="hidden" class="isFancy" />
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/personal-profile/">介绍</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>欢迎浏览 <a href="https://sstar1314.github.io/" target="_blank" rel="external">SStar1314</a>! 我的个人博客. 以及 <a href="https://github.com/SStar1314/" target="_blank" rel="external">SStar1314</a>，我的github主页. 我的主页开通于2016年11月，一直想写点什么，两年多的时间，在Evernote上记录很多自己研究的东西，一直想开通一个博客，把Evernote上的东西搬上来，顺道梳理一下以前的知识点.</p>
-<h3 id="个人关心的方向或技术"><a href="#个人关心的方向或技术" class="headerlink" title="个人关心的方向或技术"></a>个人关心的方向或技术</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">OpenStack云计算框架: Keystone／Nova／Neutron／Glance／Cinder／Swift／Ironic</div><div class="line">	Keystone: RabbitMQ,Qpid,AMQP(Producer+Consumer+Exchange+Queue)</div><div class="line">	Nova: nova-scheduler,nova-compute,虚拟化</div><div class="line">	Neutron: OVS,Linux Bridge,vlan,vxlan,gre.</div><div class="line">		Provider network ---- Self-defined network</div><div class="line">虚拟化: KVM／Xen</div><div class="line">大数据: Headoop／Spark</div><div class="line">	Headoop: MapReduce,HDFS,Yarn,Hbase,Hive,Storm. Hadoop1.x vs 2.x</div><div class="line">	Spark: RDD,Spark-shell,Spark SQL,Spark Streaming,MLlib,GraphX</div><div class="line">NoSQL: HBase, Cassandra, MongoDB, Redis</div><div class="line">容器化: Docker, Kubernetes, rkt, CoreOS</div><div class="line">数据中心操作系统: DCOS, Mesos, Marathon, Chronos</div><div class="line">分布式协同: ZooKeeper, etcd</div><div class="line">其它: Kafka, Elastic Search, Logstash</div></pre></td></tr></table></figure>
-<p>More info: <a href="https://github.com/SStar1314/" target="_blank" rel="external">我的github主页</a></p>
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      <a href="/personal-profile/" class="archive-article-date">
-  	<time datetime="2016-11-07T02:31:11.000Z" itemprop="datePublished"><i class="icon-clock"></i>2016-11-07</time>
-</a>
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags"></i>
-		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/介绍/">介绍</a></li></ul>
-	</div>
-
-      
-	<div class="article-category tagcloud">
-	<i class="icon-price-tags"></i>
-	<a class="article-category-link" href="/categories/介绍/">介绍</a>
 	</div>
 
 
@@ -1205,7 +1406,7 @@ MathJax.Hub.Queue(function() {
     
     	<section class="tools-section tools-section-tag">
     			<div class="widget tagcloud" id="js-tagcloud">
-    				<a href="/tags/Cassandra/" style="font-size: 10px;">Cassandra</a> <a href="/tags/Docker/" style="font-size: 10px;">Docker</a> <a href="/tags/Hadoop/" style="font-size: 20px;">Hadoop</a> <a href="/tags/JVM/" style="font-size: 10px;">JVM</a> <a href="/tags/Kafka/" style="font-size: 12.5px;">Kafka</a> <a href="/tags/Libvirt/" style="font-size: 10px;">Libvirt</a> <a href="/tags/Linux/" style="font-size: 12.5px;">Linux</a> <a href="/tags/Linux-Networking-Internals/" style="font-size: 15px;">Linux Networking Internals</a> <a href="/tags/Linux-Source-Code/" style="font-size: 10px;">Linux Source Code</a> <a href="/tags/Linux-Special-File-System/" style="font-size: 10px;">Linux Special File System</a> <a href="/tags/Maven/" style="font-size: 10px;">Maven</a> <a href="/tags/NoSQL/" style="font-size: 10px;">NoSQL</a> <a href="/tags/QEMU/" style="font-size: 10px;">QEMU</a> <a href="/tags/Spark/" style="font-size: 15px;">Spark</a> <a href="/tags/ZooKeeper/" style="font-size: 12.5px;">ZooKeeper</a> <a href="/tags/etcd/" style="font-size: 10px;">etcd</a> <a href="/tags/lxc/" style="font-size: 10px;">lxc</a> <a href="/tags/lxcfs/" style="font-size: 10px;">lxcfs</a> <a href="/tags/介绍/" style="font-size: 10px;">介绍</a> <a href="/tags/分布式协同/" style="font-size: 10px;">分布式协同</a> <a href="/tags/大数据/" style="font-size: 17.5px;">大数据</a>
+    				<a href="/tags/Cassandra/" style="font-size: 10px;">Cassandra</a> <a href="/tags/Docker/" style="font-size: 10px;">Docker</a> <a href="/tags/Hadoop/" style="font-size: 20px;">Hadoop</a> <a href="/tags/JVM/" style="font-size: 10px;">JVM</a> <a href="/tags/Kafka/" style="font-size: 12.5px;">Kafka</a> <a href="/tags/Libvirt/" style="font-size: 10px;">Libvirt</a> <a href="/tags/Linux/" style="font-size: 12.5px;">Linux</a> <a href="/tags/Linux-Networking-Internals/" style="font-size: 15px;">Linux Networking Internals</a> <a href="/tags/Linux-Source-Code/" style="font-size: 10px;">Linux Source Code</a> <a href="/tags/Linux-Special-File-System/" style="font-size: 10px;">Linux Special File System</a> <a href="/tags/Maven/" style="font-size: 10px;">Maven</a> <a href="/tags/Mesos/" style="font-size: 10px;">Mesos</a> <a href="/tags/NoSQL/" style="font-size: 10px;">NoSQL</a> <a href="/tags/QEMU/" style="font-size: 10px;">QEMU</a> <a href="/tags/Spark/" style="font-size: 15px;">Spark</a> <a href="/tags/ZooKeeper/" style="font-size: 12.5px;">ZooKeeper</a> <a href="/tags/etcd/" style="font-size: 10px;">etcd</a> <a href="/tags/kubernetes/" style="font-size: 10px;">kubernetes</a> <a href="/tags/lxc/" style="font-size: 10px;">lxc</a> <a href="/tags/lxcfs/" style="font-size: 10px;">lxcfs</a> <a href="/tags/介绍/" style="font-size: 10px;">介绍</a> <a href="/tags/分布式协同/" style="font-size: 10px;">分布式协同</a> <a href="/tags/大数据/" style="font-size: 17.5px;">大数据</a>
     			</div>
     	</section>
     
